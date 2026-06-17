@@ -28,6 +28,10 @@ markdown + frontmatter). **Empezá por [`knowledge/index.md`](knowledge/index.md
 solo a los conceptos que necesites — no cargues todo. Si una decisión o convención no
 está clara, leé el concepto o **preguntale al usuario**; no asumas.
 
+**Si un concepto contradice el código, gana el código** — el concepto es un bug;
+arreglalo (no al revés). El conocimiento captura el *por qué*; el *qué* se deduce del
+código, así que linkealo en vez de copiarlo (un número a mano = drift).
+
 ## 2. Mientras trabajás — mantené el contexto vivo (el trato)
 
 **Cuándo:** si tomás/descubrís una **decisión** no trivial, cambia la **arquitectura o el
@@ -45,8 +49,9 @@ memoria privada de la herramienta).
    markdown (para decisiones: Contexto / Decisión / Consecuencias).
 3. **Actualizá los índices:** agregá la entrada al `index.md` de esa carpeta — en una
    **hoja** va bajo un heading `# {type}`, en la **raíz** bajo `# Subdirectories`
-   (`* [Título](archivo.md) - <description>`) — y una línea a `knowledge/log.md` bajo la
-   fecha de hoy (`## YYYY-MM-DD`). Si fuera una regla dura nueva, sumala también acá arriba.
+   (`* [Título](archivo.md) - <description>`) — y, **si mantenés `log.md`**, una línea
+   bajo la fecha de hoy (`## YYYY-MM-DD`); si no, el log es git + `decisions/`. Si fuera
+   una regla dura nueva, sumala también acá arriba.
 
 **Guardrails:** capturá el **por qué**, no el qué (lo que se deduce del código, **linkealo**,
 no lo copies); **no dupliques** (una verdad, un archivo); **cross-links relativos**

@@ -47,14 +47,28 @@ Si lo que cambió ya se deduce leyendo el código, **no lo dupliques**: linkealo
 4. **Actualizá el `index.md`** del directorio: en una carpeta **hoja**, la entrada va
    bajo un heading `# {type}`; en la **raíz**, bajo `# Subdirectories`. Cada entrada es
    `* [Título](archivo.md) - <description del frontmatter>`.
-5. **Agregá una línea a `knowledge/log.md`** bajo la fecha de hoy
+5. **Si mantenés `log.md`**, agregá una línea bajo la fecha de hoy
    (`## YYYY-MM-DD`), ej: `* **Update**: <qué cambió> ([link](decisions/0007-x.md)).`
-   (link **relativo al archivo** desde la raíz del bundle, nunca con `/`).
+   (link **relativo al archivo**, nunca con `/`). Si tu log es git + `decisions/`, saltá esto.
 6. **Si una regla dura cambió**, reflejala también en `AGENTS.md` (mantenelo chico).
+
+# Deprecar o reemplazar algo
+
+El conocimiento viejo no se borra a las apuradas ni se edita "para darlo de baja":
+
+- **Reemplazar una decisión:** creá una decisión **nueva** (`status: accepted`) con
+  `supersedes: NNNN`, y poné en la vieja `status: "superseded by MMMM"`. Así queda el
+  camino de migración, no un agujero.
+- **Deprecar un concepto:** movélo a `knowledge/archive/` o marcá arriba
+  `SUPERSEDED → ver <link>`. **Nombrá explícito el concepto viejo** (el término, la
+  flag, la clase) para que un `grep` futuro lo encuentre.
 
 # Reglas
 
-- **No dupliques.** Una verdad, un archivo. Si está en el código, linkealo.
+- **No dupliques.** Una verdad, un archivo. Si está en el código, linkealo (un número
+  a mano = drift garantizado).
+- **Gana el código.** Si un concepto contradice la fuente (código/schema/datos), el
+  concepto es el bug — corregilo o deprecalo, no al revés.
 - **Capturá el por qué**, no el qué.
 - **Una `description` de una sola frase** — se usa verbatim en los `index.md`.
 - **No inventes.** Si no sabés el porqué de algo, preguntale al usuario antes de

@@ -70,6 +70,12 @@ class Linter:
         rel = "." if path == self.bundle else str(path.relative_to(self.bundle))
         self.issues.append((sev, rel, line, msg))
 
+    def _ignored(self, p: Path) -> bool:
+        """True si p está dentro de (o es) algo con prefijo '_': plantillas/borradores
+        (`_concept.md`) y carpetas derivadas o efímeras (`_generated/`, `_scratchpad.md`).
+        El linter no los trata como conceptos del bundle conforme."""
+        return any(part.startswith("_") for part in p.relative_to(self.bundle).parts)
+
     # ---- frontmatter ----
     @staticmethod
     def split_fm(text: str):
@@ -236,6 +242,8 @@ class Linter:
             if p.is_dir():
                 dirs.add(p)
         for d in sorted(dirs):
+            if self._ignored(d):
+                continue  # carpeta con prefijo '_' (derivada/efímera): fuera del bundle conforme
             if not any(True for _ in d.rglob("*.md")):
                 self.add("WARN", d, 0, "carpeta vacía (sin conceptos)")
                 continue
@@ -272,14 +280,14 @@ class Linter:
             print(f"okf_lint: no se encontraron .md bajo '{self.bundle}'", file=sys.stderr)
             return 2
         for p in md_files:
+            if self._ignored(p):
+                continue  # plantilla/borrador o carpeta '_' (p.ej. _generated/): no es un concepto
             if p.name in RESERVED:
                 if p.name == "index.md":
                     self.check_index(p, is_root=(p.parent == self.bundle))
                 elif p.name == "log.md":
                     self.check_log(p)
                 continue
-            if p.name.startswith("_"):
-                continue  # plantilla/borrador (prefijo '_'): no es un concepto
             self.check_concept(p)
         self.check_dirs()
         self.check_navigable()

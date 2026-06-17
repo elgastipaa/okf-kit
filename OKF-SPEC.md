@@ -51,6 +51,10 @@ knowledge/
 
 Cualquier otro `.md` es un concepto.
 
+**Prefijo `_`:** los archivos y carpetas que empiezan con `_` (p.ej. la plantilla
+`_concept.md`, un `_generated/` con hechos derivados del código, un `_scratchpad.md`
+efímero) **no son conceptos** del bundle — el linter los ignora.
+
 ---
 
 ## 3. Documentos de concepto
@@ -94,6 +98,12 @@ timestamp: <ISO 8601>              # Opcional — última modificación signific
 **Extensiones:** podés agregar cualquier clave. Los consumidores DEBEN preservar
 claves desconocidas y NO DEBEN rechazar documentos por campos no reconocidos.
 
+**Frescura (opcional, para references que espejan código):** una página que refleja
+el estado del código puede declarar `verified_against: "<commit-corto>"` y
+`source_of_truth: code | doc` — contra qué commit se verificó y quién manda si
+difieren. Equivale a un header de frescura en el cuerpo
+(`> Verificado contra <commit> · <fecha> · Fuente: código`).
+
 **Gotcha YAML:** si un valor contiene `:` (p.ej. una `description` con dos puntos),
 **entrecomillalo** (`description: "a: b"`) o el YAML lo parsea como un mapping y se rompe.
 
@@ -136,6 +146,24 @@ Todo email transaccional se encola y lo procesa un worker. Ver el
 Hay latencia de hasta ~30s en la entrega. Aceptable para transaccionales.
 No usar esto para OTPs de login (ver [auth](../domain/auth.md)).
 ```
+
+### 3.4 Frescura: una sola verdad, y la fuente gana
+
+Cada hecho vive en **un solo lugar**. Si un concepto describe algo que *también*
+está en el código (schema, datos, config), la fuente es el código: cuando el
+concepto y el código se contradicen, **gana el código** — el concepto es un bug,
+arreglalo. Por eso, al escribir:
+
+- **¿El hecho vive en el código?** (conteos, flags, rutas, nombres de modelos,
+  tunings) → **no lo transcribas a prosa** — un número a mano es drift garantizado.
+  **Linkealo** (`resource` o un link al archivo) o derivalo. Para hechos volátiles
+  derivados del código, algunos proyectos mantienen un `_generated/` (regenerado por
+  un script propio; el linter lo ignora, ver §2).
+- **¿NO vive en el código?** (el *por qué*, la intención de diseño, el roadmap) →
+  ahí el concepto **es** la fuente; autoralo bien.
+
+Los conceptos describen el **estado presente**, no historial ni planes (eso es
+`log.md` / `decisions/`). Sin checkboxes de progreso.
 
 ---
 
@@ -233,6 +261,10 @@ fecha, más nuevas primero:
 
 Las fechas DEBEN ser ISO 8601 `YYYY-MM-DD`. La palabra en negrita inicial
 (`**Update**`, `**Creation**`, `**Deprecation**`…) es convención, no requisito.
+
+> **¿Lo necesitás?** En un repo bajo git, el historial **ya es `git log` + las
+> `decisions/` (ADRs)**. Muchos proyectos no mantienen `log.md` y está perfecto —
+> elegí uno: o un `log.md` curado, o git + ADRs como tu log. No dupliques ambos.
 
 ---
 

@@ -78,6 +78,9 @@ No es pass/fail; son **smells** que bajan el valor del bundle. Reportá los que 
   lo que se lee del código/schema sin agregar intención, decisión ni caveat.
 - **¿Duplica la fuente?** Smell: bloques de código/schema copiados en vez de
   linkeados con `resource`. Lo deducible de la fuente se linkea, no se copia.
+- **¿Algún concepto contradice el código?** Smell **grave**: un dato del bundle (un
+  conteo, una flag, una ruta, un nombre) que ya no coincide con la fuente. **Gana el
+  código** — el concepto es un bug. Suele venir de transcribir en vez de linkear.
 - **¿Es un grafo o solo un árbol?** Smell: conceptos huérfanos, sin cross-links
   entrantes ni salientes. Los conceptos relacionados deberían linkearse entre sí.
 - **¿Progressive disclosure real?** Smell: `AGENTS.md` o los `index.md` enormes; o

@@ -10,6 +10,9 @@ description: {{Una frase con el dato clave a recordar.}}
 resource: {{URL canónica de la doc externa}}
 tags: [{{framework/sistema}}, {{gotcha}}]
 timestamp: {{YYYY-MM-DDTHH:MM:SSZ}}
+# Opcional, si esta página espeja el estado del código (descomentá lo que uses):
+# verified_against: "<commit-corto>"   # contra qué commit la verificaste
+# source_of_truth: code                # code | doc — quién manda si difieren
 ---
 
 {{El resumen útil: qué hay que saber, el gotcha, el comportamiento no obvio. Lo

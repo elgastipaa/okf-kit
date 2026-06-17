@@ -34,6 +34,12 @@ Reglas de nombres y `tags` (todos los perfiles):
 - **Frontmatter:** las claves (`type` requerido; `title`/`description`/`timestamp`/`tags`/
   `resource` recomendadas) están en `OKF-SPEC.md §3.1`. Entrecomillá valores con `:`.
 
+**Hechos que viven en el código (cualquier perfil):** conteos, flags, rutas, nombres de
+modelos, tunings — **no los transcribas a prosa** (un número a mano = drift). Linkealos
+(`resource`) o, si los querés versionados, derivalos con un script propio a una carpeta
+**`_generated/`** (el linter la ignora; vos la regenerás y un check de CI avisa si quedó
+vieja). El bundle autorado captura el *por qué*; los hechos del código se derivan, no se copian.
+
 ---
 
 ## Perfil: Código / Software

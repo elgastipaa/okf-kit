@@ -1,5 +1,6 @@
 ---
 type: Decision
+status: accepted
 title: El bundle en git es la fuente de verdad, no la memoria de la herramienta
 description: La memoria privada de la IA es un atajo personal; la verdad vive en knowledge/ versionado.
 resource: ../../README.md

@@ -10,6 +10,39 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.5.0 — 2026-06-17
+
+### Agregado — buenas prácticas cosechadas de un sistema de contexto real
+Tras investigar la "LLM-Wiki" de un repo real (the-conclave) —un sistema de contexto
+maduro, equivalente a OKF y en partes más avanzado— se incorporaron sus mejores ideas:
+
+- **Regla "gana el código" (staleness):** si un concepto contradice la fuente
+  (código/schema/datos), el concepto es un bug — se arregla, no al revés. En `OKF-SPEC.md`
+  (nueva §3.4), el contrato `templates/AGENTS.md`, `okf-update` y `reference/verification.md`
+  (nuevo smell **grave**).
+- **Ciclo de deprecación** (gap que la revisión en frío ya había marcado): `_decision.md`
+  suma `status` (`proposed`/`accepted`/`superseded by NNNN`) + `supersedes`; `okf-update` y
+  `reference/maintaining.md` documentan el procedimiento (decisión nueva que *supersedes* a
+  la vieja, mover a `archive/` o marcar `SUPERSEDED`, **nombrar el concepto viejo** para grep).
+- **"No transcribas hechos del código"** afilado: clasificación in-code vs *por qué*, el
+  framing "un número a mano = drift", y el patrón opcional **`_generated/`** (hechos volátiles
+  derivados del código por un script propio). En §3.4 y `reference/profiles.md`.
+- **Header de frescura** opcional en references (`verified_against`, `source_of_truth`) —
+  `OKF-SPEC.md` §3.1 y `templates/knowledge/_reference.md`.
+- **"Concepto = estado presente"** (no historial ni planes; sin checkboxes) — §3.4.
+- **`log.md` des-enfatizado a claramente opcional:** en un repo bajo git, `git log` + las
+  `decisions/` cumplen su función. `OKF-SPEC.md` §6, `GUIDE.md`, `templates/AGENTS.md`,
+  `okf-update`, `maintaining.md`.
+- **Scratchpad efímero** (`knowledge/_scratchpad.md`) para tareas multi-sesión — `maintaining.md`.
+
+### Cambiado — linter
+- `okf_lint.py` ahora ignora **archivos y carpetas con prefijo `_`** (no solo archivos):
+  habilita `_generated/` y `_scratchpad.md`. Verificado: el dogfood sigue 0/0 y un `.md`
+  normal sin frontmatter sigue dando ERROR.
+
+### Dogfood
+- Las `decisions/` del propio bundle adoptan el nuevo `status: accepted`.
+
 ## 0.4.3 — 2026-06-17
 
 ### Arreglado — pre-commit hook seguro + 2 falsos positivos

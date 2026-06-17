@@ -151,10 +151,12 @@ Generá un `index.md` en la raíz del bundle y en cada subcarpeta. Convención
 
 Esto es lo que deja a un agente navegar sin cargar todo el bundle.
 
-### Paso 4 — `log.md`
+### Paso 4 — `log.md` (opcional)
 
-Inicializá `knowledge/log.md` con una entrada de hoy (fecha ISO `YYYY-MM-DD`)
-marcando la creación del bundle. Formato en `OKF-SPEC.md` §6.
+Si vas a llevar un log curado, inicializá `knowledge/log.md` con una entrada de hoy
+(fecha ISO `YYYY-MM-DD`) marcando la creación del bundle (formato en `OKF-SPEC.md` §6).
+**En un repo bajo git podés saltarlo:** el historial ya son `git log` + las `decisions/`.
+Elegí uno; no dupliques ambos.
 
 ### Paso 5 — Entrypoint (adaptá a cómo se va a consumir el repo)
 

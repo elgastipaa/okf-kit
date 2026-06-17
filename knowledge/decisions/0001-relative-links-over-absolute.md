@@ -1,5 +1,6 @@
 ---
 type: Decision
+status: accepted
 title: Los cross-links son relativos al archivo, no absolutos al bundle
 description: Se usan links relativos (../x.md) porque los absolutos (/x.md) rompen en GitHub.
 resource: ../../OKF-SPEC.md

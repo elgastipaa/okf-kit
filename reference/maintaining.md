@@ -30,8 +30,28 @@ reglas:
 | Cambia un procedimiento operativo (build/test/deploy/DB) | `knowledge/runbooks/*.md` |
 | Te explican algo que el código no dice y vas a re-necesitar | la carpeta del perfil que toque |
 
-Lo que ya se deduce del código **no** se duplica: se linkea. El procedimiento detallado
-está en `okf-update` (ver abajo "Universalidad").
+Lo que ya se deduce del código **no** se duplica: se linkea (un número a mano = drift).
+El procedimiento detallado está en `okf-update` (ver abajo "Universalidad").
+
+---
+
+## Deprecar y reemplazar (no borres a las apuradas)
+
+El conocimiento superado no se borra ni se edita "para darlo de baja" — eso deja agujeros.
+En cambio:
+
+- **Decisión reemplazada:** decisión **nueva** con `status: accepted` y `supersedes: NNNN`;
+  la vieja pasa a `status: "superseded by MMMM"`. Queda el camino de migración.
+- **Concepto deprecado:** movélo a `knowledge/archive/` o marcá arriba `SUPERSEDED → ver X`.
+  **Nombrá el concepto viejo** (término, flag, clase) para que un `grep` futuro lo encuentre.
+- **Gana el código:** si un concepto ya no coincide con el código, el concepto es el bug —
+  corregilo o deprecalo en el mismo cambio.
+
+## Scratchpad (opcional, para tareas largas)
+
+Para trabajo multi-sesión que tiene que sobrevivir a la compactación del contexto, podés
+mantener un `knowledge/_scratchpad.md` efímero (razonamiento, progreso, dudas). El prefijo
+`_` hace que el linter lo ignore — **no es parte del bundle permanente**; borralo al cerrar.
 
 ---
 
@@ -67,6 +87,7 @@ otra herramienta, ver **`reference/install-per-tool.md`**.
 - Hubo decisiones/cambios recientes que **no** están en `knowledge/` (el hook #3 lo avisa).
 - El **cold test** (Nivel 3) empieza a fallar preguntas sobre features nuevas.
 - Los `index.md` no coinciden con los archivos (el linter lo marca).
+- Un **concepto contradice el código** → gana el código; el concepto es un bug, arreglalo.
 - El bundle creció y cuesta navegarlo → ver `special-cases.md` (cuándo partir).
 
 Regla: el bundle vale **solo si se mantiene**. Una pieza de conocimiento por vez, como

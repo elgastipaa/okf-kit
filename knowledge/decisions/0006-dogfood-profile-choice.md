@@ -1,5 +1,6 @@
 ---
 type: Decision
+status: accepted
 title: Este bundle usa un perfil Mixto para documentar el propio kit
 description: El kit se documenta a sí mismo combinando carpetas de Código y Wiki (perfil Mixto).
 tags: [okf, dogfood, profiles, meta]

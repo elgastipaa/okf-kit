@@ -1,5 +1,6 @@
 ---
 type: Decision
+status: accepted
 title: Consumo permisivo — solo `type` es requisito duro
 description: Al leer, faltantes/type desconocidos/links rotos NO invalidan el bundle; solo type es obligatorio.
 resource: ../../OKF-SPEC.md

@@ -1,5 +1,6 @@
 ---
 type: Decision
+status: accepted
 title: kit_version y okf_version son dos versiones distintas
 description: okf_version versiona el formato; kit_version versiona esta guía+templates+tooling.
 resource: ../../CHANGELOG.md

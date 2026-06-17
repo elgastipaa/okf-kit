@@ -1,5 +1,6 @@
 ---
 type: Decision
+status: accepted
 title: Sin apps externas; vendor-neutral; solo stdlib en el tooling
 description: OKF es markdown + git; el único extra es un linter Python stdlib-only, sin pip ni apps.
 resource: ../../README.md
