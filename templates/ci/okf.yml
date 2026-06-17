@@ -1,0 +1,32 @@
+# OKF conformance check — GitHub Actions.
+#
+# Copiá este archivo a `.github/workflows/okf.yml` en el repo destino.
+# Corre el linter (okf_lint.py) en cada push/PR. Es Python puro: CERO tokens,
+# cero LLM — solo valida estructura. GitHub Actions es gratis (ilimitado en repos
+# públicos; ~2000 min/mes en privados) y corre en ~1 segundo.
+#
+# NOTA: el test "en frío" (Nivel 3, que usa un agente/LLM y sí consume tokens) NO
+# va acá — ese se corre manual u ocasional, no por push.
+
+name: OKF
+
+on:
+  push:
+    paths: ["knowledge/**", "scripts/okf_lint.py", ".github/workflows/okf.yml"]
+  pull_request:
+    paths: ["knowledge/**", "scripts/okf_lint.py", ".github/workflows/okf.yml"]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      # Default: bloquea SOLO en errores duros (type faltante, links absolutos, YAML
+      # inválido). Coherente con OKF: un link a un concepto aún no escrito es WARN, no
+      # error, y no debe romper el build. Agregá --strict solo si querés un CI estricto
+      # que también falle con warnings (links rotos, defaults faltantes, etc.).
+      - name: okf_lint
+        run: python3 scripts/okf_lint.py knowledge

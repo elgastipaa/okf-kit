@@ -1,0 +1,43 @@
+#!/bin/sh
+# OKF pre-commit hook — enforcement UNIVERSAL (corre con cualquier herramienta o IA,
+# porque es a nivel git, no de un vendor).
+#
+# Instalación (elegí una):
+#   cp templates/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+#   # — o, versionable en el repo —
+#   mkdir -p .githooks && cp templates/hooks/pre-commit .githooks/ && chmod +x .githooks/pre-commit
+#   git config core.hooksPath .githooks
+#
+# Hace dos cosas:
+#   1) Conformidad (BLOQUEA el commit): linta el contenido STAGED de knowledge/.
+#   2) Frescura (solo AVISA): si cambió código pero knowledge/ no, lo recuerda.
+# Para saltarlo puntualmente: git commit --no-verify
+
+BUNDLE="knowledge"
+[ -d "$BUNDLE" ] || exit 0
+
+# --- 1. Conformidad sobre lo STAGED (bloqueante) ---
+# Copiamos SOLO el contenido staged de knowledge/ a un tempdir y linteamos ahí. El
+# working-tree NO se toca (nada de `git stash` → cero riesgo de corromper archivos
+# con partial-staging). Se valida exactamente lo que se va a commitear.
+if command -v python3 >/dev/null 2>&1 && [ -f scripts/okf_lint.py ]; then
+  tmp=$(mktemp -d)
+  trap 'rm -rf "$tmp"' EXIT
+  git ls-files -- "$BUNDLE" | git checkout-index --prefix="$tmp/" -f --stdin 2>/dev/null
+  if [ -d "$tmp/$BUNDLE" ] && ! python3 scripts/okf_lint.py "$tmp/$BUNDLE"; then
+    echo "OKF: el bundle staged no es conforme (ver arriba). Corregí, o 'git commit --no-verify' para saltar." >&2
+    exit 1
+  fi
+else
+  echo "OKF: chequeo de conformidad omitido (sin python3 o sin scripts/okf_lint.py)." >&2
+fi
+
+# --- 2. Frescura (aviso, no bloquea) ---
+staged=$(git diff --cached --name-only)
+echo "$staged" | grep -qE "^$BUNDLE/" && bundle_changed=yes || bundle_changed=no
+echo "$staged" | grep -vE "(^$BUNDLE/|\.md$)" | grep -q . && code_changed=yes || code_changed=no
+if [ "$code_changed" = yes ] && [ "$bundle_changed" = no ]; then
+  echo "OKF: cambió código pero knowledge/ no se tocó. ¿Este cambio amerita actualizar el" >&2
+  echo "     contexto (una decisión, un cambio de schema, un gotcha)? Si sí: usá okf-update." >&2
+fi
+exit 0

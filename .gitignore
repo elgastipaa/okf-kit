@@ -1,0 +1,6 @@
+# Artefactos de Python (los scripts son stdlib; nada de esto debe versionarse)
+__pycache__/
+*.pyc
+
+# Entornos de test en frío que materializa okf_coldtest.py (si los dejás acá)
+/okf-cold-*/
