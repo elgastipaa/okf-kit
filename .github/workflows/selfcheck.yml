@@ -1,0 +1,22 @@
+name: okf-kit selfcheck
+
+# El gate propio del kit (ver DEVELOPING.md). selfcheck es stdlib-only: lintea el
+# bundle dogfood knowledge/ --strict y verifica la consistencia interna del kit
+# (kit_version == VERSION, tokens keep-alive AGENTS↔okf-update, refs de reference/).
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  selfcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: okf selfcheck
+        run: python3 scripts/okf_selfcheck.py

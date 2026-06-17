@@ -39,6 +39,20 @@ salir **proactivamente**, antes de cada release.
    Después sintetizar (matriz de trazabilidad + findings por severidad). Es el proceso
    que produjo la v0.4.0; usalo como gate antes de un minor/major.
 
+## Enforcement automático (el kit se auto-aplica)
+
+El gate de arriba no depende solo de la memoria del que desarrolla — está cableado:
+
+- **CI** (`.github/workflows/selfcheck.yml`): corre `okf_selfcheck` en cada push y PR.
+  Es la red en el server; habría cazado solas las regresiones que motivaron este doc.
+- **Pre-commit hook** (`.githooks/pre-commit`): corre `okf_selfcheck` antes de cada commit
+  local. Activalo una vez por clon con `git config core.hooksPath .githooks` (salteo de
+  emergencia: `git commit --no-verify`).
+
+Ambos corren el **gate propio del kit** (`selfcheck`), no el template genérico de `templates/`
+(que asume el layout de un repo destino) — el kit se aplica a sí mismo con su propia herramienta,
+igual que the-conclave usa su `wiki:check` y no un OKF importado.
+
 ## Principio anti-deriva
 
 Una **fuente canónica por regla/procedimiento**; el resto **apunta**, no re-escribe
