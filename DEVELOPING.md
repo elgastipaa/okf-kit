@@ -29,7 +29,7 @@ salir **proactivamente**, antes de cada release.
    Si falla, el init no es self-sufficient — arreglalo antes de release.
 
 3. **Cold-review de 4 lentes (para cambios grandes):** lanzar subagentes en frío,
-   independientes y restringidos a `coding/OKF`, con estas lentes:
+   independientes y restringidos a `okf-kit`, con estas lentes:
    - **A — Consistencia:** matriz regla×archivo; ¿el mismo procedimiento coincide en
      todos los lugares donde se afirma? (caza la deriva, p.ej. el bug del index/log).
    - **B — Completitud:** ¿toda referencia/artefacto/flag documentado existe y coincide?
@@ -54,6 +54,6 @@ Si agregás una regla nueva, definila en UN lugar y apuntá desde el resto. El
 
 ## El bundle dogfood `knowledge/`
 
-`coding/OKF/knowledge/` es el kit documentándose a sí mismo en OKF. Es prueba viva de que
+`knowledge/` es el kit documentándose a sí mismo en OKF. Es prueba viva de que
 el init funciona y, de paso, contexto navegable del propio kit. Mantenelo al día con
 `okf-update` cuando el kit cambie (igual que cualquier repo OKF).

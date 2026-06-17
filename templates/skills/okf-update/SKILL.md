@@ -38,7 +38,7 @@ Si lo que cambió ya se deduce leyendo el código, **no lo dupliques**: linkealo
    dominio, un runbook, una reference, una tabla, un artículo? La carpeta y el
    `type` dependen del **perfil** del bundle (código / datos / wiki). Mirá cómo
    está organizado este bundle y seguí esa convención; si está disponible,
-   consultá `coding/OKF/reference/profiles.md`.
+   consultá `reference/profiles.md`.
 2. **Escribí o editá el archivo** en la subcarpeta correcta, con frontmatter
    completo en este orden: `type` (requerido), `title`, `description` (una frase),
    `timestamp` (ahora, ISO 8601), `tags`, y `resource` si apunta a código/dashboard.

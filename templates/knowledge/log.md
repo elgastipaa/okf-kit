@@ -8,5 +8,5 @@
 # Update Log
 
 ## {{YYYY-MM-DD}}
-* **Initialization**: Bundle OKF inicial creado con OKF kit v{{KIT_VERSION}} (de coding/OKF/VERSION).
+* **Initialization**: Bundle OKF inicial creado con OKF kit v{{KIT_VERSION}} (de VERSION).
 * **Creation**: {{qué conceptos sembraste en este primer pase}}.

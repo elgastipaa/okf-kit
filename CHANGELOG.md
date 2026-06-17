@@ -1,6 +1,6 @@
 # Changelog del kit OKF
 
-Revisiones de **este kit de templates** (`coding/OKF`). Formato basado en
+Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 [Keep a Changelog](https://keepachangelog.com/); versionado semver.
 
 > **`kit_version` ≠ `okf_version`.** `okf_version` (ej. `0.1`) es la versión del

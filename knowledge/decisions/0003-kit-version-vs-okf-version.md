@@ -18,7 +18,7 @@ Se mantienen **dos** identificadores separados:
   Se declara en el frontmatter del `index.md` **raíz** del bundle (único `index.md` que
   lleva frontmatter).
 - **`kit_version`** (p.ej. `0.3.0`) — la revisión de **este kit**, cuya fuente de verdad es
-  el archivo `coding/OKF/VERSION`. `okf-init` la estampa en el `index.md` raíz y en la línea
+  el archivo `VERSION`. `okf-init` la estampa en el `index.md` raíz y en la línea
   `Initialization` de `log.md`, para que el repo sepa de qué revisión del kit nació.
 
 # Consecuencias

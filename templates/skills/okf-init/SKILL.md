@@ -12,7 +12,7 @@ proyecto como carpeta `knowledge/` de markdown + frontmatter YAML, versionada en
 git, legible por cualquier IA. Este skill es la versión ejecutable de la guía
 completa.
 
-**Si `coding/OKF` está accesible, leé `coding/OKF/GUIDE.md` y seguilo** (es la
+**Si `okf-kit` está accesible, leé `GUIDE.md` y seguilo** (es la
 fuente autoritativa, con `reference/profiles.md`, `reference/examples.md`,
 `reference/special-cases.md`, `reference/verification.md` y los `templates/`). Si
 no está accesible, seguí el procedimiento embebido de abajo.
@@ -59,7 +59,7 @@ el comentario HTML** (el archivo debe empezar con `---`).
 (conceptos agrupados por `# {type}`), links relativos. `log.md` con una entrada de
 hoy (`## YYYY-MM-DD`). Reemplazá el placeholder `{{KIT_VERSION}}` (en el `index.md`
 raíz y en la línea de `Initialization` del `log.md`) con el contenido de
-`coding/OKF/VERSION` — la fuente única de la versión; si no está accesible, usá la
+`VERSION` — la fuente única de la versión; si no está accesible, usá la
 versión que conozcas. El `index.md` raíz lleva además `okf_version: "0.1"`.
 
 ## 5. Entrypoint

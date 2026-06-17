@@ -2,7 +2,7 @@
   TEMPLATE de index.md. Los index.md NO llevan frontmatter, EXCEPTO el de la RAÍZ
   del bundle, que puede declarar okf_version (versión del FORMATO, de la spec) y
   kit_version (revisión del KIT con que se inicializó; okf-init lo completa desde
-  coding/OKF/VERSION). Links SIEMPRE relativos al archivo. Borrá este comentario al usar.
+  VERSION). Links SIEMPRE relativos al archivo. Borrá este comentario al usar.
 
   Hay dos formas según dónde esté el index:
 
@@ -26,7 +26,7 @@
 -->
 ---
 okf_version: "0.1"
-kit_version: "{{KIT_VERSION}}"   # okf-init lo reemplaza con el contenido de coding/OKF/VERSION
+kit_version: "{{KIT_VERSION}}"   # okf-init lo reemplaza con el contenido de VERSION
 ---
 
 # Subdirectories

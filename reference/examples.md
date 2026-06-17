@@ -26,7 +26,7 @@ knowledge/
 ```markdown
 ---
 okf_version: "0.1"
-kit_version: "{{KIT_VERSION}}"   # okf-init lo estampa desde coding/OKF/VERSION
+kit_version: "{{KIT_VERSION}}"   # okf-init lo estampa desde VERSION
 ---
 
 # Subdirectories

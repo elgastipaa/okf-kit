@@ -147,7 +147,7 @@ Generá un `index.md` en la raíz del bundle y en cada subcarpeta. Convención
   entrada `* [Título](archivo.md) - <description del frontmatter>`.
 - Links **relativos al archivo**. Sin frontmatter, salvo el `index.md` **raíz**, que
   lleva `okf_version` (formato) y `kit_version` (revisión del kit; estampala desde
-  `coding/OKF/VERSION`).
+  `VERSION`).
 
 Esto es lo que deja a un agente navegar sin cargar todo el bundle.
 

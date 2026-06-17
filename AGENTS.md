@@ -1,6 +1,6 @@
 # OKF kit — Contrato para agentes que trabajan SOBRE el kit
 
-Este repo (`coding/OKF`) **es el kit OKF**: la guía + templates + tooling para montar
+Este repo (`okf-kit`) **es el kit OKF**: la guía + templates + tooling para montar
 ingeniería de contexto (OKF) en *otros* repos. Es el **toolsmith**, no un repo de producto.
 (El `README.md` orienta a un humano; este archivo es el contrato para una IA que **edita el kit**.)
 

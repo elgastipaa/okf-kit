@@ -11,7 +11,7 @@ Este repo usa **OKF** para su contexto en `knowledge/` (ver `AGENTS.md`). Este
 skill verifica que ese bundle esté bien. (Procedimiento **vendor-neutral**: skill de
 Claude Code o seguilo directo desde cualquier agente.) Hay tres niveles; corré 1 y 2 vos mismo
 leyendo los archivos, y **preparás** el 3 para que lo corra el usuario en una CLI
-nueva. Referencia completa: `coding/OKF/reference/verification.md` (si está disponible).
+nueva. Referencia completa: `reference/verification.md` (si está disponible).
 
 **No arregles nada sin avisar.** Emití el reporte primero; ofrecé aplicar los fixes
 con el skill `okf-update` si el usuario quiere.

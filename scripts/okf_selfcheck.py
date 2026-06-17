@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """okf_selfcheck.py — meta-linter del PROPIO kit OKF (herramienta de desarrollo).
 
-NO se instala en repos destino (vive en `coding/OKF/scripts/`, no en `templates/`).
+NO se instala en repos destino (vive en `scripts/`, no en `templates/`).
 Valida la consistencia INTERNA del kit — lo que la revisión de 4 lentes encontró que
 nadie chequeaba y por eso los bugs aparecían reactivamente:
 

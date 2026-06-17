@@ -24,7 +24,7 @@ autoritativo y completo es `GUIDE.md`; esto es el mapa. La versión skill es `ok
    templates `templates/knowledge/_*.md` (copialos sin el `_` y borrá el comentario HTML).
 5. **Índices + log + versión:** `index.md` raíz (subdirectorios) y por hoja (conceptos
    agrupados por `type`); `log.md` con la fecha de hoy. Estampá `kit_version` desde
-   `coding/OKF/VERSION` y `okf_version: "0.1"` en el `index.md` raíz. Ver
+   `VERSION` y `okf_version: "0.1"` en el `index.md` raíz. Ver
    [kit_version vs okf_version](../decisions/0003-kit-version-vs-okf-version.md).
 6. **Entrypoint:** `AGENTS.md` (+ `CLAUDE.md` shim) si lo trabaja un agente de código; o un
    puntero a `knowledge/` en el `README` si es wiki/datos.

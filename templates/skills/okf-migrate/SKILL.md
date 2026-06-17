@@ -11,8 +11,8 @@ Sos el camino **brownfield** de OKF: el repo ya tiene contexto, pero disperso. T
 objetivo es **consolidarlo** en un bundle `knowledge/` versionado y navegable, **sin
 agregar una capa más ni duplicar**. (Para un repo sin contexto previo, usá `okf-init`.)
 
-**Si `coding/OKF` está accesible**, leé `coding/OKF/reference/special-cases.md`
-(§"Migrar desde…") y `coding/OKF/GUIDE.md`; usá los `templates/`. Si no, seguí esto.
+**Si `okf-kit` está accesible**, leé `reference/special-cases.md`
+(§"Migrar desde…") y `GUIDE.md`; usá los `templates/`. Si no, seguí esto.
 
 # Procedimiento
 

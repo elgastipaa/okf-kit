@@ -37,12 +37,12 @@ Claude Code (o cualquier CLI de IA) **sin contexto previo** y le decís:
 **Para montar OKF en un repo nuevo:**
 ```
 Armá <nombre-del-repo> con el formato OKF, según las recomendaciones y
-especificaciones de coding/OKF.
+especificaciones de okf-kit.
 ```
 
-El agente debe entonces leer `coding/OKF/GUIDE.md` y seguir el procedimiento.
-(Las rutas `coding/OKF/...` asumen que tu cwd es el padre de `coding/`. Si no resuelve,
-usá la ruta real donde clonaste el kit.)
+El agente debe entonces leer el `GUIDE.md` del kit y seguir el procedimiento.
+(Apuntalo a donde hayas clonado `okf-kit`; todos los paths de la doc son **relativos
+a la raíz del kit**.)
 
 > **Tip:** instalá el skill `okf-init` (de `templates/skills/okf-init/`) en
 > `~/.claude/skills/okf-init/` para que ese prompt dispare un procedimiento
@@ -50,7 +50,7 @@ usá la ruta real donde clonaste el kit.)
 
 **Para actualizar el contexto de un repo que ya tiene OKF:**
 ```
-Actualizá el bundle OKF de este repo según coding/OKF/GUIDE.md (paso "Mantenimiento").
+Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 ```
 (o, si instalaste el skill, simplemente trabajá normal y pedile que corra `okf-update`.)
 

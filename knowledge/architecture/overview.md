@@ -7,7 +7,7 @@ tags: [okf, overview, methodology]
 timestamp: 2026-06-17T00:00:00Z
 ---
 
-El kit OKF (carpeta `coding/OKF`) **no es una app**: es una **guía ejecutable + una
+El kit OKF (carpeta `okf-kit`) **no es una app**: es una **guía ejecutable + una
 librería de templates** que un agente sigue para montar un sistema de "ingeniería de
 contexto" duradero sobre *cualquier* repo. El producto entregado al repo destino es un
 bundle `knowledge/` (markdown + frontmatter) más, opcionalmente, un entrypoint y unos
