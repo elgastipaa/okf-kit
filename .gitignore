@@ -4,3 +4,7 @@ __pycache__/
 
 # Entornos de test en frío que materializa okf_coldtest.py (si los dejás acá)
 /okf-cold-*/
+
+# Resultados de eval contra conejillos de indias (el MÉTODO vive en templates/eval/;
+# esto son golden-sets de repos concretos + scorecards, kit-local, no se shippea)
+/eval/

@@ -28,6 +28,10 @@ markdown + frontmatter). **Empezá por [`knowledge/index.md`](knowledge/index.md
 solo a los conceptos que necesites — no cargues todo. Si una decisión o convención no
 está clara, leé el concepto o **preguntale al usuario**; no asumas.
 
+**¿Pregunta a nivel término/stat** (qué es X, qué significa tal sigla)? Si el bundle tiene
+un `glossary.md`, abrilo **antes de grepear código** — da la respuesta en una línea + el
+archivo exacto (code-of-record) si necesitás el valor.
+
 **Si un concepto contradice el código, gana el código** — el concepto es un bug;
 arreglalo (no al revés). El conocimiento captura el *por qué*; el *qué* se deduce del
 código, así que linkealo en vez de copiarlo (un número a mano = drift).

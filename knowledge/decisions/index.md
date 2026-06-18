@@ -6,3 +6,4 @@
 * [Sin apps externas; vendor-neutral; solo stdlib en el tooling](0004-vendor-neutral-no-external-apps.md) - OKF es markdown + git; el único extra es un linter Python stdlib-only, sin pip ni apps.
 * [El bundle en git es la fuente de verdad, no la memoria de la herramienta](0005-knowledge-as-source-of-truth.md) - La memoria privada de la IA es un atajo personal; la verdad vive en knowledge/ versionado.
 * [Este bundle usa un perfil Mixto para documentar el propio kit](0006-dogfood-profile-choice.md) - El kit se documenta a sí mismo combinando carpetas de Código y Wiki (perfil Mixto).
+* [Glosario de dominio + code-of-record para abaratar preguntas a nivel término](0007-domain-glossary-and-code-of-record.md) - El kit ofrece un template de glosario que rutea término→página canónica→archivo del valor, porque las preguntas de término eran las más caras en turnos.

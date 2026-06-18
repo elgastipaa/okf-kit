@@ -131,6 +131,16 @@ Reglas al escribir conceptos (todos los perfiles):
 - **Frontmatter por defecto:** `type` + `title` + `description` (una sola frase) +
   `timestamp` + `tags`; `resource` cuando apunta a un activo real.
 
+**Glosario de dominio (opcional, alto ROI si el repo tiene jerga/stats).** Las preguntas a
+nivel *término* ("¿qué es ATK?", "¿qué es el Vigor?") son las que más caro le salen a un
+agente: sin un mapa término→página, fanea al código a reconstruir el dato. Un `glossary.md`
+(template `_glossary.md`) que rutea cada término a su **página canónica** y a su
+**code-of-record** (el archivo donde vive el *valor* exacto, p.ej. una tabla de tuning)
+colapsa esas preguntas de muchos turnos a ~1 — medido ~−60% de turnos en un repo de juego
+(ver `knowledge/decisions/0007`). Son **punteros, no fuente de verdad**: una línea por
+término, sin copiar el valor (linkealo). Para que se use, ruteá hacia él desde el `index.md`
+y desde el entrypoint (ver Paso 5).
+
 > **Sobre los templates `templates/knowledge/_*.md`:** son plantillas de referencia,
 > NO conceptos — el linter las ignora por el prefijo `_`. Cuando crees un concepto a
 > partir de una, copiá su contenido a un archivo **sin** el `_` (p.ej. `0001-x.md`) y
