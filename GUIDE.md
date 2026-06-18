@@ -162,7 +162,10 @@ medio para hechos volátiles que se preguntan seguido (conteos, niveles, flags, 
 **generarlos del código** con un script + un check de frescura en CI. Quedan rápidos de leer
 *y* no pueden driftear (patrón `_generated/state.md` + `wiki:gen`/`wiki:check`). El glosario los
 apunta como code-of-record. Vale el esfuerzo solo si esos hechos cambian seguido; si son
-estables, alcanza el puntero (ver `knowledge/decisions/0010`).
+estables, alcanza el puntero. **Aplicalo REACTIVO** —cuando observás un hecho volátil
+preguntado seguido y lo hacés la *única* ruta a ese hecho— **no especulativo**: medido, un
+archivo generado a ciegas no lo usó ningún agente (prefirieron el code-of-record del glosario)
+y fue overhead sin payoff (ver `knowledge/decisions/0010`).
 
 > **Sobre los templates `templates/knowledge/_*.md`:** son plantillas de referencia,
 > NO conceptos — el linter las ignora por el prefijo `_`. Cuando crees un concepto a

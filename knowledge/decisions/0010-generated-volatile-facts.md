@@ -37,3 +37,18 @@ exige.
 - Complementa los otros mecanismos: glosario rutea, capas no-autoritativas descartan ruido,
   hechos generados dan los valores volátiles sin abrir código. El *por qué* sigue siendo prosa
   curada a mano (eso no se genera).
+
+# Refinamiento — aplicalo REACTIVO, no especulativo (evidencia 2026-06-18)
+Aplicado **a ciegas/especulativo** a un repo, el mecanismo NO rindió: un agente generó conteos
+razonables pero **ningún consulta los leyó** (prefirió el code-of-record del glosario), no bajó
+turnos, y un hecho *cercano-pero-distinto* al preguntado hasta lo confundió. Tres causas:
+1. A ciegas no se sabe qué hecho es "caliente" → la cobertura no matchea las preguntas.
+2. Compite con el glosario: si ya hay un puntero al code-of-record, el agente usa ese.
+3. **Tensión con [mapa-no-respuesta](0009-entrypoint-is-a-map-not-an-answer.md):** el guardrail
+   "verificá en la fuente, lo que parece respuesta puede ser coincidencia" empuja al agente a
+   **desconfiar del archivo generado** e ir al código.
+
+Por eso: generá un hecho **solo cuando lo observás preguntado seguido Y cambia seguido Y lo
+hacés la ÚNICA ruta/autoridad** para ese hecho (el caso de los flags en `_generated/state.md`
+de un repo real, donde el índice rutea ahí y a ningún otro lado). Especulativo es overhead (un
+generador + CI a mantener) sin payoff. No lo agregues "por las dudas".
