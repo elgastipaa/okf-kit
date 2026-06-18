@@ -96,6 +96,11 @@ No inventes. Primero **investigá** el repo destino:
    (`package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml`…), o, si es una
    wiki/datos, qué tipo de contenido contiene.
 2. **Docs existentes** — `README.md`, `CONTRIBUTING.md`, `/docs`, ADRs si hay.
+   **Triage de frescura ANTES de usarlas:** verificá cada doc contra el código (gana el
+   código). Vigente → harvesteá/pointeá; **stale/contradice el código → declarala
+   no-autoritativa** (no la pointees como verdad: eso consagra el drift); dudosa →
+   **preguntale al usuario** si mantener/actualizar/descartar. "Mucha doc vieja" no se
+   resuelve pointeando a todo — se separa lo vivo de lo legacy (detalle: skill `okf-migrate`).
 3. **Contexto de IA ya presente** — `AGENTS.md`, `CLAUDE.md`, `.cursorrules`,
    `GEMINI.md`, `.github/copilot-instructions.md`. Si existen, **harvesteá** su
    contenido hacia el bundle en vez de duplicarlo, y dejá `AGENTS.md` como fuente.
