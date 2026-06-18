@@ -34,15 +34,16 @@ sin `pip install`**. No hay nada que adoptar para *usar* el bundle.
 Esta carpeta está pensada para que se la cites a un agente en frío. Abrís un
 Claude Code (o cualquier CLI de IA) **sin contexto previo** y le decís:
 
-**Para montar OKF en un repo nuevo:**
+**Para montar OKF en un repo (lo más común):**
 ```
-Armá <nombre-del-repo> con el formato OKF, según las recomendaciones y
-especificaciones de okf-kit.
+Cloná okf-kit y aplicalo a mi repo <X>.
 ```
 
-El agente debe entonces leer el `GUIDE.md` del kit y seguir el procedimiento.
-(Apuntalo a donde hayas clonado `okf-kit`; todos los paths de la doc son **relativos
-a la raíz del kit**.)
+El agente debe entonces abrir el **`GUIDE.md`** del kit y arrancar por su **Paso 0
+(START HERE)**, que lo orienta: el destino es **tu repo `<X>`** (nunca se escribe nada
+dentro de `okf-kit`), confirmá su ruta, y elegí init (repo limpio) o `okf-migrate`
+(repo con docs/contexto dispersos). Todos los paths de la doc son **relativos a la raíz
+del kit**, así que apuntá al agente a donde clonaste `okf-kit`.
 
 > **Tip:** instalá el skill `okf-init` (de `templates/skills/okf-init/`) en
 > `~/.claude/skills/okf-init/` para que ese prompt dispare un procedimiento

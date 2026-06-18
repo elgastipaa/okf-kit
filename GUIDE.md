@@ -4,6 +4,26 @@
 contexto OKF en un repositorio.** Si sos ese agente, leé esto entero antes de
 escribir nada, después seguí el procedimiento.
 
+## Paso 0 — START HERE (leé esto primero)
+
+Te dijeron algo como *"cloná okf-kit y aplicalo a mi repo X"*. Antes de nada:
+
+1. **El destino es OTRO repo (el "repo X"), no este.** `okf-kit` es solo la fuente de
+   la guía y los `templates/`. **NUNCA escribas el bundle `knowledge/`, `AGENTS.md`, ni
+   nada dentro de `okf-kit`** — este repo ya tiene su propio `knowledge/` (es su dogfood)
+   y pisarlo es un bug grave. Todo lo que generes va en el **repo destino**.
+2. **Confirmá cuál es el repo destino y su ruta.** Si no está claro, **preguntale al
+   usuario** cuál es y dónde está. No asumas que es el directorio actual.
+3. **Elegí el camino:**
+   - ¿El destino **ya tiene contexto disperso abundante** (un `AGENTS.md`/`CLAUDE.md`
+     rico, `/docs`, ADRs, notas)? → seguí el skill **`okf-migrate`** (consolidación
+     brownfield), apoyándote en esta guía.
+   - ¿Está **limpio / sin contexto**? → este es el camino de **init** (greenfield):
+     seguí el procedimiento de abajo (es lo mismo que ejecuta el skill `okf-init`).
+4. Recién entonces, leé el resto y procedé.
+
+---
+
 **Sin instalaciones ni apps externas.** OKF es markdown + git: no dependés de
 Obsidian, de un visor de grafos, ni de la nube. El kit incluye un linter Python
 opcional (`okf_lint.py`) para chequeos deterministas y CI — **solo stdlib, sin

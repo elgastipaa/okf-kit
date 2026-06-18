@@ -24,6 +24,11 @@ opcionales (Repomix) — ver `reference/optional-tools.md`. Nada obligatorio.
 # Procedimiento
 
 ## 0. Antes de tocar nada — entendé el repo
+**El destino es el repo del usuario, NO `okf-kit`.** Si llegaste acá por "cloná okf-kit y
+aplicalo a mi repo X", todo lo que generes va en **repo X**; nunca escribas dentro de
+`okf-kit` (tiene su propio `knowledge/` dogfood). Confirmá cuál es el destino y su ruta; si
+dudás, preguntale al usuario.
+
 Investigá: manifiestos (`package.json`/`pyproject.toml`/…) y stack, `README`/`/docs`,
 contexto de IA ya presente (`AGENTS.md`/`CLAUDE.md`/`.cursorrules`), `git log --oneline -30`,
 y cualquier memoria de la herramienta. **Lo que no puedas deducir de la fuente —el
