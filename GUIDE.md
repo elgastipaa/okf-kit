@@ -131,15 +131,23 @@ Reglas al escribir conceptos (todos los perfiles):
 - **Frontmatter por defecto:** `type` + `title` + `description` (una sola frase) +
   `timestamp` + `tags`; `resource` cuando apunta a un activo real.
 
-**Glosario de dominio (opcional, alto ROI si el repo tiene jerga/stats).** Las preguntas a
-nivel *término* ("¿qué es ATK?", "¿qué es el Vigor?") son las que más caro le salen a un
-agente: sin un mapa término→página, fanea al código a reconstruir el dato. Un `glossary.md`
-(template `_glossary.md`) que rutea cada término a su **página canónica** y a su
+**Glosario de dominio (opcional, alto ROI en código grande/ambiguo con jerga).** Las
+preguntas a nivel *término* ("¿qué es ATK?", "¿qué es el Vigor?") son las que más caro le
+salen a un agente: sin un mapa término→página, fanea al código a reconstruir el dato. Un
+`glossary.md` (template `_glossary.md`) que rutea cada término a su **página canónica** y a su
 **code-of-record** (el archivo donde vive el *valor* exacto, p.ej. una tabla de tuning)
 colapsa esas preguntas de muchos turnos a ~1 — medido ~−60% de turnos en un repo de juego
 (ver `knowledge/decisions/0007`). Son **punteros, no fuente de verdad**: una línea por
-término, sin copiar el valor (linkealo). Para que se use, ruteá hacia él desde el `index.md`
-y desde el entrypoint (ver Paso 5).
+término, sin copiar el valor (linkealo). **El ROI escala con el tamaño/ambigüedad del
+código** (repos grandes, forked, con sistemas v1/v2 coexistiendo); en repos chicos y bien
+nombrados rinde poco — no lo agregues por reflejo. Para que se use, ruteá hacia él desde el
+`index.md` y desde el entrypoint (ver Paso 5).
+
+**Capas no-autoritativas (alto ROI en repos ruidosos/legacy).** Si el repo arrastra `notes/`,
+docs de refactors viejos o mockups que ya no reflejan el estado, **declaralos como
+no-autoritativos en el entrypoint** (sección en `templates/AGENTS.md`): qué dirs son scratch y
+que *gana el código*. Sin esa señal, un agente gasta turnos reconciliando basura — medido en
+una pregunta de auditoría que cayó de 27 a 2 turnos al declararla (ver `knowledge/decisions/0008`).
 
 > **Sobre los templates `templates/knowledge/_*.md`:** son plantillas de referencia,
 > NO conceptos — el linter las ignora por el prefijo `_`. Cuando crees un concepto a

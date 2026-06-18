@@ -31,3 +31,8 @@ timestamp: {{YYYY-MM-DDTHH:MM:SSZ}}
 |---|---|---|---|
 | **{{TÉRMINO}}** | {{definición en una línea}} | [{{página}}]({{../dir/x.md}}) | `{{ruta/al/archivo.ext}}` (o `:línea`) |
 | **{{TÉRMINO}}** | {{…}} | [{{…}}]({{…}}) | {{— si no aplica}} |
+
+> **No hornees valores en la columna "qué es".** Si escribís un número/nombre exacto ("se
+> desbloquea a nivel 5", "el kit vigente es X"), un agente lo va a **repetir sin verificar el
+> código**; si quedó viejo, propaga el error con confianza. Dejá esa columna conceptual y
+> mandá el valor al code-of-record — "gana el código" solo sirve si el agente igual lo mira.

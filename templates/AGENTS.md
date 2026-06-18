@@ -36,6 +36,13 @@ archivo exacto (code-of-record) si necesitás el valor.
 arreglalo (no al revés). El conocimiento captura el *por qué*; el *qué* se deduce del
 código, así que linkealo en vez de copiarlo (un número a mano = drift).
 
+**Capas NO autoritativas — no reconcilies basura.** {{Listá los dirs/archivos que son
+scratch, legacy, planes viejos o exploración y **NO reflejan el estado actual** — ej.
+`notes/`, docs de refactors pasados, mockups.}} Para preguntas tipo "¿qué existe / cuántos /
+a qué nivel HOY?", la respuesta sale **del código**, no de estas capas; si difieren, gana el
+código y estas se ignoran (no gastes turnos reconciliándolas). Mantené acá la lista para que
+un agente nuevo no audite el repo entero para saber qué creer.
+
 ## 2. Mientras trabajás — mantené el contexto vivo (el trato)
 
 **Cuándo:** si tomás/descubrís una **decisión** no trivial, cambia la **arquitectura o el
