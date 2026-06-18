@@ -143,6 +143,13 @@ código** (repos grandes, forked, con sistemas v1/v2 coexistiendo); en repos chi
 nombrados rinde poco — no lo agregues por reflejo. Para que se use, ruteá hacia él desde el
 `index.md` y desde el entrypoint (ver Paso 5).
 
+> **Cubrí los términos-mecánica calientes, no solo los stats.** Un *hueco* de cobertura es
+> peligroso: si falta el término que preguntan, el agente agarra lo más parecido que tenga a
+> mano —a veces una sección del `AGENTS.md` que *suena* a respuesta— y contesta mal sin mirar
+> el código (medido: una "regla" de combate respondida desde la sección de capas
+> no-autoritativas). Mejor sin entrada que una entrada con el valor horneado, pero mejor aún:
+> cubrí los términos que un agente confundiría, apuntando al code-of-record.
+
 **Capas no-autoritativas (alto ROI en repos ruidosos/legacy).** Si el repo arrastra `notes/`,
 docs de refactors viejos o mockups que ya no reflejan el estado, **declaralos como
 no-autoritativos en el entrypoint** (sección en `templates/AGENTS.md`): qué dirs son scratch y

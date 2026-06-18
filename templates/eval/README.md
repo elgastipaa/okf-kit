@@ -61,8 +61,9 @@ Ver [`golden-set.example.md`](golden-set.example.md). Reglas:
 3. **Fork:** ¿el fix es general (→ cambio en el **kit**: contrato, formato, linter,
    template) o de contenido (→ autoría en el repo)? Solo el primero "optimiza el kit".
 4. Aplicar al kit → re-estampar dogfood → `python3 scripts/okf_selfcheck.py`.
-5. Re-aplicar a los repos → re-correr eval → conservar **solo si mejora sin regresar**
-   otras categorías ni otros repos.
+5. Re-aplicar a los repos → re-correr eval **con `--grade`** → conservar **solo si baja
+   turnos SIN introducir ningún `incorrecta` nuevo** (una respuesta rápida y equivocada es
+   peor que una lenta y correcta; ver [`grade.md`](grade.md)) ni regresar otros repos.
 6. ADR en `knowledge/decisions/` → volver a 1.
 
 **Stop:** por categoría, cuando le gana claro al baseline sin-kit y dos vueltas seguidas

@@ -17,6 +17,21 @@ respuesta del agente contra el `expect` del golden-set, y devuelve una etiqueta:
 
 Aprueba = `correcta` ∪ `trampa-ok`. El resumen del runner cuenta esos como `aciertos`.
 
+## El falso positivo: rápido Y mal (por qué `--grade` no es opcional)
+
+El modo de falla más peligroso no es la respuesta lenta — es la **rápida y equivocada**. Una
+capa de contexto puede hacer que un agente conteste en 1 turno citando una sección del
+`AGENTS.md` que *suena* a la pregunta, **sin verificar el código**. Midiendo solo turnos, eso
+parece una mejora; es una regresión de correctitud disfrazada.
+
+> Caso real: preguntar "¿cuál es la regla anti-waste?" (una mecánica de combate) → el agente
+> matcheó "anti-waste" con la sección *"no reconcilies basura"* del contrato y respondió mal en
+> 1 turno (vs 5 turnos y correcto sin la capa).
+
+**Regla dura del loop:** una mejora de turnos que introduce **un `incorrecta` nuevo se
+rechaza**, por más que baje el promedio. Por eso cada iteración corre `--grade` y compara
+acierto, no solo turnos/tokens.
+
 ## Cuándo calificar a mano
 
 El juez automático es el **mismo modelo**: bueno para iterar rápido, no para el veredicto

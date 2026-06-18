@@ -28,6 +28,11 @@ markdown + frontmatter). **Empezá por [`knowledge/index.md`](knowledge/index.md
 solo a los conceptos que necesites — no cargues todo. Si una decisión o convención no
 está clara, leé el concepto o **preguntale al usuario**; no asumas.
 
+**Este archivo es un MAPA, no la respuesta.** Te dice *dónde* mirar; no respondas una pregunta
+de dominio ("¿cómo funciona X?", "¿cuál es la regla de Y?") citando las reglas o secciones de
+*este* contrato — seguí el mapa hasta el concepto en `knowledge/` o el código. Si el nombre de
+una sección de acá *parece* contestar la pregunta, es una coincidencia: verificá en la fuente.
+
 **¿Pregunta a nivel término/stat** (qué es X, qué significa tal sigla)? Si el bundle tiene
 un `glossary.md`, abrilo **antes de grepear código** — da la respuesta en una línea + el
 archivo exacto (code-of-record) si necesitás el valor.
