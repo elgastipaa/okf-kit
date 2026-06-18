@@ -156,6 +156,14 @@ no-autoritativos en el entrypoint** (sección en `templates/AGENTS.md`): qué di
 que *gana el código*. Sin esa señal, un agente gasta turnos reconciliando basura — medido en
 una pregunta de auditoría que cayó de 27 a 2 turnos al declararla (ver `knowledge/decisions/0008`).
 
+**Hechos volátiles: generalos, no los copies (template `_generated.md`).** Entre copiar un
+valor a mano (drift) y dejar solo un puntero (el agente igual lee el código), hay un punto
+medio para hechos volátiles que se preguntan seguido (conteos, niveles, flags, listas):
+**generarlos del código** con un script + un check de frescura en CI. Quedan rápidos de leer
+*y* no pueden driftear (patrón `_generated/state.md` + `wiki:gen`/`wiki:check`). El glosario los
+apunta como code-of-record. Vale el esfuerzo solo si esos hechos cambian seguido; si son
+estables, alcanza el puntero (ver `knowledge/decisions/0010`).
+
 > **Sobre los templates `templates/knowledge/_*.md`:** son plantillas de referencia,
 > NO conceptos — el linter las ignora por el prefijo `_`. Cuando crees un concepto a
 > partir de una, copiá su contenido a un archivo **sin** el `_` (p.ej. `0001-x.md`) y
