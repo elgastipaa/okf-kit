@@ -12,6 +12,24 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 
 ## No publicado
 
+### Medido — la capa de futuro, con su condición y su resultado negativo
+Primera medición real (dos repos conejillo, n=3 por pregunta, todas las respuestas leídas a
+mano y sus afirmaciones verificadas contra el código). Decisión `0014`:
+
+- **Paga, con una condición.** Con un roadmap **vigente y auto-contenido**, "¿qué sigue?" cae
+  de **12.3 a 4.0 turnos** y de 337K a 93K de contexto; los rangos no se solapan y la variante
+  con capa tiene dispersión **cero**. El **harvest se corre solo** y —lo más fuerte— **verifica
+  en vez de creerle al usuario**: corrió los smokes antes de cerrar y renegoció explícitamente
+  los puntos del spec que la realidad no cumplía.
+- **Un roadmap desactualizado cuesta más que no tener roadmap** (resultado negativo). En el
+  segundo conejillo el rumbo afirmaba trabajo en curso que la fuente daba por terminado: los
+  agentes gastaron turnos corrigiéndolo (hasta 22 en una corrida) y la rama **sin** roadmap
+  encontró mejor información. Un rumbo que solo **rutea** tampoco compra el ahorro: la mejora
+  viene de que sea **una respuesta**, no un índice.
+- El roadmap entra al ciclo de frescura como cualquier concepto, y la doc de interop deja de
+  vender el ahorro de retrieval cuando el repo ya tiene su propia capa de planes.
+
+
 ### Cambiado — el disparador de scope creep chequea si la idea ya existe
 Primera medición de la capa de futuro (cambio `0001`, conejillo `idlerpg`). El resultado
 principal es positivo —las preguntas de rumbo bajan de 9→4 y 10→6 turnos, y el contexto

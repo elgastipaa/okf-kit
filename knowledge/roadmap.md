@@ -16,11 +16,16 @@ git, sin apps externas.
 
 # Ahora (en curso)
 
-- [Validar la capa de futuro con medición](_changes/0001-validar-capa-futuro.md) — la capa
-  está diseñada y auto-aplicada, pero sin números; criterio reactivo de la
-  [decisión 0010](decisions/0010-generated-volatile-facts.md).
+- (nada activo)
 
 # Después (próximo, en orden)
+
+- Medir si el doc de `_changes/` se saltea sistemáticamente cuando el agente juzga que
+  termina en una sola corrida, y si conviene cambiar el umbral del disparador a "¿podría no
+  terminar en esta sesión?" ([decisión 0014](decisions/0014-future-layer-measured.md)).
+- Arreglar los defectos del harness de medición que destapó la 0014: el resumen de
+  `run-eval.py` reporta `input_tokens` (ruido: 6–12) en vez de `cache_read` (85K–300K), que es
+  el contexto realmente leído; y el juez `--grade` no sirve para preguntas de comportamiento.
 
 - Que el linter valide lo que hoy solo valida el checklist manual: la clave `authority:`
   (vocabulario cerrado, hoy `authority: banana` pasa `--strict` en silencio), que cada
