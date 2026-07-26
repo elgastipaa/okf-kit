@@ -23,6 +23,25 @@ Estos `type` sirven en cualquier proyecto. Un perfil agrega tipos propios encima
 | `Reference` | Resumen de material externo (doc, API, paper, norma) que el proyecto usa. Con `# Citations`. |
 | `Playbook` | Procedimiento operativo repetible (también llamado *Runbook*). El *cómo*. |
 | `Glossary` | Definiciones cortas de términos del proyecto. |
+| `Roadmap` | La intención vigente: visión, qué está en curso, qué sigue, no-goals. Uno solo, en la raíz del bundle (`roadmap.md`). Sin checkboxes. |
+
+### Qué tipos son normativos (y qué implica)
+
+La clase de autoridad de un concepto (`OKF-SPEC.md` §3.5) se deduce de su `type`. El default
+es **descriptivo**: describe lo que existe, y si difiere del código, el documento es el bug.
+Estos tipos son la **excepción normativa** — prescriben lo que debe cumplirse, así que un
+código que los contradice está **en violación** (se reporta al usuario; no se edita el
+documento para emparejarlo):
+
+| `type` | Por qué es normativo |
+|---|---|
+| `Decision` (con `status: accepted`) | Alguien decidió esto por una razón; el código que lo ignora la está perdiendo. Una `proposed` todavía no obliga; una `superseded` dejó de obligar. |
+| `Convention` | Es una regla de cómo se hacen las cosas acá, no una descripción de cómo están hechas. |
+| `Roadmap` | Describe la intención, no el código: que el código todavía no la alcance es trabajo pendiente, no un bug del documento. |
+| `Change` (activo, en `_changes/`) | Su *resultado esperado* define "hecho"; caduca al cerrarse el cambio. |
+
+Si un `type` propio no encaja claro en ninguna de las dos clases, declaralo explícito en el
+frontmatter con `authority: normative` o `authority: descriptive` (`OKF-SPEC.md` §3.1).
 
 Reglas de nombres y `tags` (todos los perfiles):
 - **Archivos:** `kebab-case` descriptivo, sin espacios (`request-flow.md`,
@@ -39,6 +58,12 @@ modelos, tunings — **no los transcribas a prosa** (un número a mano = drift).
 (`resource`) o, si los querés versionados, derivalos con un script propio a una carpeta
 **`_generated/`** (el linter la ignora; vos la regenerás y un check de CI avisa si quedó
 vieja). El bundle autorado captura el *por qué*; los hechos del código se derivan, no se copian.
+
+**Trabajo futuro (cualquier perfil en desarrollo activo):** el rumbo es un concepto
+(`roadmap.md`, type `Roadmap`); el plan/progreso de cada cambio concreto **no** es un
+concepto — vive en **`_changes/`** (un doc numerado por cambio, con checkboxes; el linter
+la ignora) y al cerrarse se **harvestea** al bundle y se borra. El ciclo completo está en
+el skill `okf-plan` (template `_change.md`).
 
 ---
 

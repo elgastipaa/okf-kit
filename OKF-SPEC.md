@@ -52,8 +52,9 @@ knowledge/
 Cualquier otro `.md` es un concepto.
 
 **Prefijo `_`:** los archivos y carpetas que empiezan con `_` (p.ej. la plantilla
-`_concept.md`, un `_generated/` con hechos derivados del código, un `_scratchpad.md`
-efímero) **no son conceptos** del bundle — el linter los ignora.
+`_concept.md`, un `_generated/` con hechos derivados del código, un `_changes/` con
+los documentos de trabajo de cambios en curso, un `_scratchpad.md` efímero) **no son
+conceptos** del bundle — el linter los ignora.
 
 ---
 
@@ -97,6 +98,10 @@ timestamp: <ISO 8601>              # Opcional — última modificación signific
 
 **Extensiones:** podés agregar cualquier clave. Los consumidores DEBEN preservar
 claves desconocidas y NO DEBEN rechazar documentos por campos no reconocidos.
+
+**Autoridad (opcional):** `authority: normative | descriptive` declara en qué dirección
+manda el documento frente al código (§3.5). Si falta, se deduce del `type`
+(`reference/profiles.md`); solo hace falta escribirla cuando el `type` no lo deja claro.
 
 **Frescura (opcional, para references que espejan código):** una página que refleja
 el estado del código puede declarar `verified_against: "<commit-corto>"` y
@@ -152,7 +157,8 @@ No usar esto para OTPs de login (ver [auth](../domain/auth.md)).
 Cada hecho vive en **un solo lugar**. Si un concepto describe algo que *también*
 está en el código (schema, datos, config), la fuente es el código: cuando el
 concepto y el código se contradicen, **gana el código** — el concepto es un bug,
-arreglalo. Por eso, al escribir:
+arreglalo. *(Esto vale para los conceptos **descriptivos**, que son la enorme mayoría; los
+**normativos** —decisiones, convenciones— corren al revés: ver §3.5.)* Por eso, al escribir:
 
 - **¿El hecho vive en el código?** (conteos, flags, rutas, nombres de modelos,
   tunings) → **no lo transcribas a prosa** — un número a mano es drift garantizado.
@@ -162,8 +168,52 @@ arreglalo. Por eso, al escribir:
 - **¿NO vive en el código?** (el *por qué*, la intención de diseño, el roadmap) →
   ahí el concepto **es** la fuente; autoralo bien.
 
-Los conceptos describen el **estado presente**, no historial ni planes (eso es
-`log.md` / `decisions/`). Sin checkboxes de progreso.
+Los conceptos describen el **estado presente**, no historial (eso es `log.md` /
+`decisions/`) ni planes de trabajo. Sin checkboxes de progreso. **Matiz:** la
+*intención vigente* —hacia dónde va el proyecto HOY, qué se decidió no hacer— sí es
+estado presente y puede ser un concepto (p.ej. un `roadmap.md`; se edita cuando el
+rumbo cambia). Lo que **no** es un concepto es el plan/progreso de un cambio
+concreto (tareas, checkboxes): eso vive en un directorio ignorado tipo `_changes/`
+(§2, prefijo `_`), con ciclo de vida propio — ver la guía del kit.
+
+### 3.5 Descriptivo vs normativo — en qué dirección corre la autoridad
+
+"Gana el código" (§3.4) es el default y aplica a la enorme mayoría del bundle, pero **no a
+todo**: un bundle contiene dos clases de documento, y la contradicción con el código
+significa cosas opuestas en cada una.
+
+| Clase | Qué hace | Si difiere del código |
+|---|---|---|
+| **Descriptivo** (default) | Describe lo que **ya existe**: arquitectura, schema, conceptos de dominio, runbooks, references, glosario, hechos generados. | **Gana el código** — el documento es un bug: arreglalo (§3.4). |
+| **Normativo** | Prescribe lo que **debe** cumplirse: una **decisión aceptada**, una **convención**, el **rumbo** vigente, y el **resultado esperado** de un trabajo en curso. | **El código está en violación** — el documento NO se edita para "emparejar". |
+
+**La clase la da el `type`, no la carpeta.** Un `type: Convention` es normativo aunque viva
+en `domain/` junto a conceptos descriptivos; "dominio" en la fila de arriba se refiere a los
+**conceptos de dominio** (`type: Domain Concept`), que describen. El mapeo `type` → clase
+está en `reference/profiles.md`.
+
+Fuera del bundle, el mismo criterio aplica al **entrypoint** (`AGENTS.md` y equivalentes):
+sus reglas duras son normativas por naturaleza — prescriben cómo trabajar en el repo. No es
+un concepto OKF, así que la spec no lo gobierna, pero un consumidor que audite cumplimiento
+lo trata igual.
+
+**La regla operativa ante una violación** (esto es lo que evita que el conocimiento se
+degrade en silencio): no la resuelvas por tu cuenta. **Reportala al usuario** y ofrecé las
+dos salidas legítimas — (1) **arreglar el código** para que cumpla, o (2) **cambiar la
+decisión explícitamente** (un documento nuevo que *supersede* al viejo, dejando el camino de
+migración). Editar el documento normativo para que coincida con lo que el código ya hace, o
+seguir de largo, **no son opciones**: es exactamente así como se pierde una decisión que
+alguien tomó por una razón.
+
+Dos límites que hacen que esto no reintroduzca el drift:
+
+- **Un documento normativo nunca responde "¿qué hace el código HOY?"** — para eso gana el
+  código, siempre, sin excepción. Lo normativo responde "¿qué *debe* cumplirse?".
+- **La autoridad normativa de un trabajo en curso caduca cuando ese trabajo se cierra**: lo
+  que sobrevive pasa a ser descriptivo.
+
+Por default la clase se deduce del `type` (ver `reference/profiles.md`); un concepto PUEDE
+declararla explícitamente con `authority: normative | descriptive` (§3.1).
 
 ---
 
@@ -236,8 +286,10 @@ y un agente lean lo mismo):
   * [runbooks](runbooks/index.md) - Comandos operativos del proyecto.
   ```
 
-El `index.md` de la **raíz** del bundle típicamente solo lista subdirectorios
-(`# Subdirectories`); los `index.md` de las hojas agrupan los conceptos por `type`.
+Los `index.md` de las **hojas** agrupan los conceptos por `type`. El de la **raíz** lista
+los subdirectorios; y **si hay conceptos en la raíz del bundle** —típicamente `roadmap.md`
+o un `glossary.md`— van **antes**, agrupados por `type` igual que en una hoja. Un concepto
+en la raíz que no esté linkeado es un WARN del linter como cualquier otro.
 Se pueden escribir a mano o generar automáticamente — la forma es la misma. Como
 todo en OKF, son opcionales: un consumidor puede sintetizar uno al vuelo si falta.
 

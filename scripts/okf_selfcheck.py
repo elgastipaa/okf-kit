@@ -70,6 +70,103 @@ for rel in ["templates/AGENTS.md", "templates/skills/okf-update/SKILL.md"]:
     check(not missing, f"{rel} describe el keep-alive completo"
           + (f" (falta: {', '.join(missing)})" if missing else ""))
 
+# 3b. La capa de futuro coincide entre el contrato, el skill okf-plan y el template
+FUTURE_TOKENS = ["_changes/", "roadmap", "harvest"]
+for rel in [
+    "templates/AGENTS.md",
+    "templates/skills/okf-plan/SKILL.md",
+    "templates/knowledge/_change.md",
+]:
+    # sin los comentarios HTML: se borran al instalar, así que no cuentan como "lo describe"
+    body = re.sub(r"<!--.*?-->", "", read(rel), flags=re.S).lower()
+    missing = [t for t in FUTURE_TOKENS if t not in body]
+    check(not missing, f"{rel} describe la capa de futuro (rumbo + _changes/ + harvest)"
+          + (f" (falta: {', '.join(missing)})" if missing else ""))
+
+# 3e. Presupuesto del contrato: AGENTS.md es lo ÚNICO que se carga en cada turno de cada
+# sesión, así que su tamaño es el costo permanente del sistema (y un contrato largo se
+# skimea). Se mide el texto que queda INSTALADO: sin el comentario TEMPLATE y sin las
+# líneas de marcadores OKF:*, que son andamiaje de instalación y se borran siempre.
+_agents_raw = read("templates/AGENTS.md")
+_agents_body = re.sub(r"^<!--.*?-->\s*", "", _agents_raw, flags=re.S)  # sin el comentario TEMPLATE
+_agents_installed = re.sub(r"^[ \t]*<!--\s*OKF:.*?-->[ \t]*\n", "", _agents_body, flags=re.M)
+_budget = 7000
+check(0 < len(_agents_installed) <= _budget,
+      f"templates/AGENTS.md instalado dentro del presupuesto "
+      f"({len(_agents_installed)}/{_budget} chars ≈ {len(_agents_installed)//4} tokens por turno)")
+
+# 3f. Los marcadores de la capa de futuro están BALANCEADOS y no vacíos: son lo que hace
+# mecánico el borrado en la instalación mínima (si derivan, el contrato mínimo queda roto —
+# el blocker que encontró el cold-review de 0.6.0).
+_marks = re.findall(r"<!-- OKF:future-layer:(start|end) -->", _agents_raw)
+_starts = _marks.count("start")
+_ends = _marks.count("end")
+_well_nested = _starts == _ends and _starts >= 4 and all(
+    m == ("start" if i % 2 == 0 else "end") for i, m in enumerate(_marks))
+check(_well_nested,
+      f"templates/AGENTS.md marca la capa de futuro para borrado mecánico "
+      f"({_starts} start / {_ends} end, alternados y ≥4 pares)")
+
+# Y la instalación MÍNIMA (borrando esos bloques) no puede dejar huérfano nada de la capa:
+_minimal = re.sub(r"<!-- OKF:future-layer:start -->.*?<!-- OKF:future-layer:end -->", "",
+                  _agents_body, flags=re.S)
+_orphans = [t for t in ("_changes/", "okf-plan", "roadmap.md", "rumbo", "cambio activo")
+            if t in _minimal]
+check(not _orphans,
+      "el contrato en instalación mínima no menciona la capa de futuro"
+      + (f" (huérfanos: {', '.join(_orphans)})" if _orphans else ""))
+
+# 3d. La rama NORMATIVA de la regla de autoridad no se cae en los archivos que la afirman
+# (es la regla que más riesgo de deriva tiene: se enuncia en el contrato y en okf-update,
+# y su fuente canónica es OKF-SPEC §3.5)
+check("3.5" in read("OKF-SPEC.md") and "normativ" in read("OKF-SPEC.md").lower(),
+      "OKF-SPEC.md define la regla canónica de autoridad (§3.5 descriptivo vs normativo)")
+for rel in [
+    "templates/AGENTS.md",
+    "templates/skills/okf-update/SKILL.md",
+    "templates/skills/okf-verify/SKILL.md",
+]:
+    body = read(rel).lower()
+    check("normativ" in body and "supersede" in body,
+          f"{rel} afirma la rama normativa (violación → arreglar código o superseder)")
+# El GUIDE es el recorrido de bootstrap: si la regla no aparece ahí, nadie la aprende al
+# instalar (se cayó una vez, y el CHANGELOG la daba por propagada).
+check("3.5" in read("GUIDE.md") and "normativ" in read("GUIDE.md").lower(),
+      "GUIDE.md enseña la regla de autoridad y apunta al canónico (§3.5)")
+
+# 3g. El material INSTALADO es autosuficiente: no puede citar rutas que solo existen en el
+# kit (reference/*.md, templates/*). El repo destino no las recibe — un puntero así manda al
+# agente a un archivo inexistente meses después. okf-init/okf-migrate quedan exentos: corren
+# con el kit en disco. (Los comentarios HTML de los templates también: se borran al usar.)
+_kitpath_re = re.compile(
+    r"(?<!okf-kit/)\b(reference/[a-z][a-z0-9-]*\.md|templates/[a-z_]+/"
+    r"|OKF-SPEC\.md|GUIDE\.md|DEVELOPING\.md|CHANGELOG\.md)")
+for rel in [
+    "templates/AGENTS.md",
+    "templates/skills/okf-update/SKILL.md",
+    "templates/skills/okf-verify/SKILL.md",
+    "templates/skills/okf-plan/SKILL.md",
+]:
+    body = re.sub(r"<!--.*?-->", "", read(rel), flags=re.S)  # sin comentarios de instalación
+    hits = sorted({m.group(1) for m in _kitpath_re.finditer(body)})
+    check(not hits, f"{rel} es autosuficiente (no cita rutas del kit)"
+          + (f" — cita: {', '.join(hits)}" if hits else ""))
+
+# 3h. El formato del reporte de verificación está duplicado a propósito (la copia instalada
+# tiene que funcionar sin el kit — decisión 0013), así que las dos copias tienen que coincidir.
+_fmt_re = re.compile(r"```markdown\n(# OKF Verification Report.*?)```", re.S)
+_fmt_ref = _fmt_re.search(read("reference/verification.md"))
+_fmt_skill = _fmt_re.search(read("templates/skills/okf-verify/SKILL.md"))
+check(bool(_fmt_ref) and bool(_fmt_skill) and _fmt_ref.group(1) == _fmt_skill.group(1),
+      "el formato del reporte coincide entre reference/verification.md y okf-verify")
+
+# 3c. El kit SE APLICA a sí mismo la capa de futuro (no solo la distribuye)
+own_agents = read("AGENTS.md").lower()
+check("roadmap.md" in own_agents and "_changes/" in own_agents,
+      "el AGENTS.md del kit rutea a su propia capa de futuro (roadmap.md + _changes/)")
+check((KIT / "knowledge" / "roadmap.md").is_file(),
+      "el dogfood tiene su propio knowledge/roadmap.md (el kit se auto-aplica la capa)")
+
 # 4. Toda referencia reference/*.md resuelve
 ref_re = re.compile(r"reference/([a-z][a-z0-9-]*\.md)")
 referenced: set[str] = set()

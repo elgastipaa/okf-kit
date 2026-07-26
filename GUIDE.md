@@ -38,6 +38,8 @@ Documentos hermanos que vas a necesitar:
 - `reference/verification.md` — cómo testear el bundle (lo usás en el Paso 7).
 - `reference/maintaining.md` — el ciclo de vida DESPUÉS del init (cómo no perder frescura).
 - `reference/install-per-tool.md` — conectar OKF a cualquier IA (Claude/Cursor/Copilot/Gemini).
+- `reference/spec-driven-interop.md` — cómo se relaciona con OpenSpec/Spec Kit (si el repo
+  ya usa una de esas, leelo **antes** de montar la capa de futuro: no montes dos).
 - `templates/` — archivos para copiar y completar.
 
 ---
@@ -51,10 +53,14 @@ Hasta tres capas de contexto en el repo destino:
 ├── AGENTS.md            # Entrypoint para agentes (OPCIONAL — ver Paso 3)
 ├── CLAUDE.md            # Shim de 1 línea → @AGENTS.md (si usás Claude Code)
 ├── .claude/skills/      # Procedimientos como skills (OPCIONAL, tool-específico)
-│   └── okf-update/
+│   ├── okf-update/      # mantener el bundle
+│   ├── okf-verify/      # testearlo
+│   └── okf-plan/        # rumbo y cambios (solo si instalás la capa de futuro)
 └── knowledge/           # El bundle OKF — el "qué/por qué". SIEMPRE.
     ├── index.md         # mapa raíz (progressive disclosure)
     ├── log.md           # historial de cambios de contexto
+    ├── roadmap.md       # el rumbo vigente (recomendado en desarrollo activo)
+    ├── _changes/        # specs de trabajo en curso, efímeras (el linter la ignora)
     └── <carpetas según el perfil>/
 ```
 
@@ -62,6 +68,36 @@ El **bundle `knowledge/` es el corazón y es obligatorio**. Las otras dos capas
 (`AGENTS.md` y los skills) son convenientes cuando un *agente de código* va a
 trabajar el repo; para una wiki pura o un bundle de datos que humanos navegan,
 podés omitirlas y dejar que el entrypoint sea `knowledge/index.md` (ver Paso 3).
+
+### Cuánto instalar (el costo permanente es el contrato)
+
+Lo único que se carga en **cada turno de cada sesión** es `AGENTS.md`; el bundle, los
+procedimientos y los docs de cambios se leen **solo cuando hacen falta**. Así que el costo
+fijo del sistema es el tamaño del contrato, y hay dos niveles:
+
+- **Completo** (default, ~1600 tokens por turno): incluye la capa de futuro.
+- **Mínimo** (~1300 tokens por turno): sin capa de futuro — queda pasado + presente (el
+  bundle), sin ninguna ceremonia previa a codear.
+
+**Preguntáselo al usuario en su idioma, no en el del kit** (la regla de `okf-plan`: la
+metodología es invisible). No le preguntes por tokens por turno: no puede contestarlo y no es
+su problema. Preguntale por el comportamiento que va a ver:
+
+> *"¿Querés que además lleve el rumbo del proyecto —qué estás haciendo, qué sigue— para
+> retomar sin explicarme todo de nuevo cada vez? Suma un poco de ida y vuelta antes de
+> codear."*
+
+Sí → completo. No, o "quiero que vayas directo al código" → mínimo. **Ante la duda,
+completo** (es el default). Se puede subir de mínimo a completo después: agregar la sección
+al contrato y sembrar el roadmap. En **los dos** niveles, el contrato ya dice que si el
+usuario pide ir directo al código, se respeta.
+
+**Para instalar el nivel mínimo, el borrado es mecánico** (no interpretes prosa): en
+`templates/AGENTS.md`, borrá todo lo que esté entre cada par de marcadores
+`<!-- OKF:future-layer:start -->` / `<!-- OKF:future-layer:end -->` (4 bloques) y los
+marcadores mismos; en `templates/knowledge/index.md`, borrá el bloque `# Roadmap`; y no
+copies el skill `okf-plan` ni creés `roadmap.md`/`_changes/`. En el nivel **completo** solo
+borrás las 8 líneas de marcadores.
 
 Las carpetas dentro de `knowledge/` **dependen del perfil** del proyecto. No las
 asumas: elegilas en §2 (Elegí el perfil).
@@ -151,10 +187,12 @@ Reglas al escribir conceptos (todos los perfiles):
   linkea al otro.
 - **Cross-linkeá liberalmente** con links **relativos al archivo** (`../otra/x.md`,
   `./y.md`) — funcionan en GitHub y en cualquier visor, sin herramientas. Nunca
-  empieces un link con `/`. Detalle en `OKF-SPEC.md` §4.
+  empieces un link con `/`. Detalle en `OKF-SPEC.md` §4. **Una excepción:** ningún concepto
+  linkea a `_changes/` — esos docs se borran al cerrarse, y el link queda roto justo el día
+  del harvest. El único que linkea ahí es el `roadmap.md`, que se edita en ese mismo momento.
 - **`type:` del vocabulario** de `reference/profiles.md` (núcleo universal + perfil).
 - **Frontmatter por defecto:** `type` + `title` + `description` (una sola frase) +
-  `timestamp` + `tags`; `resource` cuando apunta a un activo real.
+  `timestamp`; `tags` y `resource` cuando apliquen.
 
 **Glosario de dominio (opcional, alto ROI en código grande/ambiguo con jerga).** Las
 preguntas a nivel *término* ("¿qué es ATK?", "¿qué es el Vigor?") son las que más caro le
@@ -175,6 +213,15 @@ nombrados rinde poco — no lo agregues por reflejo. Para que se use, ruteá hac
 > no-autoritativas). Mejor sin entrada que una entrada con el valor horneado, pero mejor aún:
 > cubrí los términos que un agente confundiría, apuntando al code-of-record.
 
+**Descriptivo vs normativo — en qué dirección corre la autoridad.** Casi todo lo que sembrás
+*describe* lo que existe: si difiere del código, gana el código y el documento es el bug. La
+excepción son los que *prescriben* —decisiones aceptadas, convenciones, el rumbo, el
+resultado esperado de un cambio activo—: ahí el **código está en violación** y el documento
+**no se edita** para emparejarlo. Sembrá con eso en mente: una decisión redactada como
+descripción ("el sistema usa X") pierde su fuerza normativa. La regla completa, con las dos
+salidas legítimas ante una violación, es `OKF-SPEC.md` §3.5; el mapeo `type` → clase está en
+`reference/profiles.md`.
+
 **Capas no-autoritativas (alto ROI en repos ruidosos/legacy).** Si el repo arrastra `notes/`,
 docs de refactors viejos o mockups que ya no reflejan el estado, **declaralos como
 no-autoritativos en el entrypoint** (sección en `templates/AGENTS.md`): qué dirs son scratch y
@@ -192,6 +239,28 @@ preguntado seguido y lo hacés la *única* ruta a ese hecho— **no especulativo
 archivo generado a ciegas no lo usó ningún agente (prefirieron el code-of-record del glosario)
 y fue overhead sin payoff (ver `knowledge/decisions/0010`).
 
+**La capa de futuro: rumbo + cambios (recomendado si el repo está en desarrollo activo).**
+El bundle también lleva el trabajo *por venir*, en dos piezas: **`knowledge/roadmap.md`**
+(un concepto `type: Roadmap`, template `_roadmap.md`: visión, qué está en curso, qué sigue,
+no-goals — la intención vigente, sin checkboxes) y **`knowledge/_changes/`** (un doc efímero
+por cambio no trivial, template `_change.md`: mini-spec + tareas; el linter la ignora y al
+cerrarse se harvestea al bundle — ciclo completo en el skill `okf-plan`). **Sembrá el
+roadmap preguntándole al usuario** — visión, próximos pasos, qué decidió NO hacer: es
+exactamente el conocimiento que no se deduce de ninguna fuente, y para un proyecto que se
+desarrolla conversando con IAs es lo que evita perder el rumbo entre sesiones. **Si no
+contesta o dice "hacelo vos": escribí lo que sí puedas inferir del código/README y marcá
+cada hueco con un blockquote `> Pendiente de confirmar: …`. No omitas el archivo** — si
+instalaste el nivel completo, el contrato lo linkea y quedaría un link roto. Si detectás
+trabajo a medio hacer (branches, TODOs, features a medias), proponé abrir su doc en
+`_changes/`. Para una wiki/datos sin desarrollo activo, omití la capa: eso es la
+instalación **mínima**, y se recorta con los marcadores (§1, "Cuánto instalar"). **Si el repo ya usa OpenSpec/Spec Kit u otra herramienta
+spec-driven, NO montes `_changes/`**: esa herramienta ya es el dueño del trabajo en curso y
+tendrías dos — leé `reference/spec-driven-interop.md` para hacerlas convivir.
+
+> **No planifiques de más.** Sembrá el roadmap y, a lo sumo, los cambios que están
+> *realmente* en curso. Escribir specs de trabajo hipotético se siente productivo y no lo
+> es: nada las obliga a seguir la realidad, así que se pudren igual que la doc abandonada.
+
 > **Sobre los templates `templates/knowledge/_*.md`:** son plantillas de referencia,
 > NO conceptos — el linter las ignora por el prefijo `_`. Cuando crees un concepto a
 > partir de una, copiá su contenido a un archivo **sin** el `_` (p.ej. `0001-x.md`) y
@@ -203,7 +272,8 @@ y fue overhead sin payoff (ver `knowledge/decisions/0010`).
 Generá un `index.md` en la raíz del bundle y en cada subcarpeta. Convención
 (detalle y ejemplos en `OKF-SPEC.md` §5):
 - En la **raíz**: lista los subdirectorios bajo `# Subdirectories`, cada uno con su
-  descripción.
+  descripción. Si hay **conceptos en la raíz** (`roadmap.md`, un `glossary.md`), van
+  **antes**, agrupados por `type` como en una hoja — si no, el linter los marca sin linkear.
 - En las **hojas**: agrupá los conceptos bajo un heading por su `type`, cada
   entrada `* [Título](archivo.md) - <description del frontmatter>`.
 - Links **relativos al archivo**. Sin frontmatter, salvo el `index.md` **raíz**, que
@@ -234,15 +304,20 @@ Elegí uno; no dupliques ambos.
 
 ### Paso 6 — Mantenimiento, testeo y enforcement
 
-Si se usa Claude Code, copiá **dos** skills a `<repo>/.claude/skills/`:
+Si se usa Claude Code, copiá **tres** skills a `<repo>/.claude/skills/`:
 - `templates/skills/okf-update/` → para que futuros agentes mantengan el bundle al día.
 - `templates/skills/okf-verify/` → para testear el bundle (conformidad + calidad +
   test de comportamiento). Ver `reference/verification.md`.
+- `templates/skills/okf-plan/` → para gestionar el rumbo y los cambios en curso
+  (abrir/retomar/cerrar con harvest). Si omitiste la capa de futuro, saltealo.
 
 Copiá también los scripts a `<repo>/scripts/`: **`templates/scripts/okf_lint.py`**
 (chequeador de conformidad determinista, solo stdlib, sin `pip install`, ideal para
 CI) y **`templates/scripts/okf_coldtest.py`** (arma el entorno aislado para el test
 en frío del Nivel 3). Sirven aunque no uses Claude Code.
+
+**Si decidís NO instalar el linter**, ajustá la línea de §3 del `AGENTS.md` que manda correrlo:
+si no, el contrato ordena un comando inexistente en cada turno.
 
 Para correrlo en cada push, copiá **`templates/ci/okf.yml`** a
 `<repo>/.github/workflows/okf.yml`. Es Python puro: **cero tokens, cero LLM** (el
@@ -253,16 +328,35 @@ Instalá el **git hook universal** `templates/hooks/pre-commit` (`cp` a
 el bundle no es conforme y avisa si cambió código sin tocar `knowledge/`. Corre con
 **cualquier** IA, porque es a nivel git.
 
-Si no se usa Claude Code, dejá ambos procedimientos como `runbooks/` dentro del
-bundle, o seguí §5 de esta guía y `reference/verification.md` a mano (el script
-`okf_lint.py` igual corre). El ciclo de mantenimiento completo está en
-`reference/maintaining.md`; cómo conectar cada herramienta (Cursor/Copilot/Gemini…), en
-`reference/install-per-tool.md`.
+**Si no se usa Claude Code** (no hay skills que se auto-disparen), copiá igual los tres
+procedimientos a `<repo>/docs/okf/` como docs legibles, **renombrando cada uno** (los tres
+archivos fuente se llaman `SKILL.md`: si los copiás con `cp` a la misma carpeta, se pisan y
+te quedás con uno solo, sin ningún error):
+
+```
+cp templates/skills/okf-update/SKILL.md <repo>/docs/okf/okf-update.md
+cp templates/skills/okf-verify/SKILL.md <repo>/docs/okf/okf-verify.md
+cp templates/skills/okf-plan/SKILL.md   <repo>/docs/okf/okf-plan.md   # si instalaste la capa de futuro
+```
+
+**Van fuera de `knowledge/`**: traen su propio frontmatter (`name`/`description`, sin `type`),
+así que adentro del bundle serían conceptos inválidos y harían fallar el linter, el hook y el
+CI. Y **dejá el disparador en `AGENTS.md`** — que sí lee toda herramienta. Ese es el punto: el
+contrato ya trae *cuándo* actuar (rumbo, cambio no trivial, harvest); el skill solo agrega el
+*cómo* detallado. Sin skills el sistema funciona igual, apenas menos automático. El ciclo de
+mantenimiento completo está en `reference/maintaining.md`; cómo conectar cada herramienta
+(Cursor/Copilot/Gemini…), en `reference/install-per-tool.md`.
+
+> **El usuario nunca tiene que nombrar un procedimiento.** Ni "okf-plan" ni "okf-update":
+> habla en lenguaje natural ("quiero que haga X", "¿en qué estábamos?") y el agente
+> reconoce el momento por el contrato. Si al instalar dejás algo que **exija** que el
+> usuario recuerde un comando, el sistema se va a dejar de usar en dos semanas.
 
 ### Paso 7 — Verificá (testeá el resultado)
 
 Seguí **`reference/verification.md`** (o corré el skill `okf-verify`). Son tres
-niveles:
+niveles (más un cuarto opcional y periódico, **Cumplimiento**: ¿el código viola alguna
+decisión aceptada? — no se corre en el init, sino cada tanto):
 1. **Conformidad** (objetivo, PASS/FAIL): corré `python3 scripts/okf_lint.py knowledge`
    — chequea frontmatter + `type` en cada concepto, reservados, links **relativos**
    que resuelven, índices que coinciden con los archivos, carpetas vacías. Exit 1 = falla.
@@ -292,6 +386,10 @@ de enforcement, en `reference/maintaining.md`.
 **Cuándo** actualizar: ante una **decisión** no trivial, un cambio de **arquitectura/schema**,
 un **gotcha**, un cambio de **runbook**, o algo que te explican y "ya deberías saber". No
 documentes todo de una: el bundle crece orgánico, una pieza por vez.
+
+El trabajo **futuro** tiene su propio ciclo: cada cambio no trivial nace como doc en
+`knowledge/_changes/` y muere en un **harvest** hacia el bundle (skill `okf-plan`); el rumbo
+vive en `knowledge/roadmap.md` y se edita cuando cambia.
 
 ---
 

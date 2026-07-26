@@ -65,21 +65,24 @@ Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 | **`OKF-SPEC.md`** | La especificación del formato (reglas normativas), condensada y self-contained. |
 | `reference/profiles.md` | Cómo organizar carpetas y `type:` por dominio (código / datos / wiki / mixto). El núcleo de la universalidad. |
 | `reference/examples.md` | Mini-bundles de ejemplo completos, en los tres dominios, para copiar el estilo. |
-| `reference/verification.md` | Cómo **testear** un bundle: conformidad (PASS/FAIL), calidad y el test de comportamiento en frío. |
+| `reference/verification.md` | Cómo **testear** un bundle: conformidad (PASS/FAIL), calidad, el test de comportamiento en frío, y la auditoría de cumplimiento (¿el código respeta lo normativo?). |
 | `reference/maintaining.md` | El ciclo de vida **después del init**: cómo el contexto se mantiene fresco y las capas de enforcement. |
 | `reference/install-per-tool.md` | Cómo conectar OKF a **cualquier IA** (Claude/Cursor/Copilot/Gemini…) — punteros a `AGENTS.md`, sin lock-in. |
 | `reference/special-cases.md` | Monorepos, migración desde contexto existente, escala (cuándo partir), e idioma. |
 | `reference/optional-tools.md` | Aceleradores externos **opcionales** (Repomix): entender el repo al bootstrapear y medir el tamaño del bundle en tokens. |
+| `reference/spec-driven-interop.md` | En qué difiere OKF de las herramientas spec-driven (OpenSpec, Spec Kit, Kiro), qué se tomó de su filosofía y cómo convivir con ellas en el mismo repo. |
 | `templates/AGENTS.md` | Template del entrypoint universal. |
 | `templates/CLAUDE.md` | Shim que apunta a AGENTS.md (evita duplicar). |
 | `templates/knowledge/` | Templates de `index.md`, `log.md` y de cada tipo de concepto. |
 | `templates/skills/okf-init/` | Skill de **arranque** (greenfield): bootstrapea OKF en un repo (la versión ejecutable del GUIDE). Instalalo global para disparar el "prompt mágico". |
 | `templates/skills/okf-migrate/` | Skill de **migración** (brownfield): consolida contexto disperso existente (AGENTS.md/ADRs/docs) en un bundle OKF, sin duplicar. |
 | `templates/skills/okf-update/` | Skill que se instala en el repo destino para mantener el bundle fresco. |
+| `templates/skills/okf-plan/` | Skill que se instala en el repo destino para gestionar la **capa de futuro**: el rumbo (`roadmap.md`) y los cambios en curso (`_changes/`, spec-driven liviano con harvest al cerrar). |
 | `templates/skills/okf-verify/` | Skill que se instala en el repo destino para **testear** el bundle y emitir un reporte PASS/FAIL. |
 | `templates/scripts/okf_lint.py` | Linter determinista (solo stdlib, sin `pip install`) que valida conformidad OKF. Ideal para CI; lo usa el skill `okf-verify`. |
 | `templates/scripts/okf_coldtest.py` | Arma un entorno aislado (solo el bundle, sin código ni `.git`) para correr el test en frío del Nivel 3. Stdlib, sin install. |
 | `templates/ci/okf.yml` | Workflow de GitHub Actions que corre el linter en cada push. **Cero tokens** (Python puro). Copialo a `.github/workflows/`. |
+| `templates/eval/` | Harness **opcional** para medir el bundle contra un golden-set de preguntas (turnos, tokens, acierto). Sirve para comparar antes/después de un cambio de contexto; no se instala por defecto. |
 | `templates/hooks/pre-commit` | Git hook **universal** (cualquier IA/herramienta): bloquea commits no conformes y avisa si cambió código sin actualizar `knowledge/`. |
 | `VERSION` | Revisión semver de **este kit** (no del formato). `okf-init` la estampa como `kit_version` en el bundle del repo. |
 | `CHANGELOG.md` | Historial de revisiones del kit. Aclara `kit_version` (kit) vs `okf_version` (formato OKF). |
@@ -124,6 +127,9 @@ vive en `knowledge/`").
 - **Desde donde sea** → `git clone` y el contexto completo te sigue.
 - **Sin reventar la ventana de contexto** → los `index.md` dan *progressive disclosure*:
   el agente ve el mapa y baja solo a lo que necesita.
+- **Sin perder el rumbo** → el contexto cubre pasado (`decisions/`, log), presente (los
+  conceptos) **y futuro**: el rumbo vigente en `roadmap.md` y cada cambio no trivial
+  especificado en `_changes/` antes de codearse, cosechado al bundle al cerrarse (`okf-plan`).
 
 ---
 

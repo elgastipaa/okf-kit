@@ -1,6 +1,6 @@
 # Golden set (EJEMPLO) — copialo y adaptalo a tu repo
 
-Formato leído por `run-eval.sh`. Cada pregunta es un bloque:
+Formato leído por `run-eval.py`. Cada pregunta es un bloque:
 
 - encabezado `### <id> · <category>`  (categorías: `domain`, `where`, `impact`, `ops`, `trap`)
 - `- Q:` la pregunta tal cual la haría alguien

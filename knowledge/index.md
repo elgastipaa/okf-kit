@@ -1,7 +1,11 @@
 ---
 okf_version: "0.1"
-kit_version: "0.5.0"
+kit_version: "0.6.0"
 ---
+
+# Roadmap
+
+* [Rumbo del kit OKF](roadmap.md) - Hacia dónde va el kit hoy: ingeniería de contexto completa (pasado, presente y futuro) aplicable a cualquier repo sin tooling.
 
 # Subdirectories
 

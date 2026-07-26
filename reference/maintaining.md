@@ -44,8 +44,20 @@ En cambio:
   la vieja pasa a `status: "superseded by MMMM"`. Queda el camino de migración.
 - **Concepto deprecado:** movélo a `knowledge/archive/` o marcá arriba `SUPERSEDED → ver X`.
   **Nombrá el concepto viejo** (término, flag, clase) para que un `grep` futuro lo encuentre.
-- **Gana el código:** si un concepto ya no coincide con el código, el concepto es el bug —
-  corregilo o deprecalo en el mismo cambio.
+- **Gana el código (descriptivos):** si un concepto que *describe* algo ya no coincide con
+  el código, el concepto es el bug — corregilo o deprecalo en el mismo cambio.
+- **Al revés para los normativos:** si el código viola una **decisión aceptada**, una
+  convención o el rumbo, el bug es el código. No se edita el documento para emparejarlo:
+  se avisa al usuario y se elige entre arreglar el código o **superseder** la decisión
+  (canónico: `OKF-SPEC.md` §3.5; mapeo de tipos: `reference/profiles.md`).
+
+## El rumbo y los cambios en curso (la capa de futuro)
+
+Si el repo usa la capa de futuro (recomendada en desarrollo activo): el rumbo vigente vive
+en `knowledge/roadmap.md` (un concepto; se edita cuando cambia) y cada cambio no trivial
+nace como doc en `knowledge/_changes/` y muere en un **harvest** hacia el bundle. El ciclo
+completo (abrir / retomar / cerrar) es el skill **`okf-plan`**; la mecánica de escribir lo
+cosechado es la de `okf-update`.
 
 ## Scratchpad (opcional, para tareas largas)
 
@@ -85,9 +97,14 @@ otra herramienta, ver **`reference/install-per-tool.md`**.
 ## Anti-rot: señales de que el contexto envejeció
 
 - Hubo decisiones/cambios recientes que **no** están en `knowledge/` (el hook #3 lo avisa).
+- Hay docs en `_changes/` terminados sin harvest, abandonados, o un `roadmap.md` que ya no
+  refleja lo que se está haciendo → harvest/poda pendiente (`okf-plan`).
 - El **cold test** (Nivel 3) empieza a fallar preguntas sobre features nuevas.
 - Los `index.md` no coinciden con los archivos (el linter lo marca).
-- Un **concepto contradice el código** → gana el código; el concepto es un bug, arreglalo.
+- Un **concepto descriptivo contradice el código** → gana el código; el concepto es un bug.
+- El **código viola una decisión aceptada** (drift al revés, el más caro: se pierde el
+  *por qué*) → reportalo; arreglar el código o superseder la decisión, nunca editarla en
+  silencio. Se caza con el chequeo de cumplimiento de `reference/verification.md`.
 - El bundle creció y cuesta navegarlo → ver `special-cases.md` (cuándo partir).
 
 Regla: el bundle vale **solo si se mantiene**. Una pieza de conocimiento por vez, como

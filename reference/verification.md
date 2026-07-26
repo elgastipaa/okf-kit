@@ -1,13 +1,16 @@
 # Verificación — cómo testear un bundle OKF
 
-Testear un bundle tiene **tres niveles**, de lo mecánico a lo que de verdad importa.
-Corré 1 y 2 siempre (son baratos); el 3 es la prueba de fuego.
+Testear un bundle tiene **cuatro niveles**, de lo mecánico a lo que de verdad importa.
+Corré 1 y 2 siempre (son baratos); el 3 es la prueba de fuego. El 4 es **opcional y
+periódico**, y mira en la dirección contraria: no si el bundle está bien, sino si el
+**código respeta** lo que el bundle prescribe.
 
 | Nivel | Qué mide | Naturaleza | Veredicto |
 |---|---|---|---|
 | **1. Conformidad** | ¿Es OKF válido? (estructura) | Objetivo, chequeable | PASS / FAIL |
 | **2. Calidad** | ¿Es un *buen* bundle? | Heurístico, con criterio | smells a corregir |
 | **3. Outcome** | ¿Un agente en frío entiende el proyecto con *solo* el bundle? | Comportamiento | **la prueba real** |
+| **4. Cumplimiento** *(opcional)* | ¿El código viola alguna decisión aceptada o convención? | Auditoría, con criterio | violaciones a resolver |
 
 > **Quién corre qué:**
 > - **Nivel 1** → el script `okf_lint.py` (determinista, solo stdlib, sin instalar nada).
@@ -55,7 +58,9 @@ código) e **ignora los archivos `_*.md`** (plantillas/borradores). Para cada í
   *(Roto = warning, no fatal — puede ser conocimiento no escrito aún; pero listalos.)*
 - [ ] **Índices cubren y coinciden.** Cada carpeta con conceptos tiene `index.md`;
   sus entradas coinciden con los archivos reales (sin entradas viejas ni archivos
-  faltantes). La raíz lista los subdirectorios.
+  faltantes). La raíz lista **todos** los subdirectorios, y los conceptos que vivan en la
+  raíz (`roadmap.md`, `glossary.md`) agrupados por `type`. *(Lo de los subdirectorios el
+  script todavía no lo valida — se chequea acá.)*
 - [ ] **Entrypoint resuelto** *(lo evalúa el agente, no el script)*. Existe
   `AGENTS.md` que apunta a `knowledge/index.md`, **o** el `README` del repo apunta a
   `knowledge/`. Si hay `CLAUDE.md`, es un shim fino. *(El script solo valida que el
@@ -78,9 +83,11 @@ No es pass/fail; son **smells** que bajan el valor del bundle. Reportá los que 
   lo que se lee del código/schema sin agregar intención, decisión ni caveat.
 - **¿Duplica la fuente?** Smell: bloques de código/schema copiados en vez de
   linkeados con `resource`. Lo deducible de la fuente se linkea, no se copia.
-- **¿Algún concepto contradice el código?** Smell **grave**: un dato del bundle (un
-  conteo, una flag, una ruta, un nombre) que ya no coincide con la fuente. **Gana el
-  código** — el concepto es un bug. Suele venir de transcribir en vez de linkear.
+- **¿Algún concepto DESCRIPTIVO contradice el código?** Smell **grave**: un dato del
+  bundle (un conteo, una flag, una ruta, un nombre) que ya no coincide con la fuente.
+  **Gana el código** — el concepto es un bug. Suele venir de transcribir en vez de linkear.
+  *(Si el que contradice es un concepto **normativo** —una decisión aceptada, una
+  convención— no es este smell: es una **violación del código**, y va al Nivel 4.)*
 - **¿Es un grafo o solo un árbol?** Smell: conceptos huérfanos, sin cross-links
   entrantes ni salientes. Los conceptos relacionados deberían linkearse entre sí.
 - **¿Progressive disclosure real?** Smell: `AGENTS.md` o los `index.md` enormes; o
@@ -154,6 +161,39 @@ Regla: usá el grado 1-2 como **test de regresión** barato y frecuente; usá el
 
 ---
 
+## Nivel 4 — Cumplimiento (opcional, periódico)
+
+Los otros tres niveles preguntan *"¿está bien el bundle?"*. Este pregunta lo inverso:
+**¿el código respeta lo que el bundle prescribe?** Es el drift más caro, porque no se ve:
+el bundle sigue prolijo, el código sigue andando, y la decisión que alguien tomó por una
+razón se perdió en silencio.
+
+Es una **auditoría con criterio** (no un script): requiere leer el código, así que no va en
+CI ni se corre en cada commit. Corrélo cada tanto, o antes de un release.
+
+1. **Listá lo normativo *auditable*:** las `decisions/` con `status: accepted`, las
+   convenciones, y las reglas duras del `AGENTS.md`. (Los `type` normativos están en
+   `reference/profiles.md`; la regla, en `OKF-SPEC.md` §3.5.) Ignorá las `proposed` y las
+   `superseded`. El **rumbo** también es normativo pero **no se audita acá**: que el código
+   no lo haya alcanzado es trabajo pendiente, no una violación.
+2. **Por cada una, buscá su violación**, no su confirmación. Si la decisión declara **cómo
+   verificarla** (el comando/grep/test del template `_decision.md`), corré eso. Si no,
+   derivá la señal: "usamos cola para emails" → ¿hay envíos directos fuera del worker?
+3. **Clasificá cada hallazgo:**
+   - **Violación** — el código contradice la decisión. Reportala; **no toques el documento**.
+   - **Decisión obsoleta** — la realidad cambió y la decisión ya no tiene sentido. También
+     se reporta: el fix es **supersederla** (decisión nueva con `supersedes`), no borrarla.
+   - **Ambiguo** — la decisión está redactada tan vaga que no se puede chequear. El fix es
+     afilar el documento (y agregarle su forma de verificación).
+4. **Resolvé con el usuario, no solo.** Cada violación tiene dos salidas legítimas —
+   arreglar el código, o cambiar la decisión explícitamente. Elegir por él (sobre todo
+   "actualizo el doc y listo") es el failure mode que este nivel existe para cazar.
+
+> **Escala:** si el bundle tiene muchas decisiones, no audites todas cada vez. Priorizá las
+> que tocan el área que se está cambiando y las que tengan verificación declarada (baratas).
+
+---
+
 ## Formato de reporte
 
 ```markdown
@@ -161,7 +201,7 @@ Regla: usá el grado 1-2 como **test de regresión** barato y frecuente; usá el
 Resultado: PASS | PASS-WITH-WARNINGS | FAIL
 
 ## Nivel 1 — Conformidad
-[x]/[!]/[ ] por ítem (lista arriba)
+[x]/[!]/[ ] por ítem (el output del script tal cual, o el checklist de 9 ítems)
 
 ## Nivel 2 — Calidad
 - smells encontrados (o "ninguno")
@@ -169,6 +209,9 @@ Resultado: PASS | PASS-WITH-WARNINGS | FAIL
 ## Nivel 3 — Outcome
 - Set de preguntas usado
 - Cómo correrlo (prompt de CLI en frío) — o resultados si ya se corrió
+
+## Nivel 4 — Cumplimiento (si se corrió)
+- Decisiones/convenciones auditadas y violaciones encontradas (o "ninguna")
 
 ## Issues
 | Sev | Archivo | Problema | Fix sugerido |

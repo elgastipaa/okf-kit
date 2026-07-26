@@ -22,12 +22,15 @@ autoritativo y completo es `GUIDE.md`; esto es el mapa. La versión skill es `ok
 4. **Sembrá los conceptos** (lo más importante): un archivo por concepto, capturando el
    *por qué* que la fuente no dice; lo deducible se **linkea**, no se copia. Partí de los
    templates `templates/knowledge/_*.md` (copialos sin el `_` y borrá el comentario HTML).
-5. **Índices + log + versión:** `index.md` raíz (subdirectorios) y por hoja (conceptos
+5. **Índices + log + versión:** `index.md` raíz (subdirectorios, y los conceptos que vivan en
+   la raíz —`roadmap.md`, `glossary.md`— agrupados por `type`) y por hoja (conceptos
    agrupados por `type`); `log.md` con la fecha de hoy. Estampá `kit_version` desde
    `VERSION` y `okf_version: "0.1"` en el `index.md` raíz. Ver
    [kit_version vs okf_version](../decisions/0003-kit-version-vs-okf-version.md).
 6. **Entrypoint:** `AGENTS.md` (+ `CLAUDE.md` shim) si lo trabaja un agente de código; o un
-   puntero a `knowledge/` en el `README` si es wiki/datos.
+   puntero a `knowledge/` en el `README` si es wiki/datos. Recortá el template con sus
+   marcadores según el nivel instalado — ver
+   [material instalado autosuficiente](../decisions/0013-installed-material-is-self-sufficient.md).
 7. **Mantenimiento + CI** (opcional): skills, scripts, `okf.yml`, git hook.
 8. **Verificá:** corré [el linter](lint-the-bundle.md) y, periódicamente, el
    [cold test](cold-test.md).

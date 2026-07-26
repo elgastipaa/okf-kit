@@ -16,8 +16,10 @@ YAML**. Dos términos son la base de todo lo demás:
   **Concept ID** es el path dentro del bundle sin el `.md` (`decisions/0001-orm`).
 
 Dos nombres están **reservados** y NO son conceptos: `index.md` (listado de directorio)
-y `log.md` (historial). Cualquier otro `.md` es un concepto y **debe** llevar
-frontmatter con `type`. Las reglas exactas están en
+y `log.md` (historial). Tampoco lo es nada con **prefijo `_`** (archivo o carpeta): queda
+fuera del bundle conforme y el linter lo ignora — así viven los derivados (`_generated/`) y
+los docs de trabajo efímeros (`_changes/`). Cualquier otro `.md` es un concepto y **debe**
+llevar frontmatter con `type`. Las reglas exactas están en
 [el formato OKF](../references/okf-format.md).
 
 # Por qué importa

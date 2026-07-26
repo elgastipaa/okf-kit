@@ -7,7 +7,9 @@
   Hay dos formas según dónde esté el index:
 
   (A) RAÍZ del bundle (knowledge/index.md) → lista los SUBDIRECTORIOS bajo
-      "# Subdirectories". Es el bloque de abajo.
+      "# Subdirectories". Es el bloque de abajo. Si hay conceptos EN la raíz
+      (p.ej. roadmap.md o un glossary.md), van antes, agrupados por type como
+      en las hojas (el bloque "# Roadmap" de abajo; borralo si no aplica).
 
   (B) HOJAS (knowledge/<carpeta>/index.md) → agrupa los CONCEPTOS bajo un heading
       por su `type`, así (sin frontmatter):
@@ -28,6 +30,10 @@
 okf_version: "0.1"
 kit_version: "{{KIT_VERSION}}"   # okf-init lo reemplaza con el contenido de VERSION
 ---
+
+# Roadmap
+
+* [Rumbo de {{proyecto}}](roadmap.md) - {{description del frontmatter del roadmap}}
 
 # Subdirectories
 

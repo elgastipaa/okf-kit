@@ -9,9 +9,11 @@ description: >
 
 Este repo usa **OKF** para su contexto en `knowledge/` (ver `AGENTS.md`). Este
 skill verifica que ese bundle esté bien. (Procedimiento **vendor-neutral**: skill de
-Claude Code o seguilo directo desde cualquier agente.) Hay tres niveles; corré 1 y 2 vos mismo
+Claude Code o seguilo directo desde cualquier agente.) Hay cuatro niveles; corré 1 y 2 vos mismo
 leyendo los archivos, y **preparás** el 3 para que lo corra el usuario en una CLI
-nueva. Referencia completa: `reference/verification.md` (si está disponible).
+nueva. El **Nivel 4 es opcional** (auditoría de cumplimiento): corrélo si el usuario lo pide
+o si el bundle no se audita hace mucho. **Es autosuficiente**: todo lo que hace falta para
+correrlo y para emitir el reporte está acá, sin depender de que `okf-kit` siga en disco.
 
 **No arregles nada sin avisar.** Emití el reporte primero; ofrecé aplicar los fixes
 con el skill `okf-update` si el usuario quiere.
@@ -44,7 +46,9 @@ sin Python — el Nivel 1 no depende de ejecutar nada:
 6. **Links resuelven:** cada link relativo apunta a un archivo existente. *(Roto =
    warning; listalos.)*
 7. **Índices:** cada carpeta con conceptos tiene `index.md` y sus entradas coinciden
-   con los archivos reales (sin entradas viejas ni faltantes). La raíz lista subdirs.
+   con los archivos reales (sin entradas viejas ni faltantes). La raíz lista **todos** los
+   subdirs (el script todavía no lo valida — chequealo acá) y los conceptos que vivan en la
+   raíz (`roadmap.md`, `glossary.md`), agrupados por `type`.
 8. **Entrypoint:** `AGENTS.md` apunta a `knowledge/index.md`, o el `README` apunta a
    `knowledge/`.
 9. **Sin carpetas vacías.**
@@ -58,11 +62,15 @@ desfasados — es **WARN** y NO hace fallar (salvo `--strict`). Reportá los war
 # Nivel 2 — Calidad (heurístico)
 
 Reportá smells, no des pass/fail:
+- Conceptos **descriptivos** que **contradicen el código** (smell grave: gana el código,
+  el concepto es el bug). *(Si el que contradice es normativo —decisión aceptada,
+  convención— eso NO es este smell: es una violación del código y va al Nivel 4.)*
 - Conceptos que **repiten el código** en vez de capturar el *por qué*.
 - **Duplicación** de la fuente (código/schema copiado en vez de linkeado).
 - Conceptos **huérfanos** (sin cross-links entrantes ni salientes).
 - `AGENTS.md` o `index.md` **demasiado grandes** (rompe progressive disclosure)
-  *(medible con el token-sizer opcional — ver `reference/optional-tools.md`)*.
+  *(regla gruesa: el `AGENTS.md` instalado no debería pasar los ~7000 caracteres —
+  se paga en cada turno de cada sesión)*.
 - `description` de varias oraciones o genéricas.
 - `Decision` sin contexto/consecuencias.
 - Falta de **conocimiento tribal** (decisiones, gotchas, runbooks): estructura linda
@@ -88,8 +96,56 @@ físico). Calificá: ✅ correcta y citada · ⚠️ parcial · ❌ inventó ·
 la IA que sea", entregale al usuario el prompt listo para pegar en una CLI/IA nueva
 (Claude, Gemini, Cursor…). Es lo único que valida portabilidad real entre herramientas.
 
+# Nivel 4 — Cumplimiento (opcional: ¿el código respeta lo que el bundle prescribe?)
+
+Los niveles 1-3 preguntan "¿está bien el bundle?"; este pregunta al revés. Es una
+**auditoría con criterio** (lee código), así que no va en CI y no se corre siempre.
+
+1. Listá lo **normativo auditable**: `decisions/` con `status: accepted`, convenciones, y las
+   reglas duras del `AGENTS.md`. Ignorá `proposed` y `superseded`. **El rumbo y los cambios
+   abiertos NO se auditan acá**: que el código todavía no los haya alcanzado es trabajo
+   pendiente, no una violación — reportarlos sería un falso positivo.
+2. Por cada una **buscá su violación** (no su confirmación). Si la decisión trae su forma de
+   verificarla (comando/grep/test), corré esa; si no, derivá la señal del texto.
+3. Clasificá: **violación** (el código contradice) · **decisión obsoleta** (la realidad
+   cambió → se supersede, no se borra) · **ambigua** (no se puede chequear → afilar el doc).
+4. **Reportá; no resuelvas solo.** Cada violación tiene dos salidas legítimas: arreglar el
+   código, o superseder la decisión. **Nunca** edites la decisión para que coincida con lo
+   que el código hace hoy — eso borra el *por qué* y es justo lo que este nivel caza.
+
+Si el bundle tiene muchas decisiones, priorizá las del área que se está tocando y las que
+tengan verificación declarada.
+
 # Salida
 
-Emití el reporte con el formato de `reference/verification.md` (Resultado, Nivel 1
-con checklist, Nivel 2 smells, Nivel 3 set de preguntas + prompt, tabla de Issues por
-severidad, Veredicto en una línea). Terminá ofreciendo correr `okf-update` para los fixes.
+Emití el reporte con este formato:
+
+```markdown
+# OKF Verification Report — <bundle> — <YYYY-MM-DD>
+Resultado: PASS | PASS-WITH-WARNINGS | FAIL
+
+## Nivel 1 — Conformidad
+[x]/[!]/[ ] por ítem (el output del script tal cual, o el checklist de 9 ítems)
+
+## Nivel 2 — Calidad
+- smells encontrados (o "ninguno")
+
+## Nivel 3 — Outcome
+- Set de preguntas usado
+- Cómo correrlo (prompt de CLI en frío) — o resultados si ya se corrió
+
+## Nivel 4 — Cumplimiento (si se corrió)
+- Decisiones/convenciones auditadas y violaciones encontradas (o "ninguna")
+
+## Issues
+| Sev | Archivo | Problema | Fix sugerido |
+|-----|---------|----------|--------------|
+| FAIL/WARN/SMELL | path | … | … |
+
+## Veredicto
+<una línea> + próximos pasos
+```
+
+Terminá ofreciendo correr
+`okf-update` para los fixes del bundle — pero las **violaciones del Nivel 4 no se
+"arreglan" con `okf-update`**: se llevan al usuario para decidir código vs supersede.

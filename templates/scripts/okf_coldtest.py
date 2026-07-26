@@ -83,8 +83,11 @@ def main(argv: list[str]) -> int:
         dest = Path(tempfile.mkdtemp(prefix="okf-cold-"))
 
     # Copiar SOLO el bundle + entrypoints; nada de código ni .git del repo original.
+    # Se excluye todo lo de prefijo `_` (derivados, y las specs efímeras de `_changes/`):
+    # no es bundle conforme, y una spec de trabajo en curso es NORMATIVA sobre el futuro —
+    # un agente en frío la leería como descripción del presente y respondería mal.
     shutil.copytree(bundle, dest / bundle.name, dirs_exist_ok=True,
-                    ignore=shutil.ignore_patterns(".git"))
+                    ignore=shutil.ignore_patterns(".git", "_*"))
     copied = []
     for name in ENTRYPOINTS:
         src = bundle.parent / name

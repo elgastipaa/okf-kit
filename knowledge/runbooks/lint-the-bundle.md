@@ -24,8 +24,9 @@ Antes de cerrar cualquier cambio al bundle, en el pre-commit hook, y en CI. Es e
    ```
 
 # Notas / gotchas
-- **Solo stdlib, sin `pip install`.** Si PyYAML está disponible, valida la sintaxis YAML;
-  si no, solo chequea presencia de claves (los chequeos duros funcionan igual).
+- **Solo stdlib, sin `pip install` — y sin PyYAML.** El frontmatter lo valida un parser
+  determinista propio, así que el veredicto es el mismo en cualquier máquina (nada de
+  chequeos que aparecen o desaparecen según lo que haya instalado).
 - Hace fallar (ERROR) solo por: frontmatter ausente/roto/no-mapping, `type` faltante, YAML
   inválido, o link que **empieza con `/`**. Todo lo demás es WARN. Es la materialización de
   [consumo permisivo](../decisions/0002-permissive-consumption.md).

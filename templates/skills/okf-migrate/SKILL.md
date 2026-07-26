@@ -21,6 +21,7 @@ Buscá y listá todo lo que ya documenta el proyecto:
 - `AGENTS.md`, `CLAUDE.md`, `.cursorrules`, `.github/copilot-instructions.md`.
 - `/docs`, wikis, READMEs largos, ADRs (`docs/adr/`, `decisions/`…).
 - Comentarios "tribales" en el README o en el código (decisiones, gotchas).
+- Planes y pendientes: `TODO.md`, `ROADMAP.md`, listas de "próximos pasos", features a medias.
 Mostrale el inventario al usuario antes de mover nada. (Para repos grandes, empaquetá
 con Repomix y leé ese archivo — opcional, ver `reference/optional-tools.md`.)
 
@@ -48,17 +49,25 @@ terminaría ruteando a los agentes hacia la basura).
 - **Dominio / schema / procesos** → la carpeta del perfil que toque (ver `profiles.md`).
 - **Procedimientos operativos** → `knowledge/runbooks/`.
 - **Material externo** → `knowledge/references/` (resumido, con `# Citations`).
+- **Planes / TODOs / roadmaps**: **preguntale al usuario si quiere la capa de futuro**
+  (misma pregunta que en `okf-init` §3 — en su idioma, no en el del kit). Si va: la
+  intención que sigue viva → `knowledge/roadmap.md` (visión, qué sigue, no-goals —
+  confirmala con él) y, si hay trabajo a medio hacer, un doc por cambio en
+  `knowledge/_changes/` (ver `okf-plan`). Si no va, es la instalación **mínima**: aplicá el
+  borrado por marcadores del `AGENTS.md` que describe `okf-init` §5. Los planes muertos
+  → no-autoritativos o borrar (preguntá la disposición, como con cualquier doc stale).
 
 ## 4. Mové, no copies
 Por cada pieza: creá el concepto OKF en `knowledge/` (frontmatter `type`+`title`+
-`description`+`timestamp`+`tags`; cross-links **relativos al archivo**, nunca `/`) y
+`description`+`timestamp`, `tags` si aplica; cross-links **relativos al archivo**, nunca `/`) y
 **borrá el contenido del original**, dejando un puntero ("esto ahora vive en
 `knowledge/<...>`"). En `AGENTS.md` dejá solo el índice + "el contexto vive en
 `knowledge/`, empezá por `knowledge/index.md`". `CLAUDE.md` queda como shim `@AGENTS.md`.
 
 ## 5. Anti-duplicación + verificá
 **Una verdad, un lugar.** Si algo quedó en dos lados, borralo de uno y linkeá. Generá
-los `index.md` (raíz + hojas) y una entrada en `log.md` (`## YYYY-MM-DD`, "Migración
+los `index.md` (raíz —subdirectorios **y** los conceptos que vivan en la raíz, como
+`roadmap.md`, agrupados por `# {type}`— y hojas) y una entrada en `log.md` (`## YYYY-MM-DD`, "Migración
 de contexto existente a OKF"). Corré `python3 scripts/okf_lint.py knowledge` (o
 `okf-verify`) para detectar links rotos tras mover.
 

@@ -24,7 +24,8 @@ Lo que hay que recordar:
 - **Conformidad** (§8): solo `type` + frontmatter parseable son duros; el resto es guía
   blanda ([consumo permisivo](../decisions/0002-permissive-consumption.md)).
 
-Para *testear* un bundle hay tres niveles (conformidad / calidad / outcome), detallados en
+Para *testear* un bundle hay cuatro niveles (conformidad / calidad / outcome, y cumplimiento
+—¿el código respeta lo normativo?— opcional y periódico), detallados en
 `reference/verification.md` — el Nivel 1 lo automatiza [el linter](../runbooks/lint-the-bundle.md).
 
 # Citations

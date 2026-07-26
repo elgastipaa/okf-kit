@@ -9,11 +9,40 @@ adaptación:
 
 Lo único que cambia por herramienta es **cómo te asegurás de que tu IA lea `AGENTS.md`**
 (el contrato) y, opcionalmente, cómo hacés que los **procedimientos** (`okf-update`,
-`okf-verify`…) se auto-disparen. El contenido de esos procedimientos es markdown
+`okf-verify`, `okf-plan`…) se auto-disparen. **Los disparadores que importan ya viven en el
+`AGENTS.md`** (cuándo leer el rumbo, cuándo abrir un cambio, cuándo cosechar), así que una
+herramienta sin skills no pierde el comportamiento: pierde el detalle del *cómo*, que el
+agente puede leer del markdown del procedimiento. El contenido de esos procedimientos es markdown
 vendor-neutral: cualquier agente puede seguirlo aunque no tenga el mecanismo de "skills".
 
 > **Regla de oro:** un solo source of truth (`AGENTS.md` + `knowledge/`). Los archivos
 > por-herramienta son **punteros finos**, nunca copias — así no hay drift.
+
+## Qué tan fuerte es cada garantía (independencia del vendor)
+
+Ninguna herramienta se puede *obligar* a obedecer una instrucción. Por eso el sistema no
+apuesta todo a eso: hay tres capas, y las dos duras no dependen del vendor.
+
+| Capa | Qué la hace cumplir | ¿Depende del vendor? |
+|---|---|---|
+| **Instrucción** — `AGENTS.md` (+ el puntero nativo de la herramienta) | Que el agente lo lea y lo siga | **Sí** — es un default fuerte, no una garantía |
+| **Git** — pre-commit hook + CI | Corren en `git commit`/`push`, sin importar quién escribió el código (o si lo escribió un humano) | **No** |
+| **Auditoría** — `okf-verify` + cold test + Nivel 4 (cumplimiento) | Se corre cada tanto y detecta lo que se escapó | **No** |
+
+Corolario práctico: **si te importa que algo no se pierda, no lo dejes solo en la capa de
+instrucción.** El hook y el CI son los que hacen que el sistema sobreviva a una herramienta
+que ignoró el contrato, o a un commit hecho a mano.
+
+## Canario: ¿tu herramienta está leyendo el contrato?
+
+Antes de confiar en una herramienta nueva, preguntale en una sesión limpia:
+
+> *"Sin buscar en el código: ¿qué dice el contrato de este repo que tenés que hacer antes de
+> cerrar una tarea, y dónde vive el contexto del proyecto?"*
+
+Si contesta el linter/harvest y `knowledge/`, lo está leyendo. Si duda o generaliza, **no lo
+está leyendo**: revisá el puntero nativo de esa herramienta (abajo). Repetilo cuando cambies
+de herramienta o de versión — el soporte de `AGENTS.md` se mueve rápido.
 
 ---
 

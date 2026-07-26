@@ -18,6 +18,8 @@ trabajo normal, no como un proyecto aparte.
 - Aparece un **gotcha** (framework, API, setup) → `references/*.md`.
 - Cambia un **procedimiento operativo** → `runbooks/*.md`.
 - Te explican algo que el código no dice y vas a re-necesitar → la carpeta que toque.
+- Se abre o se cierra un **cambio** planificado → `_changes/` + harvest al bundle
+  (capa de futuro — ver la [decisión 0011](../decisions/0011-future-work-layer.md)).
 
 # Las capas de enforcement (de blanda a dura)
 El mantenimiento no depende de la buena voluntad; hay varias redes y ninguna es

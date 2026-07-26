@@ -53,14 +53,28 @@ llenar. No crees carpetas vacías.
 
 ## 3. Sembrá los conceptos (lo más importante)
 Un archivo por concepto, con frontmatter `type`(req) + `title` + `description`
-(una frase) + `timestamp` + `tags`; `resource` si apunta a un activo real. Priorizá
+(una frase) + `timestamp`; `tags` y `resource` si aplican. Priorizá
 el *por qué* que la fuente no dice; no copies lo que se deduce del código —linkealo.
 **Cross-links relativos al archivo** (`../dir/x.md`), nunca con `/`. Usá los
 `templates/knowledge/_*.md` como base: copialos a archivos **sin** el `_` y **borrá
 el comentario HTML** (el archivo debe empezar con `---`).
 
+**Capa de futuro (default; es lo que decide si la instalación es "completa" o "mínima"):**
+preguntale al usuario **en su idioma, no en el del kit** — *"¿querés que además lleve el
+rumbo del proyecto —qué estás haciendo, qué sigue— para retomar sin explicarme todo de nuevo?
+Suma un poco de ida y vuelta antes de codear."* Sí (o duda) → completa; "andá directo al
+código" → mínima (saltá esta capa y seguí las instrucciones de borrado en §5 y §6).
+
+Si va: sembrá `knowledge/roadmap.md` (template `_roadmap.md`) **preguntándole** la visión, lo
+próximo y los no-goals — no se deducen de ninguna fuente. **Si no contesta o dice "hacelo
+vos": escribí lo que sí puedas inferir del código/README y marcá cada hueco con un
+blockquote `> Pendiente de confirmar: …`. No omitas el archivo** — el contrato instalado lo
+linkea. El trabajo en curso va como docs en `knowledge/_changes/` (template `_change.md`; el
+linter la ignora). Ciclo completo: skill `okf-plan`.
+
 ## 4. Índices, log y sello de versión
-`index.md` en la raíz (subdirectorios bajo `# Subdirectories`) y en cada hoja
+`index.md` en la raíz (subdirectorios bajo `# Subdirectories`, y los conceptos que vivan en
+la raíz —`roadmap.md`, `glossary.md`— antes, agrupados por `# {type}`) y en cada hoja
 (conceptos agrupados por `# {type}`), links relativos. `log.md` con una entrada de
 hoy (`## YYYY-MM-DD`). Reemplazá el placeholder `{{KIT_VERSION}}` (en el `index.md`
 raíz y en la línea de `Initialization` del `log.md`) con el contenido de
@@ -72,8 +86,17 @@ Si un agente de código va a trabajar el repo: copiá `templates/AGENTS.md` a la
 (+ `CLAUDE.md` shim). Si es wiki/datos navegado a mano: omití `AGENTS.md` y poné un
 puntero a `knowledge/` en el `README`.
 
+**Borrá el andamiaje, mecánicamente** (si no, el contrato manda al agente a archivos que no
+existen): siempre, las 8 líneas de marcadores `<!-- OKF:future-layer:… -->`; y **si no
+instalaste la capa de futuro** (§3), además todo lo que quede **entre** cada par de
+marcadores `:start`/`:end` (4 bloques) y el bloque `# Roadmap` del `knowledge/index.md`.
+
 ## 6. Instalá mantenimiento, testeo y CI
-- `templates/skills/okf-update/` y `templates/skills/okf-verify/` → `.claude/skills/`.
+- `templates/skills/okf-update/` y `templates/skills/okf-verify/` → `.claude/skills/`; sumá
+  `templates/skills/okf-plan/` **solo si instalaste la capa de futuro** (§3). Si no se usa
+  Claude Code, copiá cada `SKILL.md` a `docs/okf/okf-<nombre>.md` — **renombrando** (los tres
+  se llaman igual y si no se pisan entre sí) y **fuera de `knowledge/`**, o el linter los
+  rechaza (traen frontmatter sin `type`).
 - `templates/scripts/okf_lint.py` y `templates/scripts/okf_coldtest.py` → `scripts/`.
 - `templates/ci/okf.yml` → `.github/workflows/okf.yml` (linter en cada push, cero tokens).
 - `templates/hooks/pre-commit` → git hook **universal** (corre con cualquier IA): `cp` a

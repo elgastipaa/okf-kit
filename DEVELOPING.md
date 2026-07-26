@@ -16,10 +16,12 @@ salir **proactivamente**, antes de cada release.
    python3 scripts/okf_selfcheck.py
    ```
    Valida la consistencia *interna*: el linter pasa limpio sobre el bundle dogfood
-   `knowledge/`, `kit_version` no se "cae" en ejemplos/skills, el keep-alive coincide
-   entre `AGENTS.md` y `okf-update`, y toda referencia `reference/*.md` resuelve. Exit 0
-   = OK. (Es kit-only: vive en `scripts/`, no en `templates/`, así que no se instala en
-   repos destino.)
+   `knowledge/`, `kit_version` no se "cae" en ejemplos/skills, el keep-alive y la capa de
+   futuro coinciden entre el contrato y los skills, la rama normativa no se cae, el
+   contrato instalado entra en su presupuesto y **la instalación mínima no queda mencionando
+   la capa de futuro**, el material instalado no cita rutas del kit, y toda referencia
+   `reference/*.md` resuelve. Exit 0 = OK. (Es kit-only: vive en `scripts/`, no en
+   `templates/`, así que no se instala en repos destino.)
 
 2. **Linter sobre el dogfood:**
    ```
@@ -62,6 +64,17 @@ Una **fuente canónica por regla/procedimiento**; el resto **apunta**, no re-esc
 - Frontmatter (claves req/recomendadas + gotcha del `:`): canónico = `OKF-SPEC.md §3.1`.
 - Criterio de FAIL del linter: canónico = el código de `okf_lint.py` + `reference/verification.md`.
 - Versión del kit: canónico = `VERSION`; los templates usan el placeholder `{{KIT_VERSION}}`.
+- Autoridad descriptivo/normativo: canónico = `OKF-SPEC.md §3.5` (+ el mapeo `type` → clase
+  en `reference/profiles.md`). `GUIDE` y las `reference/` **apuntan**; el material que se
+  instala (contrato, `okf-update`, `okf-verify`) la **enuncia**, a propósito — el repo destino
+  no recibe la spec (ver [decisión 0013](knowledge/decisions/0013-installed-material-is-self-sufficient.md)).
+  El selfcheck vigila que esas copias no pierdan la rama normativa.
+- Capa de futuro (rumbo + `_changes/` + harvest): canónico = `templates/skills/okf-plan/SKILL.md`;
+  el *cuándo* se dispara vive en `templates/AGENTS.md` (es lo que lee toda herramienta).
+- Qué se borra del contrato en la instalación mínima: canónico = los **marcadores**
+  `OKF:future-layer` del propio `templates/AGENTS.md` — el rango manda. `GUIDE §1` y
+  `okf-init §5` explican *cómo* aplicarlos, pero **no enumeran qué se borra**: eso lo dicen
+  los marcadores. El selfcheck verifica que el resultado no quede huérfano.
 
 Si agregás una regla nueva, definila en UN lugar y apuntá desde el resto. El
 `okf_selfcheck.py` debería crecer con un assert por cada regla que pueda derivar.
