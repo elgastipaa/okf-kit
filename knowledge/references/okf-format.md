@@ -4,7 +4,7 @@ title: El formato OKF (spec condensada)
 description: Resumen de las reglas del formato — frontmatter, cross-links, index.md, log.md, conformidad.
 resource: ../../OKF-SPEC.md
 tags: [okf, spec, format]
-timestamp: 2026-06-17T00:00:00Z
+timestamp: 2026-07-26T00:00:00Z
 ---
 
 `OKF-SPEC.md` es la especificación condensada y self-contained del Open Knowledge Format

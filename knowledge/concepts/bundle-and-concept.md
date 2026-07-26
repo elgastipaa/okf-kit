@@ -3,7 +3,7 @@ type: Concept
 title: Bundle y Concepto — las unidades de OKF
 description: Un bundle es la carpeta knowledge/; un concepto es un .md con frontmatter.
 tags: [okf, format, fundamentals]
-timestamp: 2026-06-17T00:00:00Z
+timestamp: 2026-07-26T00:00:00Z
 ---
 
 OKF representa conocimiento como **un directorio de archivos markdown con frontmatter

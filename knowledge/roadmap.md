@@ -16,7 +16,10 @@ git, sin apps externas.
 
 # Ahora (en curso)
 
-- (nada activo)
+- [Detectar contexto falso barato, y que lo decida el usuario](_changes/0003-detectar-contexto-falso.md)
+  — la maquinaria existe (`okf-verify` Niveles 2 y 4) pero no se corre: falta método en el 2,
+  gatillo en los dos, y un ranking barato de dónde mirar. Sale de la
+  [decisión 0014](decisions/0014-future-layer-measured.md).
 
 # Después (próximo, en orden)
 

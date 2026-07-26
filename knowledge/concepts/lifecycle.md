@@ -4,7 +4,7 @@ title: El ciclo de vida del contexto (init y mantenimiento)
 description: El bundle se monta una vez (init) y se mantiene vivo incremental para no pudrirse.
 resource: ../../reference/maintaining.md
 tags: [okf, lifecycle, maintenance]
-timestamp: 2026-06-17T00:00:00Z
+timestamp: 2026-07-26T00:00:00Z
 ---
 
 El kit cubre dos fases. **`GUIDE.md` = el init** (montar el bundle por primera vez).

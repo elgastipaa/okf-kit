@@ -4,7 +4,7 @@ title: Validar conformidad de un bundle con el linter
 description: Corré okf_lint.py para el chequeo determinista de Nivel 1 (PASS/FAIL).
 resource: ../../templates/scripts/okf_lint.py
 tags: [ops, verification, linter]
-timestamp: 2026-06-17T00:00:00Z
+timestamp: 2026-07-26T00:00:00Z
 ---
 
 # Cuándo

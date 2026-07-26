@@ -4,7 +4,7 @@ title: Bootstrapear OKF en un repo (resumen del GUIDE)
 description: La secuencia de init — perfil, estructura, siembra, índices, log, entrypoint, verificación.
 resource: ../../GUIDE.md
 tags: [ops, bootstrap, init]
-timestamp: 2026-06-17T00:00:00Z
+timestamp: 2026-07-26T00:00:00Z
 ---
 
 # Cuándo
@@ -31,7 +31,9 @@ autoritativo y completo es `GUIDE.md`; esto es el mapa. La versión skill es `ok
    puntero a `knowledge/` en el `README` si es wiki/datos. Recortá el template con sus
    marcadores según el nivel instalado — ver
    [material instalado autosuficiente](../decisions/0013-installed-material-is-self-sufficient.md).
-7. **Mantenimiento + CI** (opcional): skills, scripts, `okf.yml`, git hook.
+7. **Mantenimiento + CI** (opcional): los skills (`okf-update`, `okf-verify`, y `okf-plan`
+   solo si instalaste la capa de futuro), scripts, `okf.yml`, git hook. Sin Claude Code, los
+   `SKILL.md` van a `docs/okf/<nombre>.md` — **fuera** del bundle, o el linter los rechaza.
 8. **Verificá:** corré [el linter](lint-the-bundle.md) y, periódicamente, el
    [cold test](cold-test.md).
 
