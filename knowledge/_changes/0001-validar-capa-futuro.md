@@ -44,7 +44,7 @@ tener números. Ver el [rumbo](../roadmap.md).
 - [x] Medir baseline (sin capa) en `idlerpg`
 - [x] Instalar la capa (roadmap + un `_changes/` real) y re-medir
 - [x] **Arreglar el disparador de scope creep** ("¿ya existe?" antes de anotar) y re-medir `r4`
-- [ ] Probar el ciclo completo de harvest con un agente en frío (¿lo corre sin que se lo pidan?)
+- [x] Probar el ciclo completo de harvest con un agente en frío (¿lo corre sin que se lo pidan?)
 - [ ] Repetir con n>1 y un segundo conejillo antes de dar los números por firmes
 - [ ] Registrar el resultado —positivo Y negativo— como decisión
 
@@ -93,6 +93,49 @@ implementó y **ninguna los anotó en "Después"** (una lo dice explícito: *"no
 anoté como pendiente (sería anotar algo ya hecho)"*). Las tres siguieron reportando el
 cambio activo desde `_changes/`, así que el beneficio de la capa se conserva. Turnos 6/5/7
 (prom 6.0) contra 6 de la versión con el bug: **el chequeo de existencia no cuesta turnos**.
+
+**Ciclo completo con agente en frío** (dos escenarios, `idlerpg` con la capa instalada):
+
+- **Pedido no trivial → ¿abre el doc antes de codear?** Sin efectos sobre `src/`: exploró 21
+  turnos, encontró que hoy el daño no tiene tipo, y **frenó a acordar** con tres opciones,
+  una recomendación y dos propuestas propias ("con eso escribo el criterio de *listo* y voy
+  al código"). Además **disparó el trigger 0 sin que se lo pidieran**: abrió reportando el
+  cambio abierto y en qué tarea quedó. Nunca nombró `okf-plan` ni `_changes/` — habló en el
+  idioma del usuario, como manda la regla.
+  - **PERO al continuar la sesión con la decisión tomada, NUNCA escribió el doc en
+    `_changes/`**: fue del acuerdo directo al código (94 turnos, $7.12). Implementó bien y
+    cosechó bien —decisión nueva, glosario, log, roadmap, fuera-de-alcance a "Después"— y
+    **verificó corriendo el juego**, no leyendo código (mismo golpe contra tres enemigos:
+    174 neutral / 84 con 50% resist / 228 con 30% vuln; saves viejos cargan). Pero el
+    *Resultado esperado* acordado no quedó escrito en ningún lado: si la sesión se cortaba a
+    la mitad, no había registro de qué era "listo".
+  - → **El doc de `_changes/` se saltea cuando el agente juzga que termina en una sola
+    corrida.** Es un atajo racional —crear el doc y cosecharlo en el mismo turno es ceremonia
+    pura— pero derrota el propósito cross-sesión, y el agente **no puede saber de antemano**
+    si va a terminar. El disparador dice "dejalo escrito ANTES de codear" y eso no se cumplió.
+    Fix candidato (sin medir todavía): que el umbral no sea "¿es no trivial?" sino "¿podría
+    no terminar en esta sesión?", que es lo que el doc realmente protege.
+- **"Ya quedó andando, cerralo" → ¿corre el harvest?** Sí, completo y sin que se lo pidan:
+  decisión nueva + índices + `log.md` + roadmap + conceptos afectados (glosario y la regla
+  dura del `AGENTS.md`) + doc borrado + lint verde. **Y verificó en vez de creerme**: corrió
+  los 5 smokes antes de dar nada por cerrado ("verifiqué primero que estuviera andando de
+  verdad, no solo tildado"). Costo: 42 turnos, $2.41 — el harvest es caro.
+  - **Renegoció el spec donde la realidad no coincidía, y lo reportó**: las facades no se
+    borraron (10 importadores cada una, sin lógica adentro) e ítems nunca tuvo dos versiones
+    en competencia. Es la conducta que la regla normativa pide: bajar la vara **explicitando**,
+    no en silencio.
+  - **Corrigió una sobreafirmación del propio bundle**: la advertencia "conviven sistemas
+    versionados" era imprecisa — hay un smoke (`skillsV2UiRegression`), una rama paralela
+    (Ecos) y facades de re-export puro de 3 líneas. Verifiqué sus tres afirmaciones contra
+    el código: las tres ciertas. Gana el código, en la dirección descriptiva de §3.5.
+  - Respetó la regla dura "no edites `src/`" aun habiendo encontrado un bug real ahí, y
+    preguntó en vez de arreglarlo de prepo.
+
+> **El contraste con `r4` es la lección central de esta medición.** El mismo sistema, con la
+> misma capa, falló cuando **no** chequeó el código y acertó cuando **sí**. La capa no
+> reemplaza a la verificación: la hace más barata de *saltear*, porque da una respuesta
+> plausible a mano. Por eso el chequeo de existencia tuvo que volverse explícito en el
+> disparador.
 
 # Harvest (al cerrar — NO borres este archivo sin completarlo)
 
