@@ -290,6 +290,21 @@ _guide = read_required("GUIDE.md")
 check(_guide is not None and "3.5" in _guide and "normativ" in _guide.lower(),
       "GUIDE.md enseña la regla de autoridad y apunta al canónico (§3.5)")
 
+# --------------------------------- 3i. Existe camino de ACTUALIZACIÓN, no solo de instalación
+# El bundle lo mantiene `okf-update`, pero el material instalado (contrato, skills, scripts)
+# se fosiliza en la revisión con la que el repo nació. Sin este camino, `kit_version` es una
+# clave que se estampa y nadie usa.
+_upg = read_required("reference/upgrading.md")
+check(_upg is not None and "kit_version" in _upg and "material instalado" in _upg.lower(),
+      "reference/upgrading.md documenta cómo subir el material instalado",
+      "falta el doc o no distingue material instalado de contenido" if not _upg else "")
+_init = read_required("templates/skills/okf-init/SKILL.md") or ""
+check("upgrading.md" in _init and "kit_version" in _init,
+      "okf-init rutea a la actualización cuando el bundle ya existe con kit_version viejo",
+      "sigue mandando a okf-update, que no puede tocar el material instalado" if "upgrading.md" not in _init else "")
+check("upgrading.md" in (read_required("GUIDE.md") or ""),
+      "GUIDE.md ofrece el camino de actualización entre init y migrate")
+
 # ---------------------------------------------------------------- 3f. Autosuficiencia
 # El material instalado no puede citar rutas que solo existen en el kit: el repo destino
 # no las recibe. Se listan por nombre exacto — un charclass genérico (`templates/[a-z]+/`)

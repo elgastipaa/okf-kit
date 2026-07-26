@@ -119,6 +119,11 @@ def _(d):
          "**chequeá primero si ya existe en\n   el código**; si no existe, una línea", "una línea")
 
 
+@case("okf-init vuelve a rutear a okf-update ante un bundle existente", True)
+def _(d):
+    edit(d, "templates/skills/okf-init/SKILL.md", "seguí `reference/upgrading.md`", "seguí `okf-update`")
+
+
 @case("término de la capa huérfano fuera de los marcadores", True)
 def _(d):
     edit(d, "templates/AGENTS.md", "## Reglas duras",

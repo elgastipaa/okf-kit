@@ -67,6 +67,7 @@ Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 | `reference/examples.md` | Mini-bundles de ejemplo completos, en los tres dominios, para copiar el estilo. |
 | `reference/verification.md` | Cómo **testear** un bundle: conformidad (PASS/FAIL), calidad, el test de comportamiento en frío, y la auditoría de cumplimiento (¿el código respeta lo normativo?). |
 | `reference/maintaining.md` | El ciclo de vida **después del init**: cómo el contexto se mantiene fresco y las capas de enforcement. |
+| `reference/upgrading.md` | Subir un repo que ya tiene OKF a la revisión actual del kit. El bundle es tuyo y no se toca; lo que se reemplaza es el material instalado. |
 | `reference/install-per-tool.md` | Cómo conectar OKF a **cualquier IA** (Claude/Cursor/Copilot/Gemini…) — punteros a `AGENTS.md`, sin lock-in. |
 | `reference/special-cases.md` | Monorepos, migración desde contexto existente, escala (cuándo partir), e idioma. |
 | `reference/optional-tools.md` | Aceleradores externos **opcionales** (Repomix): entender el repo al bootstrapear y medir el tamaño del bundle en tokens. |

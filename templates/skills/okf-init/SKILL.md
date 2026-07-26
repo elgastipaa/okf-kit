@@ -33,8 +33,11 @@ Investigá: manifiestos (`package.json`/`pyproject.toml`/…) y stack, `README`/
 contexto de IA ya presente (`AGENTS.md`/`CLAUDE.md`/`.cursorrules`), `git log --oneline -30`,
 y cualquier memoria de la herramienta. **Lo que no puedas deducir de la fuente —el
 *por qué*, una convención no escrita, el grano de una tabla— preguntáselo al usuario.
-No lo inventes.** Si ya existe un `knowledge/`, no lo pises: actualizalo (ver el
-skill `okf-update`). Si el repo ya tiene **contexto disperso abundante** (un
+No lo inventes.** **Si ya existe un `knowledge/`, no lo pises.** Mirá el `kit_version` de su
+`index.md`: si es anterior al `VERSION` del kit, el repo tiene el bundle al día pero el
+**material instalado viejo** (contrato, skills, scripts) — seguí `reference/upgrading.md`, no
+`okf-update` (ese mantiene el *contenido* y no puede tocar la maquinaria del kit). Si coincide,
+el repo ya está al día y lo que haga falta es mantenimiento normal (`okf-update`). Si el repo ya tiene **contexto disperso abundante** (un
 `AGENTS.md`/`CLAUDE.md` rico, `/docs`, ADRs), usá el skill `okf-migrate` en vez de
 sembrar de cero. Para repos grandes, empaquetalos primero con Repomix y leé ese único
 archivo en vez de caminar todo (opcional — ver `reference/optional-tools.md`, uso 1).

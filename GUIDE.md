@@ -20,6 +20,10 @@ Te dijeron algo como *"cloná okf-kit y aplicalo a mi repo X"*. Antes de nada:
      brownfield), apoyándote en esta guía.
    - ¿Está **limpio / sin contexto**? → este es el camino de **init** (greenfield):
      seguí el procedimiento de abajo (es lo mismo que ejecuta el skill `okf-init`).
+   - ¿**Ya tiene OKF**, de una revisión anterior del kit (mirá el `kit_version` de su
+     `knowledge/index.md` contra el `VERSION` de acá)? → no es init ni migración: es
+     **actualización**, y va por `reference/upgrading.md`. El bundle no se toca; lo que
+     envejeció es el material instalado.
 4. Recién entonces, leé el resto y procedé.
 
 ---
@@ -37,6 +41,7 @@ Documentos hermanos que vas a necesitar:
 - `reference/special-cases.md` — monorepos, migración desde contexto existente, y escala.
 - `reference/verification.md` — cómo testear el bundle (lo usás en el Paso 7).
 - `reference/maintaining.md` — el ciclo de vida DESPUÉS del init (cómo no perder frescura).
+- `reference/upgrading.md` — subir un repo que ya tiene OKF a la revisión actual del kit.
 - `reference/install-per-tool.md` — conectar OKF a cualquier IA (Claude/Cursor/Copilot/Gemini).
 - `reference/spec-driven-interop.md` — cómo se relaciona con OpenSpec/Spec Kit (si el repo
   ya usa una de esas, leelo **antes** de montar la capa de futuro: no montes dos).

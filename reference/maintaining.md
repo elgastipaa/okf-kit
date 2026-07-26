@@ -51,6 +51,12 @@ En cambio:
   se avisa al usuario y se elige entre arreglar el código o **superseder** la decisión
   (canónico: `OKF-SPEC.md` §3.5; mapeo de tipos: `reference/profiles.md`).
 
+## El material instalado también envejece
+
+`okf-update` mantiene el **contenido** del bundle, pero no puede tocar el `AGENTS.md`, los
+skills ni los scripts: corre sin el kit en disco. Esos se fosilizan en la revisión con la que
+el repo nació (`kit_version` en `knowledge/index.md`). Para subirlos: `reference/upgrading.md`.
+
 ## El rumbo y los cambios en curso (la capa de futuro)
 
 Si el repo usa la capa de futuro (recomendada en desarrollo activo): el rumbo vigente vive
