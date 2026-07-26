@@ -11,8 +11,9 @@ Usa dos señales:
 
 1. **`resource:` que ya no existe** → drift CONFIRMADO, no sospecha. El concepto apunta a un
    archivo que se movió o se borró. Es gratis de detectar y siempre es un hallazgo real.
-2. **`timestamp` anterior al último commit del propio concepto** → el sello de frescura está
-   podrido: alguien editó el concepto sin actualizarlo, así que las otras señales (que se
+2. **`timestamp` anterior al último commit del propio concepto, con ≥2 commits** → el sello
+   de frescura está podrido: alguien **editó** el concepto sin actualizarlo (un concepto
+   creado con fecha retroactiva no cuenta: es legítimo), así que las otras señales (que se
    calculan *desde* ese timestamp) están midiendo mal. Se detecta en la primera corrida real
    de este script, sobre su propio repo.
 3. **Churn desde el `timestamp`** → cuántos commits tocaron esa fuente desde que el concepto
@@ -90,6 +91,8 @@ def main() -> int:
     ap.add_argument("bundle", nargs="?", default="knowledge")
     ap.add_argument("--top", type=int, default=10, help="cuántos sospechosos listar (default 10)")
     ap.add_argument("--repo", default=".", help="raíz del repo (default: cwd)")
+    ap.add_argument("--rotate", action="store_true",
+                    help="rota la ventana de los conceptos sin fuente por semana ISO, para que\ncon el tiempo se cubran todos en vez de mirar siempre los mismos")
     a = ap.parse_args()
 
     repo, bundle = Path(a.repo).resolve(), Path(a.bundle)
@@ -120,10 +123,14 @@ def main() -> int:
         # DÍA, no por instante: los timestamps se escriben a medianoche y el commit del mismo
         # día llega horas después — marcarlo sería un falso positivo, y un detector que
         # inventa hallazgos se deja de correr.
+        # Solo cuenta si el concepto se MODIFICÓ después (≥2 commits): un concepto creado con
+        # timestamp retroactivo —fechado el día en que se decidió la cosa, commiteado después—
+        # es legítimo y frecuente, y marcarlo taparía su clasificación real.
         if ts is not None:
+            ncommits = git(repo, "rev-list", "--count", "HEAD", "--", str(c.resolve()))
             last = git(repo, "log", "-1", "--format=%aI", "--", str(c.resolve()))
             last_dt = parse_ts(last) if last else None
-            if last_dt and last_dt.date() > ts.date():
+            if last_dt and last_dt.date() > ts.date() and (ncommits or "0").isdigit() and int(ncommits or 0) >= 2:
                 unstamped.append((rel, ts.date().isoformat(), last_dt.date().isoformat()))
                 continue
         if target is None or ts is None:
@@ -166,8 +173,16 @@ def main() -> int:
 
     if no_source:
         no_source.sort(key=lambda r: -r[0])
-        print("SIN FUENTE LOCAL — no se pueden rankear por churn; van por antigüedad")
-        for days, rel, why in no_source[: a.top]:
+        # Sin --rotate se ven siempre los más viejos: si esos están bien, tapan al resto para
+        # siempre. Rotando por semana ISO la cobertura avanza, y sigue siendo reproducible
+        # dentro de la misma semana (dos corridas el mismo día dan lo mismo).
+        window = no_source
+        if a.rotate and len(no_source) > a.top:
+            off = (now.isocalendar().week * a.top) % len(no_source)
+            window = no_source[off:] + no_source[:off]
+        etiqueta = "por antigüedad, ventana rotada por semana" if a.rotate else "por antigüedad"
+        print(f"SIN FUENTE LOCAL — no se pueden rankear por churn; van {etiqueta}")
+        for days, rel, why in window[: a.top]:
             print(f"  {days if days >= 0 else '?':>5} días  {rel}  ({why})")
         print()
 

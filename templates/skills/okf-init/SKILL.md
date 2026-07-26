@@ -97,7 +97,7 @@ marcadores `:start`/`:end` (4 bloques) y el bloque `# Roadmap` del `knowledge/in
   Claude Code, copiá cada `SKILL.md` a `docs/okf/okf-<nombre>.md` — **renombrando** (los tres
   se llaman igual y si no se pisan entre sí) y **fuera de `knowledge/`**, o el linter los
   rechaza (traen frontmatter sin `type`).
-- `templates/scripts/okf_lint.py` y `templates/scripts/okf_coldtest.py` → `scripts/`.
+- `templates/scripts/okf_lint.py`, `okf_coldtest.py` y `okf_stale.py` → `scripts/`.
 - `templates/ci/okf.yml` → `.github/workflows/okf.yml` (linter en cada push, cero tokens).
 - `templates/hooks/pre-commit` → git hook **universal** (corre con cualquier IA): `cp` a
   `.git/hooks/pre-commit` + `chmod +x`, o `git config core.hooksPath`. Bloquea si el bundle

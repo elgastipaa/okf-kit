@@ -311,10 +311,11 @@ Si se usa Claude Code, copiá **tres** skills a `<repo>/.claude/skills/`:
 - `templates/skills/okf-plan/` → para gestionar el rumbo y los cambios en curso
   (abrir/retomar/cerrar con harvest). Si omitiste la capa de futuro, saltealo.
 
-Copiá también los scripts a `<repo>/scripts/`: **`templates/scripts/okf_lint.py`**
-(chequeador de conformidad determinista, solo stdlib, sin `pip install`, ideal para
-CI) y **`templates/scripts/okf_coldtest.py`** (arma el entorno aislado para el test
-en frío del Nivel 3). Sirven aunque no uses Claude Code.
+Copiá también los scripts a `<repo>/scripts/`: **`okf_lint.py`** (chequeador de conformidad
+determinista, solo stdlib, sin `pip install`, ideal para CI), **`okf_coldtest.py`** (arma el
+entorno aislado para el test en frío del Nivel 3) y **`okf_stale.py`** (rankea dónde buscar
+divergencia entre el bundle y el código, con git + frontmatter: no es un gate, es el paso 1
+del Nivel 2). Sirven aunque no uses Claude Code.
 
 **Si decidís NO instalar el linter**, ajustá la línea de §3 del `AGENTS.md` que manda correrlo:
 si no, el contrato ordena un comando inexistente en cada turno.

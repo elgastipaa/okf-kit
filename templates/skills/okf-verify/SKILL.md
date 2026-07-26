@@ -61,10 +61,26 @@ desfasados — es **WARN** y NO hace fallar (salvo `--strict`). Reportá los war
 
 # Nivel 2 — Calidad (heurístico)
 
-Reportá smells, no des pass/fail:
-- Conceptos **descriptivos** que **contradicen el código** (smell grave: gana el código,
-  el concepto es el bug). *(Si el que contradice es normativo —decisión aceptada,
-  convención— eso NO es este smell: es una violación del código y va al Nivel 4.)*
+Reportá smells, no des pass/fail. El **drift descriptivo** es el que importa y el único que
+necesita método —un concepto que contradice el código se ve igual de prolijo que uno
+correcto—, así que va primero y con procedimiento:
+
+1. **Corré `python3 scripts/okf_stale.py knowledge`** (si está). Con `resource:` +
+   `timestamp` + git te dice dónde mirar: qué conceptos apuntan a código que se movió mucho,
+   cuáles apuntan a algo que ya no existe, y cuáles tienen el sello de frescura podrido. No
+   lee código ni gasta tokens. **Auditar el bundle entero es lo que hace que nadie lo audite.**
+2. **Por cada concepto de esa lista corta, buscá la contradicción, no la confirmación.**
+   Listá qué afirma sobre el código (un conteo, una ruta, un nombre, una flag, "existe X",
+   "esto está en curso") y andá a la fuente a intentar **refutarlo**.
+3. **Clasificá:** *doc podrido* (gana el código, se corrige el concepto) · *ambos cambiaron*
+   (se deprecia, no se parcha) · *lo que contradice es normativo* → no es este nivel, va al 4.
+4. **Reportá; no resuelvas solo.** Quién tiene razón lo decide el usuario, sobre todo si el
+   arreglo obvio es borrar el documento.
+
+> Un dato transcrito a mano es un dato que va a driftear: si el hallazgo es un valor copiado,
+> el arreglo duradero es que **deje de estar copiado** (`resource`, un link, o generarlo).
+
+Otros smells, sin método (se ven leyendo):
 - Conceptos que **repiten el código** en vez de capturar el *por qué*.
 - **Duplicación** de la fuente (código/schema copiado en vez de linkeado).
 - Conceptos **huérfanos** (sin cross-links entrantes ni salientes).
@@ -102,9 +118,13 @@ Los niveles 1-3 preguntan "¿está bien el bundle?"; este pregunta al revés. Es
 **auditoría con criterio** (lee código), así que no va en CI y no se corre siempre.
 
 1. Listá lo **normativo auditable**: `decisions/` con `status: accepted`, convenciones, y las
-   reglas duras del `AGENTS.md`. Ignorá `proposed` y `superseded`. **El rumbo y los cambios
-   abiertos NO se auditan acá**: que el código todavía no los haya alcanzado es trabajo
-   pendiente, no una violación — reportarlos sería un falso positivo.
+   reglas duras del `AGENTS.md`. Ignorá `proposed` y `superseded`.
+
+   **Del rumbo, solo la sección "Ahora".** Visión, "Después" y no-goals son intención pura:
+   que el código no los haya alcanzado es trabajo pendiente, no una violación, y auditarlos
+   sería falso positivo. Pero **"Ahora" afirma estado del código** —que ese trabajo está en
+   curso— y eso sí es chequeable: un ítem cuyo trabajo **ya está terminado** o que nunca
+   arrancó es una afirmación podrida, y un roadmap que miente sale más caro que no tenerlo.
 2. Por cada una **buscá su violación** (no su confirmación). Si la decisión trae su forma de
    verificarla (comando/grep/test), corré esa; si no, derivá la señal del texto.
 3. Clasificá: **violación** (el código contradice) · **decisión obsoleta** (la realidad

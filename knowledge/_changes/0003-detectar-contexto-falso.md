@@ -57,13 +57,12 @@ concretas:
 
 - [x] Ranking por churn: `resource:` + `timestamp` + `git log` → lista corta de sospechosos,
       determinista y sin tokens. Vive en `templates/scripts/okf_stale.py` (script aparte)
-- [ ] Muestreo para los conceptos sin `resource:`, para que no queden fuera del radar
-- [ ] Darle método al Nivel 2, espejando el del 4 ("buscá la contradicción, no la confirmación")
-- [ ] Meter "Ahora" del roadmap al Nivel 4 (y dejar Visión/Después/No-goals fuera, que sí son
-      intención pura)
-- [ ] Sembrar drift a propósito en un repo de prueba y verificar los dos escenarios: lo
-      encuentra, y sobre el limpio no inventa
+- [x] Muestreo para los conceptos sin `resource:` — `--rotate` mueve la ventana por semana ISO
+- [x] Darle método al Nivel 2, espejando el del 4 ("buscá la contradicción, no la confirmación")
+- [x] Meter "Ahora" del roadmap al Nivel 4 (Visión/Después/No-goals quedan fuera: intención pura)
+- [x] Sembrar drift a propósito y verificar los dos escenarios — `scripts/okf_stale_test.py`, 8/8, en CI
 - [ ] Asserts en `okf_selfcheck.py` + sus casos en `okf_selfcheck_test.py`
+- [ ] Instalar `okf_stale.py` también donde ya hay OKF (idlerpg/forgeidle usan kit 0.5.0)
 
 # Decisiones y descubrimientos en el camino
 
@@ -88,6 +87,11 @@ concretas:
   después, así que marcaba conceptos sanos. Se compara por **día**. Sin ese arreglo el script
   reportaba 10 hallazgos de los cuales 5 eran ruido — y un detector que inventa se deja de
   correr, que es exactamente por qué el Nivel 4 no se corre hoy.
+- **El test sembrado encontró un defecto de diseño, no del fixture.** El sello podrido trataba
+  igual "editado sin re-sellar" que "creado con fecha retroactiva" — y esto último es legítimo
+  y frecuente (fechás el concepto el día en que se decidió la cosa, lo commiteás después). El
+  falso positivo además **tapaba** la clasificación real de esos conceptos, porque cortaba
+  antes de calcular el churn. Ahora exige ≥2 commits: el concepto tuvo que ser **modificado**.
 - **Los conejillos no sirven para validar este script**: sus bundles se escribieron *después*
   del último commit de código, así que el churn es 0 y es correcto que lo sea. La validación
   tuvo que hacerse sobre el dogfood del kit, que sí tiene código moviéndose bajo conceptos

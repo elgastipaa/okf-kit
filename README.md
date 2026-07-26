@@ -81,6 +81,7 @@ Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 | `templates/skills/okf-verify/` | Skill que se instala en el repo destino para **testear** el bundle y emitir un reporte PASS/FAIL. |
 | `templates/scripts/okf_lint.py` | Linter determinista (solo stdlib, sin `pip install`) que valida conformidad OKF. Ideal para CI; lo usa el skill `okf-verify`. |
 | `templates/scripts/okf_coldtest.py` | Arma un entorno aislado (solo el bundle, sin código ni `.git`) para correr el test en frío del Nivel 3. Stdlib, sin install. |
+| `templates/scripts/okf_stale.py` | Rankea **dónde buscar drift** entre el bundle y el código usando `resource:` + `timestamp` + git — sin leer código ni gastar tokens. No es un gate: es el paso 1 del Nivel 2 de verificación. |
 | `templates/ci/okf.yml` | Workflow de GitHub Actions que corre el linter en cada push. **Cero tokens** (Python puro). Copialo a `.github/workflows/`. |
 | `templates/eval/` | Harness **opcional** para medir el bundle contra un golden-set de preguntas (turnos, tokens, acierto). Sirve para comparar antes/después de un cambio de contexto; no se instala por defecto. |
 | `templates/hooks/pre-commit` | Git hook **universal** (cualquier IA/herramienta): bloquea commits no conformes y avisa si cambió código sin actualizar `knowledge/`. |

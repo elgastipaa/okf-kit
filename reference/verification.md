@@ -79,6 +79,36 @@ desfasados, etc.). Con `--strict`, los warnings también hacen FAIL.
 
 No es pass/fail; son **smells** que bajan el valor del bundle. Reportá los que veas.
 
+### Cómo buscar el drift descriptivo (el smell que importa)
+
+El resto de los smells se ven leyendo. Este no: un concepto que contradice el código se ve
+igual de prolijo que uno correcto. Necesita método, y es el mismo del Nivel 4 invertido:
+
+1. **Empezá por donde es más probable, no por el principio.** Corré
+   `python3 scripts/okf_stale.py knowledge`: con `resource:` + `timestamp` + git te dice
+   qué conceptos apuntan a código que se movió mucho desde que se escribieron, cuáles
+   apuntan a un archivo que ya no existe, y cuáles tienen el sello de frescura podrido.
+   No lee código ni gasta tokens — solo **rankea dónde mirar**. Auditar el bundle entero es
+   lo que hace que nadie lo audite.
+2. **Por cada concepto de esa lista corta, buscá la contradicción, no la confirmación.**
+   Listá qué **afirma sobre el código** —un conteo, una ruta, un nombre, una flag, "existe
+   X", "esto está en curso"— y andá a la fuente a intentar **refutarlo**. Leerlo buscando
+   que cierre es la forma más rápida de no encontrar nada.
+3. **Clasificá cada hallazgo**, porque el arreglo es distinto:
+   - **Doc podrido** — el código cambió y el concepto quedó viejo. Gana el código: se
+     corrige el concepto (y si el dato es volátil, se **linkea o se genera** en vez de
+     re-transcribirlo, o vuelve a pasar).
+   - **Código desviado** — solo si lo que contradice es **normativo**; entonces no es este
+     nivel, es el 4.
+   - **Ambos cambiaron** — el concepto describe algo que ya no existe *de ninguna forma*.
+     Se deprecia, no se parcha.
+4. **Reportá; no resuelvas solo.** Igual que en el Nivel 4: quién tiene razón lo decide el
+   usuario, sobre todo cuando el "arreglo" obvio es borrar el documento.
+
+> **Un dato que hay que transcribir a mano es un dato que va a driftear.** Si el hallazgo es
+> un valor copiado, el arreglo duradero no es corregirlo: es que deje de estar copiado
+> (`resource`, un link, o el patrón `_generated/`).
+
 - **¿Captura el *por qué* o repite el *qué*?** Smell: un concepto que solo reenuncia
   lo que se lee del código/schema sin agregar intención, decisión ni caveat.
 - **¿Duplica la fuente?** Smell: bloques de código/schema copiados en vez de
@@ -174,8 +204,15 @@ CI ni se corre en cada commit. Corrélo cada tanto, o antes de un release.
 1. **Listá lo normativo *auditable*:** las `decisions/` con `status: accepted`, las
    convenciones, y las reglas duras del `AGENTS.md`. (Los `type` normativos están en
    `reference/profiles.md`; la regla, en `OKF-SPEC.md` §3.5.) Ignorá las `proposed` y las
-   `superseded`. El **rumbo** también es normativo pero **no se audita acá**: que el código
-   no lo haya alcanzado es trabajo pendiente, no una violación.
+   `superseded`.
+
+   **Del rumbo, solo la sección "Ahora".** Visión, "Después" y no-goals son **intención
+   pura**: que el código no los haya alcanzado es trabajo pendiente, no una violación, y
+   auditarlos sería puro falso positivo. Pero **"Ahora" afirma estado del código** —que ese
+   trabajo está en curso— y eso sí es chequeable: un ítem cuyo trabajo **ya está terminado**
+   (o que nunca arrancó) es una afirmación descriptiva podrida, con un costo medido: un
+   roadmap desactualizado sale **más caro que no tener roadmap**, porque los agentes gastan
+   turnos descubriendo que miente (ver `0014-future-layer-measured`).
 2. **Por cada una, buscá su violación**, no su confirmación. Si la decisión declara **cómo
    verificarla** (el comando/grep/test del template `_decision.md`), corré eso. Si no,
    derivá la señal: "usamos cola para emails" → ¿hay envíos directos fuera del worker?
