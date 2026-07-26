@@ -102,7 +102,13 @@ def numbered_steps(text: str) -> str:
 
 
 def near(text: str, *tokens: str, window: int = 400) -> bool:
-    """¿Los tokens coocurren en una misma ventana? Presencia suelta no es afirmación."""
+    """¿Los tokens coocurren en una misma ventana? Presencia suelta no es afirmación.
+
+    Colapsa los espacios primero: en markdown envuelto a 90 columnas una frase se parte en
+    dos líneas, y buscar el literal fallaría por un salto de línea — un assert que falla por
+    el formato del texto es un impuesto, no una red.
+    """
+    text = re.sub(r"\s+", " ", text)
     first, rest = tokens[0], tokens[1:]
     for m in re.finditer(re.escape(first), text):
         chunk = text[max(0, m.start() - window): m.start() + window]
@@ -289,6 +295,29 @@ for rel in [
 _guide = read_required("GUIDE.md")
 check(_guide is not None and "3.5" in _guide and "normativ" in _guide.lower(),
       "GUIDE.md enseña la regla de autoridad y apunta al canónico (§3.5)")
+
+# ------------------------- 3j. El Nivel 2 tiene método, y solo "Ahora" del rumbo se audita
+# El drift descriptivo es el único smell que necesita procedimiento (un concepto que
+# contradice el código se ve igual de prolijo que uno correcto) y el que más riesgo de
+# deriva tiene: vive duplicado entre la reference del kit y el skill instalado.
+for rel in ["reference/verification.md", "templates/skills/okf-verify/SKILL.md"]:
+    body = strip_comments(read_required(rel) or "").lower()
+    ok = near(body, "okf_stale", "contradicción", window=900)
+    check(ok, f"{rel} da método al Nivel 2 (rankear con okf_stale + buscar la contradicción)",
+          "falta el método o no nombra la herramienta que lo hace barato" if not ok else "")
+    # Auditar el rumbo entero sería puro falso positivo: solo "Ahora" afirma estado del código.
+    # Hay que exigir la mitad de INCLUSIÓN ("solo la sección Ahora"), no solo la de exclusión:
+    # con la exclusión sola, borrar la regla de inclusión pasaba desapercibido (lo cazó la
+    # inyección, no la lectura).
+    ok2 = near(body, "solo la sección", "ahora", window=120) and near(body, "intención pura")
+    check(ok2, f"{rel} limita la auditoría del rumbo a la sección \"Ahora\"",
+          "falta la mitad de inclusion (solo la seccion Ahora) o la de exclusion (intencion pura)" if not ok2 else "")
+
+# `okf-verify` manda a correr okf_stale.py: si la instalación no lo copia, manda a la nada.
+for rel in ["GUIDE.md", "templates/skills/okf-init/SKILL.md"]:
+    check("okf_stale.py" in (read_required(rel) or ""),
+          f"{rel} instala okf_stale.py en el repo destino",
+          "okf-verify lo manda a correr y no estaría" )
 
 # --------------------------------- 3i. Existe camino de ACTUALIZACIÓN, no solo de instalación
 # El bundle lo mantiene `okf-update`, pero el material instalado (contrato, skills, scripts)

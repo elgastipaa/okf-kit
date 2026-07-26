@@ -124,6 +124,22 @@ def _(d):
     edit(d, "templates/skills/okf-init/SKILL.md", "seguí `reference/upgrading.md`", "seguí `okf-update`")
 
 
+@case("el Nivel 2 pierde su método", True)
+def _(d):
+    edit(d, "templates/skills/okf-verify/SKILL.md",
+         "buscá la contradicción, no la confirmación", "revisá que todo esté bien")
+
+
+@case("la auditoría del rumbo deja de limitarse a \"Ahora\"", True)
+def _(d):
+    edit(d, "reference/verification.md", "**Del rumbo, solo la sección \"Ahora\".**", "Auditá el rumbo entero.")
+
+
+@case("la instalación deja de copiar okf_stale.py", True)
+def _(d):
+    edit(d, "GUIDE.md", "y **`okf_stale.py`** (rankea dónde buscar", "y ~~okf_stale~~ (rankea dónde buscar")
+
+
 @case("término de la capa huérfano fuera de los marcadores", True)
 def _(d):
     edit(d, "templates/AGENTS.md", "## Reglas duras",

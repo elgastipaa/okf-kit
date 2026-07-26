@@ -61,7 +61,7 @@ concretas:
 - [x] Darle método al Nivel 2, espejando el del 4 ("buscá la contradicción, no la confirmación")
 - [x] Meter "Ahora" del roadmap al Nivel 4 (Visión/Después/No-goals quedan fuera: intención pura)
 - [x] Sembrar drift a propósito y verificar los dos escenarios — `scripts/okf_stale_test.py`, 8/8, en CI
-- [ ] Asserts en `okf_selfcheck.py` + sus casos en `okf_selfcheck_test.py`
+- [x] Asserts en `okf_selfcheck.py` (80) + sus casos en `okf_selfcheck_test.py` (23)
 - [ ] Instalar `okf_stale.py` también donde ya hay OKF (idlerpg/forgeidle usan kit 0.5.0)
 
 # Decisiones y descubrimientos en el camino
@@ -92,6 +92,16 @@ concretas:
   y frecuente (fechás el concepto el día en que se decidió la cosa, lo commiteás después). El
   falso positivo además **tapaba** la clasificación real de esos conceptos, porque cortaba
   antes de calcular el churn. Ahora exige ≥2 commits: el concepto tuvo que ser **modificado**.
+- **El test de inyecciones encontró que un assert mío era demasiado débil.** El de "solo se
+  audita Ahora del rumbo" chequeaba que *Ahora* e *intención pura* coexistieran; borré la
+  mitad de **inclusión** ("del rumbo se audita solo Ahora") y siguió pasando, porque la mitad
+  de **exclusión** alcanzaba para satisfacerlo. Ahora exige las dos. Tercera vez en el día que
+  la inyección caza un assert que yo había leído como correcto: **leer un chequeo no dice si
+  funciona.**
+- **`near()` fallaba con texto envuelto.** En markdown a 90 columnas una frase se parte en dos
+  líneas (`intención\n   pura`) y el literal no matchea. Afectaba a todos los asserts de texto.
+  Ahora colapsa espacios primero — un assert que falla por el formato del texto es un impuesto.
+
 - **Los conejillos no sirven para validar este script**: sus bundles se escribieron *después*
   del último commit de código, así que el churn es 0 y es correcto que lo sea. La validación
   tuvo que hacerse sobre el dogfood del kit, que sí tiene código moviéndose bajo conceptos
