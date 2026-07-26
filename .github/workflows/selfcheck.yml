@@ -20,3 +20,5 @@ jobs:
           python-version: "3.x"
       - name: okf selfcheck
         run: python3 scripts/okf_selfcheck.py
+      - name: ¿el gate falla cuando debe?
+        run: python3 scripts/okf_selfcheck_test.py

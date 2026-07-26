@@ -51,11 +51,12 @@ código hace hoy.
 
 ## 3. Antes de cerrar — verificá (gate de release)
 
-Corré **`python3 scripts/okf_selfcheck.py`** (consistencia interna: linter limpio sobre el dogfood,
-`kit_version` sembrado, keep-alive y capa de futuro coincidentes, rama normativa presente,
-presupuesto del contrato, instalación mínima sin huérfanos, material instalado autosuficiente,
-referencias que resuelven). Si bumpeás `VERSION`,
-re-estampá el dogfood. Para cambios grandes, corré el cold-review de 4 lentes. Detalle en `DEVELOPING.md`.
+Corré **`python3 scripts/okf_selfcheck.py`** (consistencia interna: linter limpio sobre el
+dogfood, `kit_version` sembrado, keep-alive y capa de futuro coincidentes, rama normativa
+presente, presupuesto del contrato, instalación mínima sin huérfanos, material instalado
+autosuficiente, referencias que resuelven) y **`python3 scripts/okf_selfcheck_test.py`**, que
+verifica que el gate **falle cuando debe** — si tocaste un assert, este es el que lo prueba.
+Si bumpeás `VERSION`, re-estampá el dogfood. Para cambios grandes, corré el cold-review de 4 lentes. Detalle en `DEVELOPING.md`.
 
 ## Mapa rápido
 

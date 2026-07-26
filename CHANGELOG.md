@@ -193,7 +193,7 @@ en el diseño**: todos en la capa de propagación e instalación. El patrón com
   `GUIDE` en los dos niveles de instalación, y descripciones stale del `okf_selfcheck`, del
   registro anti-deriva de `DEVELOPING.md` y del linter (atribuía a PyYAML un chequeo que hace
   un parser propio).
-- **`okf_selfcheck.py`: 26 → 35 asserts.** Los nuevos cubren exactamente las reglas que este
+- **`okf_selfcheck.py`: 26 → 68 asserts.** Los nuevos cubren exactamente las reglas que este
   review vio derivar. Los cuatro revisores convergieron de forma independiente en 5 findings,
   y 7 de 7 roturas deliberadas del gate fallaron correctamente.
 

@@ -88,6 +88,7 @@ Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 | `CHANGELOG.md` | Historial de revisiones del kit. Aclara `kit_version` (kit) vs `okf_version` (formato OKF). |
 | `DEVELOPING.md` | Proceso interno para **desarrollar el kit**: el gate de release (selfcheck + cold-review de 4 lentes). |
 | `scripts/okf_selfcheck.py` | Meta-linter de consistencia *interna* del kit (kit-only, NO se instala en repos destino). |
+| `scripts/okf_selfcheck_test.py` | Verifica que el gate **falle cuando debe**: inyecta cada rotura sobre una copia del kit. Un assert sin su rotura probada es decoración. |
 | `knowledge/` | Bundle **dogfood**: el kit documentándose en su propio formato OKF (prueba viva del init). |
 
 ---

@@ -13,7 +13,8 @@ salir **proactivamente**, antes de cada release.
 
 1. **Meta-linter del kit (obligatorio):**
    ```
-   python3 scripts/okf_selfcheck.py
+   python3 scripts/okf_selfcheck.py        # el gate
+   python3 scripts/okf_selfcheck_test.py   # ¿el gate falla cuando debe?
    ```
    Valida la consistencia *interna*: el linter pasa limpio sobre el bundle dogfood
    `knowledge/`, `kit_version` no se "cae" en ejemplos/skills, el keep-alive y la capa de
@@ -77,7 +78,13 @@ Una **fuente canónica por regla/procedimiento**; el resto **apunta**, no re-esc
   los marcadores. El selfcheck verifica que el resultado no quede huérfano.
 
 Si agregás una regla nueva, definila en UN lugar y apuntá desde el resto. El
-`okf_selfcheck.py` debería crecer con un assert por cada regla que pueda derivar.
+`okf_selfcheck.py` debería crecer con un assert por cada regla que pueda derivar — y
+**cada assert nuevo va con su caso en `okf_selfcheck_test.py`**: la rotura concreta que
+debería cazar y, si puede dar falso positivo, la redacción legítima que NO debe romperlo.
+Una revisión en frío encontró siete asserts que nunca fallaban (pasaban sobre archivos
+borrados, se satisfacían desde comentarios que la instalación borra, o se contentaban con
+dos substrings en un texto que negaba la regla). Un assert sin su rotura probada es
+decoración.
 
 ## El bundle dogfood `knowledge/`
 
