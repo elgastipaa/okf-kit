@@ -31,9 +31,6 @@ git, sin apps externas.
 - Que el pre-commit hook del kit valide **lo staged** en vez del working tree, como el que
   el kit shippea a otros repos (hoy commitea estado roto y bloquea commits sanos; CI ataja
   el escape, por eso no es urgente).
-- Que `run-eval.py` falle ruidosamente si `claude` falla (hoy nunca chequea `returncode` y
-  emite un scorecard de ceros con exit 0 — indistinguible de una medición real). Bloquea la
-  confiabilidad de la medición del cambio 0001.
 - Revisar si el linter debería chequear la higiene de `_changes/` (cambios zombie) —
   **solo si** la medición muestra que pasa seguido.
 

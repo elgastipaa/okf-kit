@@ -43,13 +43,34 @@ def parse_golden(path: Path) -> list[dict]:
     return [q for q in qs if q["query"]]
 
 
-def claude_json(prompt: str, cwd: Path | None = None, timeout: int = 420) -> dict:
+def claude_json(prompt: str, cwd: Path | None = None, timeout: int = 420) -> dict | None:
+    """El JSON de `claude -p`, o **None si la corrida falló**.
+
+    Devolver `{}` ante un fallo sería el peor bug posible en un harness de medición: una
+    corrida que no corrió quedaría indistinguible de una que midió cero, y el scorecard
+    saldría lleno de ceros con exit 0 — números que parecen datos. Acá el fallo se
+    propaga y el error de `claude` se ve.
+    """
     try:
         r = subprocess.run(["claude", "-p", prompt, "--output-format", "json"],
                            cwd=cwd, capture_output=True, text=True, timeout=timeout)
-        return json.loads(r.stdout or "{}")
-    except (subprocess.TimeoutExpired, json.JSONDecodeError, OSError):
-        return {}
+    except subprocess.TimeoutExpired:
+        print(f"  ! claude excedió el timeout de {timeout}s", file=sys.stderr)
+        return None
+    except OSError as e:
+        print(f"  ! no se pudo ejecutar claude: {e}", file=sys.stderr)
+        return None
+    if r.returncode != 0:
+        err = (r.stderr or r.stdout or "").strip().splitlines()
+        print(f"  ! claude salió con código {r.returncode}: {err[-1] if err else '(sin salida)'}",
+              file=sys.stderr)
+        return None
+    try:
+        return json.loads(r.stdout)
+    except json.JSONDecodeError:
+        head = (r.stdout or "").strip()[:200]
+        print(f"  ! la salida de claude no es JSON: {head!r}", file=sys.stderr)
+        return None
 
 
 def grade_one(q: str, answer: str, expect: str) -> str:
@@ -58,7 +79,10 @@ def grade_one(q: str, answer: str, expect: str) -> str:
           "esperados y cita la fuente correcta? Si lo esperado dice que es una TRAMPA "
           "(no documentado), 'trampa-ok' = el agente admitió que no está.\nRespondé SOLO "
           "UNA palabra: correcta | parcial | incorrecta | trampa-ok")
-    out = (claude_json(jp).get("result") or "").lower()
+    j = claude_json(jp)
+    if j is None:
+        return "?"          # el juez falló: no se inventa un veredicto
+    out = (j.get("result") or "").lower()
     m = re.search(r"correcta|parcial|incorrecta|trampa-ok", out)
     return m.group(0) if m else "?"
 
@@ -88,12 +112,15 @@ def main() -> int:
         if a.mode == "nokit":
             prompt = NOKIT_PRE + prompt
         j = claude_json(prompt, cwd=repo)
+        failed = j is None
+        j = j or {}
         u = j.get("usage", {}) or {}
         answer = j.get("result") or ""
         grade = grade_one(q["query"], answer, q["expect"]) if (a.grade and answer) else "-"
         row = {
             "id": q["id"], "category": q["category"], "mode": a.mode,
             "query": q["query"], "expect": q["expect"], "grade": grade,
+            "failed": failed,
             "input_tokens": u.get("input_tokens", 0),
             "cache_read": u.get("cache_read_input_tokens", 0),
             "output_tokens": u.get("output_tokens", 0),
@@ -105,23 +132,40 @@ def main() -> int:
         rows.append(row)
         with out.open("a", encoding="utf-8") as f:
             f.write(json.dumps(row, ensure_ascii=False) + "\n")
-        print(f"{row['id']:<6}{row['category']:<9}{row['input_tokens']:>8}"
-              f"{row['num_turns']:>7}{row['duration_ms']//1000:>6}"
-              f"{round(row['cost_usd'], 3):>8}  {grade}")
+        if failed:
+            print(f"{row['id']:<6}{row['category']:<9}{'ERROR — la corrida falló':>29}")
+        else:
+            print(f"{row['id']:<6}{row['category']:<9}{row['input_tokens']:>8}"
+                  f"{row['num_turns']:>7}{row['duration_ms']//1000:>6}"
+                  f"{round(row['cost_usd'], 3):>8}  {grade}")
 
-    n = max(len(rows), 1)
-    ok = sum(1 for r in rows if r["grade"] in ("correcta", "trampa-ok"))
+    # Los promedios se calculan SOLO sobre las corridas que de verdad corrieron: promediar
+    # ceros de corridas fallidas produce un número más lindo y mentiroso.
+    good = [r for r in rows if not r["failed"]]
+    bad = len(rows) - len(good)
+    n = max(len(good), 1)
+    ok = sum(1 for r in good if r["grade"] in ("correcta", "trampa-ok"))
     print(f"\n== resumen ({a.mode}) ==")
     print(json.dumps({
         "preguntas": len(rows),
-        "input_tokens_total": sum(r["input_tokens"] for r in rows),
-        "input_tokens_prom": sum(r["input_tokens"] for r in rows) // n,
-        "turns_prom": round(sum(r["num_turns"] for r in rows) / n, 1),
-        "segundos_total": sum(r["duration_ms"] for r in rows) // 1000,
-        "cost_usd_total": round(sum(r["cost_usd"] for r in rows), 3),
+        "corridas_ok": len(good),
+        "corridas_fallidas": bad,
+        "input_tokens_total": sum(r["input_tokens"] for r in good),
+        "input_tokens_prom": sum(r["input_tokens"] for r in good) // n,
+        "turns_prom": round(sum(r["num_turns"] for r in good) / n, 1),
+        "segundos_total": sum(r["duration_ms"] for r in good) // 1000,
+        "cost_usd_total": round(sum(r["cost_usd"] for r in good), 3),
         "aciertos": ok if a.grade else "(corré con --grade)",
     }, ensure_ascii=False, indent=2))
     print(f"scorecard → {out}")
+    if bad:
+        print(f"\n*** {bad}/{len(rows)} corridas FALLARON — este scorecard NO es una medición "
+              f"válida. Revisá los errores de arriba (auth, red, timeout) y volvé a correr.",
+              file=sys.stderr)
+        return 1
+    if not rows:
+        print("*** el golden-set no tiene preguntas parseables", file=sys.stderr)
+        return 1
     return 0
 
 
