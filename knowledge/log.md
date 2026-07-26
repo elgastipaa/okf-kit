@@ -1,6 +1,7 @@
 # Update Log
 
 ## 2026-07-26
+* **Update**: v0.6.2 — `okf_stale.py` (rankear el drift sin leer codigo), metodo para el Nivel 2, camino de actualizacion del material instalado, y el gate de 74 a 80 asserts + `okf_stale_test.py`.
 * **Update**: El drift entre bundle y código se **rankea** antes de auditarse ([0015](decisions/0015-rankear-el-drift-antes-de-auditarlo.md)): `okf_stale.py` usa `resource` + `timestamp` + git para decir dónde mirar sin leer código ni gastar tokens, y el Nivel 2 gana el método que solo tenía el 4. Encontró drift real en el propio kit en su primera corrida.
 * **Update**: Separado **material instalado** (contrato, skills, scripts — del kit, se reemplazan) de **contenido del bundle** (del proyecto, no se toca), con `reference/upgrading.md` y ruteo desde `okf-init` ([0016](decisions/0016-material-instalado-vs-contenido.md)). Probado subiendo un conejillo de 0.5.0 a 0.6.1 sin romper nada.
 * **Update**: v0.6.1 — el gate reescrito (26 → 70 asserts + `okf_selfcheck_test.py`, que verifica que falle cuando debe), el disparador de scope creep con chequeo de existencia, `run-eval.py` distinguiendo "midió 0" de "falló", y la capa de futuro medida ([0014](decisions/0014-future-layer-measured.md)).

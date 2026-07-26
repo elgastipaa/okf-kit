@@ -10,6 +10,52 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.6.2 — 2026-07-26
+
+### Agregado — el drift se rankea antes de auditarlo
+`okf-verify` ya tenía con qué cazar la divergencia bundle↔código (Nivel 2 descriptivo,
+Nivel 4 de cumplimiento, con la regla de que **el usuario decide** si el bug es el código o
+el documento), pero no se usaba — y no por ignorancia: **auditar el bundle entero es caro**,
+el Nivel 2 no tenía método, y nada los dispara.
+
+- **`templates/scripts/okf_stale.py`** (nuevo, se instala): convierte "revisá todo, alguna
+  vez" en una lista corta y ordenada, con git + el frontmatter que el bundle ya tiene, **sin
+  leer código ni gastar tokens**. Tres señales: `resource:` que ya no existe (drift
+  confirmado), `timestamp` anterior al último commit del propio concepto con ≥2 commits (el
+  sello de frescura está podrido), y churn de la fuente desde el timestamp. **No es un gate**:
+  el linter dice "¿es OKF válido?", esto dice "¿por dónde empiezo?". `--rotate` mueve por
+  semana la ventana de los conceptos sin `resource`, para que los más viejos no tapen al resto.
+- **El Nivel 2 gana método**, espejando el del 4: rankear → buscar la **contradicción** y no
+  la confirmación → clasificar → reportar sin resolver solo.
+- **Del rumbo se audita solo "Ahora".** Visión, "Después" y no-goals son intención pura;
+  auditarlos sería puro falso positivo. Pero "Ahora" afirma estado del código.
+- Encontró drift real en su primera corrida sobre el propio kit: un runbook desalineado del
+  `GUIDE` y 5 conceptos con el sello podrido. Decisión `0015`.
+
+### Agregado — camino de ACTUALIZACIÓN (el material instalado dejaba de recibir mejoras)
+El kit tenía camino de instalación y no de actualización: `okf-update` mantiene el
+**contenido** del bundle pero no puede tocar el `AGENTS.md`, los skills ni los scripts —
+corre sin el kit en disco. Dos repos reales corrían `kit_version: 0.5.0` sin nada de 0.6.x.
+**El bug era de ruteo:** `okf-init` detectaba el bundle existente y mandaba a `okf-update`.
+
+- **`reference/upgrading.md`** (nuevo): la distinción que faltaba —contenido del bundle (del
+  proyecto, no se toca) vs material instalado (del kit, se reemplaza)— y el procedimiento. El
+  `AGENTS.md` es el único con contenido mezclado y por eso el único que no se reemplaza entero.
+- `okf-init` compara `kit_version` contra `VERSION` y rutea ahí; `GUIDE` Paso 0 gana el tercer
+  camino (init / migrate / **upgrade**).
+- **`kit_version` pasó de decorativa a disparador.** Tercera clave escrita-y-nunca-leída del
+  kit, después de `resource:`. De ahí la regla: **cuando el kit agrega una clave, hay que
+  decir quién la lee.** Queda `authority:`, en el rumbo. Decisión `0016`.
+- Probado subiendo un conejillo real de 0.5.0 a 0.6.1: **no se rompió nada**.
+
+### Cambiado — el gate: 74 → 80 asserts, y un test nuevo
+- `scripts/okf_stale_test.py`: 8 casos que verifican las dos mitades — encuentra el drift
+  sembrado, y **sobre un bundle limpio no inventa**. Corre en CI. Un detector con falsos
+  positivos se deja de correr en dos semanas, que es cómo el Nivel 4 llegó a no correrse.
+- El test de inyecciones volvió a pagar: encontró que un assert propio era **demasiado débil**
+  (chequeaba la mitad de exclusión de una regla y no la de inclusión) y que `near()` fallaba
+  con texto envuelto a 90 columnas, lo que afectaba a **todos** los asserts de texto.
+
 ## 0.6.1 — 2026-07-26
 
 ### Medido — la capa de futuro, con su condición y su resultado negativo

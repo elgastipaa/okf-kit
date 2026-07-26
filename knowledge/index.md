@@ -1,6 +1,6 @@
 ---
 okf_version: "0.1"
-kit_version: "0.6.1"
+kit_version: "0.6.2"
 ---
 
 # Roadmap
