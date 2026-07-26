@@ -206,6 +206,17 @@ for rel in [
           f"{rel} nombra las tres piezas de la capa de futuro (_changes/, roadmap, harvest)",
           "el archivo no existe" if txt is None else (f"falta: {', '.join(missing)}" if missing else ""))
 
+# --------------------------------- 3b2. El disparador de scope creep chequea existencia
+# Medido: sin este chequeo, el agente anota como "por hacer" algo que el código ya tiene, y
+# esa premisa falsa queda ESCRITA en el roadmap (ver el cambio 0001). La regla general
+# "gana el código" ya está en el contrato, pero el disparador la salteaba.
+for rel in ["templates/AGENTS.md", "templates/skills/okf-plan/SKILL.md"]:
+    txt = read_required(rel)
+    body = strip_comments(txt).lower() if txt is not None else ""
+    ok = near(body, "después", "ya existe", window=300)
+    check(ok, f"{rel} exige chequear si la idea ya existe antes de anotarla en Después",
+          "el archivo no existe" if txt is None else ("el disparador no menciona el chequeo" if not ok else ""))
+
 # ---------------------------------------------------------------- 3c. Contrato: presupuesto
 # Se mide lo que queda INSTALADO: sin el comentario TEMPLATE y sin las líneas de
 # marcadores OKF:*, que son andamiaje de instalación y se borran siempre.

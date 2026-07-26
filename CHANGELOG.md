@@ -10,6 +10,33 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## No publicado
+
+### Cambiado — el disparador de scope creep chequea si la idea ya existe
+Primera medición de la capa de futuro (cambio `0001`, conejillo `idlerpg`). El resultado
+principal es positivo —las preguntas de rumbo bajan de 9→4 y 10→6 turnos, y el contexto
+leído cae ~60%— pero destapó un modo de falla que solo aparece **con** la capa instalada:
+
+- Ante "agregá logros" a mitad de otra tarea, el agente aplicó el disparador correctamente
+  (no lo implementó, lo anotó en "Después") pero **nunca miró el código**: describió los
+  logros como *feature nueva* en un repo con **52 ya implementados**, y escribió esa premisa
+  falsa **dentro del roadmap**, donde queda como contexto de las sesiones siguientes. El
+  mismo agente **sin** la capa había contestado bien. El disparador lleva a *anotar*, y
+  anotar es escribir contexto: la capa puede **fabricar** contexto falso.
+- Fix: el disparador exige **chequear si ya existe en el código** antes de anotar, en el
+  contrato y en `okf-plan` (con la evidencia medida, porque la razón importa más que la
+  regla). Re-medido 3/3: detecta los 52 logros, no los implementa, no los anota, y sigue
+  reportando el cambio activo. No cuesta turnos.
+- `okf_selfcheck.py`: assert nuevo (+ su caso de rotura en `okf_selfcheck_test.py`) para que
+  la regla no se caiga.
+
+### Arreglado — `run-eval.py` distinguía "midió 0" de "falló"
+Devolvía `{}` ante cualquier fallo de `claude` y nunca miraba el `returncode`: una corrida
+que fallaba entera producía un scorecard de ceros con exit 0. En un harness de medición ese
+es el peor bug posible — emite números que parecen datos. Ahora el fallo se propaga, se ve
+el error real, los promedios se calculan solo sobre las corridas que corrieron, y el script
+sale con 1 avisando que el scorecard no es una medición válida.
+
 ## 0.6.0 — 2026-07-26
 
 ### Agregado — la capa de FUTURO (rumbo + cambios con harvest)

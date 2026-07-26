@@ -48,9 +48,17 @@ sabe qué es "okf-plan" ni tiene por qué saberlo: vos reconocés el momento y a
    esta capa existe para dar.
 3. **Un cambio se terminó** (su "Resultado esperado" se verifica) → **harvest**
    (abajo). Nunca lo saltees: un cambio done sin harvest es contexto perdiéndose.
-4. **Aparece una idea buena que NO es la tarea actual** → una línea en "Después"
-   del `roadmap.md` (título + por qué). NO la implementes "de paso": eso es el
-   scope creep que esta capa frena.
+4. **Aparece una idea buena que NO es la tarea actual** → **chequeá primero si ya existe en
+   el código**; si no existe, una línea en "Después" del `roadmap.md` (título + por qué). NO
+   la implementes "de paso": eso es el scope creep que esta capa frena.
+
+   **El chequeo de existencia no es opcional** (medido): un agente con la capa instalada
+   anotó "sistema de logros" en "Después" describiéndolo como *feature nueva* en un repo que
+   ya tenía 52 logros implementados — y esa premisa falsa quedó **escrita en el roadmap**,
+   envenenando el contexto de todas las sesiones siguientes. Sin la capa, el mismo agente
+   había buscado en el código y contestado bien. El disparador te lleva a *anotar*, y anotar
+   es escribir contexto: **para "¿esto ya existe?" gana el código, siempre.** Si ya existe,
+   decíselo al usuario en una línea en vez de anotarlo.
 
 # Explorar antes de comprometer
 

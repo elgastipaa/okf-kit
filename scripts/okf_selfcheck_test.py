@@ -113,6 +113,12 @@ def _(d):
          "<!-- OKF:future-layer:start -->\nextra\n<!-- OKF:future-layer:end -->\n\n## Procedimientos")
 
 
+@case("el disparador de scope creep pierde el chequeo de existencia", True)
+def _(d):
+    edit(d, "templates/skills/okf-plan/SKILL.md",
+         "**chequeá primero si ya existe en\n   el código**; si no existe, una línea", "una línea")
+
+
 @case("término de la capa huérfano fuera de los marcadores", True)
 def _(d):
     edit(d, "templates/AGENTS.md", "## Reglas duras",

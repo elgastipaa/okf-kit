@@ -79,7 +79,8 @@ ni conocer estos archivos:**
 - **"¿Qué sigue?" / "¿en qué estábamos?"** → respondé desde el roadmap y los cambios, no
   reconstruyendo del código.
 - **Terminaste un cambio** → hacé su harvest (§3). **Aparece una idea que no es la tarea
-  actual** → una línea en "Después" del roadmap; no la implementes de paso.
+  actual** → **chequeá primero si ya existe en el código**; si no existe, una línea en
+  "Después" del roadmap. No la implementes de paso, y no anotes como pendiente algo ya hecho.
 
 Detalle del procedimiento: **`okf-plan`**.
 <!-- OKF:future-layer:end -->
