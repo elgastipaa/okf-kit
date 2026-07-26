@@ -10,6 +10,33 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## No publicado
+
+### Arreglado — pasada en frío sobre el `GUIDE` (sin blockers, 5 majors)
+Un agente sin contexto caminó la guía entera sobre un repo de juguete y llegó al final solo:
+linter limpio a la primera, hook funcionando, Nivel 3 con 6/6 + trampa. Lo que trajo son
+puntos donde **tuvo que adivinar**, que es lo que la verificación mecánica no puede ver:
+
+- **El paso que dice "no interpretes prosa, es mecánico" mandaba a editar el kit.** El
+  borrado del nivel mínimo decía "en `templates/AGENTS.md`…" — o sea los archivos que el
+  Paso 0 prohíbe tocar en mayúsculas 90 líneas antes. Ahora dice explícitamente que se hace
+  sobre **las copias ya en el repo destino**.
+- **El criterio init-vs-migrate no cubría el caso más común**: un repo con `README`
+  sustancioso y cero artefactos de IA no es "contexto disperso abundante" ni "limpio". Es la
+  primera decisión irreversible del flujo y era la peor especificada. Ahora hay regla de
+  corte: si lo único que hay es el `README`, es **init**.
+- **El harness del Nivel 3 fabricaba un falso positivo.** `okf_coldtest.py` excluye `_*` a
+  propósito (una spec activa es normativa sobre el futuro), así que el link obligatorio del
+  roadmap queda colgado y el agente en frío lo reporta como defecto — y el `GUIDE` manda
+  tratar cada hallazgo del Nivel 3 como concepto faltante. Ahora el script avisa qué excluyó.
+- El bloque `cp … <repo>/docs/okf/…` no era ejecutable (faltaba `mkdir -p`), y la pregunta de
+  "cuánto instalar" no decía qué hacer **si no hay usuario que conteste**.
+- Menores: "todos los subdirectorios" incluía literalmente `_changes/`; el enumerado de "borrá
+  lo que no instalaste" cubría 2 de 4 casos; el techo de 7000 chars decía "el gate lo verifica"
+  cuando en el repo destino no hay tal gate; el `{{KIT_VERSION}}` del `log.md` solo se
+  mencionaba en el skill; el hook imprimía el output del linter **en cada commit limpio**
+  (ahora solo habla cuando algo falla).
+
 ## 0.6.2 — 2026-07-26
 
 ### Agregado — el drift se rankea antes de auditarlo

@@ -6,7 +6,8 @@
   más se paga siempre, y un contrato largo se skimea (pierde obediencia). El detalle vive
   en knowledge/ y en los procedimientos, que se cargan bajo demanda. Si crece, mové el
   detalle a un concepto y dejá acá el puntero. Techo: 7000 caracteres instalado
-  (~1750 tokens); el gate del kit lo verifica.
+  (~1750 tokens). Lo verifica el gate del KIT sobre su template, no el linter de tu repo:
+  acá el techo es tuyo para respetarlo.
 
   BORRÁ lo que no instalaste (si no, mandás al agente a archivos que no existen). El
   andamiaje son las 8 líneas de comentario marcadas `OKF:future-layer:start` y
@@ -17,6 +18,8 @@
     TODO lo que quede ENTRE cada par. No hay nada más que tocar — el resto del contrato no
     la nombra.
   - Si no instalaste scripts/okf_lint.py: ajustá la línea del linter en §3.
+  - Si no sembraste un glossary.md: borrá esa frase de §1.
+  - Si el repo no tiene capas scratch/legacy: borrá la sección "Capas NO autoritativas".
 
   UNIVERSAL: AGENTS.md es el estándar cross-vendor — toda IA lo lee, o se la apunta acá
   (ver reference/install-per-tool.md). Las secciones 1-3 son iguales para todo repo.
@@ -142,4 +145,4 @@ El **pre-commit hook**, si está instalado, lo chequea igual en cualquier herram
 <!-- OKF:future-layer:end -->
 
 Son **vendor-neutral**: corren como skills de Claude Code *o* los sigue cualquier agente
-leyendo su procedimiento (en `docs/okf/<nombre>.md` si no se usa Claude Code).
+leyendo su procedimiento (si no se usa Claude Code, están en `docs/okf/<nombre>.md`).

@@ -20,13 +20,18 @@ BUNDLE="knowledge"
 # Copiamos SOLO el contenido staged de knowledge/ a un tempdir y linteamos ahí. El
 # working-tree NO se toca (nada de `git stash` → cero riesgo de corromper archivos
 # con partial-staging). Se valida exactamente lo que se va a commitear.
+# El output del linter solo se muestra si algo falla: un hook que escupe texto en cada
+# commit limpio se vuelve ruido que se deja de leer.
 if command -v python3 >/dev/null 2>&1 && [ -f scripts/okf_lint.py ]; then
   tmp=$(mktemp -d)
   trap 'rm -rf "$tmp"' EXIT
   git ls-files -- "$BUNDLE" | git checkout-index --prefix="$tmp/" -f --stdin 2>/dev/null
-  if [ -d "$tmp/$BUNDLE" ] && ! python3 scripts/okf_lint.py "$tmp/$BUNDLE"; then
-    echo "OKF: el bundle staged no es conforme (ver arriba). Corregí, o 'git commit --no-verify' para saltar." >&2
-    exit 1
+  if [ -d "$tmp/$BUNDLE" ]; then
+    out=$(python3 scripts/okf_lint.py "$tmp/$BUNDLE" 2>&1) || {
+      printf '%s\n' "$out" >&2
+      echo "OKF: el bundle staged no es conforme (ver arriba). Corregí, o 'git commit --no-verify' para saltar." >&2
+      exit 1
+    }
   fi
 else
   echo "OKF: chequeo de conformidad omitido (sin python3 o sin scripts/okf_lint.py)." >&2

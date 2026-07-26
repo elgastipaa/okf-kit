@@ -114,6 +114,14 @@ def main(argv: list[str]) -> int:
     print(f"  {n_files} archivo(s) del bundle, sin código" +
           (" (repo git limpio inicializado)" if args.git else " ni .git"))
     print()
+    excluidos = sorted(p.name for p in bundle.iterdir() if p.name.startswith("_"))
+    if excluidos:
+        print()
+        print(f"  OJO: se excluyó {', '.join(excluidos)} (prefijo `_`: derivados y specs de")
+        print("  trabajo en curso, que son normativas sobre el FUTURO — un agente en frío las")
+        print("  leería como estado presente). Un link colgado hacia ahí NO es un defecto del")
+        print("  bundle: decíselo al agente, o vas a recibirlo como hallazgo.")
+    print()
     print("Prompt para una CLI/IA nueva (o un subagente restringido a esta carpeta):")
     print()
     print(PROMPT.format(dest=dest, bundle=bundle.name))

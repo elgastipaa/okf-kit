@@ -18,8 +18,13 @@ Te dijeron algo como *"cloná okf-kit y aplicalo a mi repo X"*. Antes de nada:
    - ¿El destino **ya tiene contexto disperso abundante** (un `AGENTS.md`/`CLAUDE.md`
      rico, `/docs`, ADRs, notas)? → seguí el skill **`okf-migrate`** (consolidación
      brownfield), apoyándote en esta guía.
-   - ¿Está **limpio / sin contexto**? → este es el camino de **init** (greenfield):
-     seguí el procedimiento de abajo (es lo mismo que ejecuta el skill `okf-init`).
+   - ¿Está **limpio**, o su único contexto es el `README`? → camino de **init**
+     (greenfield): seguí el procedimiento de abajo (lo mismo que ejecuta `okf-init`).
+   - **Regla de corte**, porque el caso más común cae justo en el medio: si lo único que hay
+     es un `README` —por sustancioso que sea— es **init**. `okf-migrate` es solo si hay
+     artefactos de *contexto para IA* (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`,
+     `GEMINI.md`), ADRs, o una carpeta `/docs` con varios documentos. Ante la duda, init: el
+     `README` se harvestea igual en el Paso 3.
    - ¿**Ya tiene OKF**, de una revisión anterior del kit (mirá el `kit_version` de su
      `knowledge/index.md` contra el `VERSION` de acá)? → no es init ni migración: es
      **actualización**, y va por `reference/upgrading.md`. El bundle no se toca; lo que
@@ -93,14 +98,17 @@ su problema. Preguntale por el comportamiento que va a ver:
 > codear."*
 
 Sí → completo. No, o "quiero que vayas directo al código" → mínimo. **Ante la duda,
-completo** (es el default). Se puede subir de mínimo a completo después: agregar la sección
+completo** (es el default). **Si no hay nadie que conteste** —corrés sin usuario en la
+sesión— instalá **completo** y decilo en el reporte final, para que quede visible que fue
+un default y no una decisión. Se puede subir de mínimo a completo después: agregar la sección
 al contrato y sembrar el roadmap. En **los dos** niveles, el contrato ya dice que si el
 usuario pide ir directo al código, se respeta.
 
-**Para instalar el nivel mínimo, el borrado es mecánico** (no interpretes prosa): en
-`templates/AGENTS.md`, borrá todo lo que esté entre cada par de marcadores
+**Para instalar el nivel mínimo, el borrado es mecánico** (no interpretes prosa). Se hace
+**sobre las copias ya en el repo destino**, nunca sobre los `templates/` del kit (Paso 0): en
+el `AGENTS.md` que copiaste, borrá todo lo que esté entre cada par de marcadores
 `<!-- OKF:future-layer:start -->` / `<!-- OKF:future-layer:end -->` (4 bloques) y los
-marcadores mismos; en `templates/knowledge/index.md`, borrá el bloque `# Roadmap`; y no
+marcadores mismos; en su `knowledge/index.md`, borrá el bloque `# Roadmap`; y no
 copies el skill `okf-plan` ni creés `roadmap.md`/`_changes/`. En el nivel **completo** solo
 borrás las 8 líneas de marcadores.
 
@@ -289,6 +297,9 @@ Esto es lo que deja a un agente navegar sin cargar todo el bundle.
 
 ### Paso 4 — `log.md` (opcional)
 
+> Si partís del template `templates/knowledge/log.md`, reemplazá su `{{KIT_VERSION}}` en la
+> línea de `Initialization` con el contenido de `VERSION` — igual que en el `index.md` raíz.
+
 Si vas a llevar un log curado, inicializá `knowledge/log.md` con una entrada de hoy
 (fecha ISO `YYYY-MM-DD`) marcando la creación del bundle (formato en `OKF-SPEC.md` §6).
 **En un repo bajo git podés saltarlo:** el historial ya son `git log` + las `decisions/`.
@@ -340,6 +351,7 @@ archivos fuente se llaman `SKILL.md`: si los copiás con `cp` a la misma carpeta
 te quedás con uno solo, sin ningún error):
 
 ```
+mkdir -p <repo>/docs/okf
 cp templates/skills/okf-update/SKILL.md <repo>/docs/okf/okf-update.md
 cp templates/skills/okf-verify/SKILL.md <repo>/docs/okf/okf-verify.md
 cp templates/skills/okf-plan/SKILL.md   <repo>/docs/okf/okf-plan.md   # si instalaste la capa de futuro

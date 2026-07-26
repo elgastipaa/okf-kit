@@ -58,7 +58,8 @@ código) e **ignora los archivos `_*.md`** (plantillas/borradores). Para cada í
   *(Roto = warning, no fatal — puede ser conocimiento no escrito aún; pero listalos.)*
 - [ ] **Índices cubren y coinciden.** Cada carpeta con conceptos tiene `index.md`;
   sus entradas coinciden con los archivos reales (sin entradas viejas ni archivos
-  faltantes). La raíz lista **todos** los subdirectorios, y los conceptos que vivan en la
+  faltantes). La raíz lista **todos** los subdirectorios **no ignorados** (los de prefijo `_`
+  no van: son derivados o efímeros), y los conceptos que vivan en la
   raíz (`roadmap.md`, `glossary.md`) agrupados por `type`. *(Lo de los subdirectorios el
   script todavía no lo valida — se chequea acá.)*
 - [ ] **Entrypoint resuelto** *(lo evalúa el agente, no el script)*. Existe
