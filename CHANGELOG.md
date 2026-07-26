@@ -10,7 +10,7 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
-## No publicado
+## 0.6.1 — 2026-07-26
 
 ### Medido — la capa de futuro, con su condición y su resultado negativo
 Primera medición real (dos repos conejillo, n=3 por pregunta, todas las respuestas leídas a
