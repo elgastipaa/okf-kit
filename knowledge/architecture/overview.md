@@ -4,7 +4,7 @@ title: Qué es el kit OKF y cómo está armado
 description: El kit es una guía self-contained + templates para montar contexto OKF en cualquier repo.
 resource: ../../README.md
 tags: [okf, overview, methodology]
-timestamp: 2026-06-17T00:00:00Z
+timestamp: 2026-07-29T00:00:00Z
 ---
 
 El kit OKF (carpeta `okf-kit`) **no es una app**: es una **guía ejecutable + una

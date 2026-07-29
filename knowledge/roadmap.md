@@ -3,7 +3,7 @@ type: Roadmap
 title: Rumbo del kit OKF
 description: "Hacia dónde va el kit hoy: ingeniería de contexto completa (pasado, presente y futuro) aplicable a cualquier repo sin tooling."
 tags: [roadmap]
-timestamp: 2026-07-26T00:00:00Z
+timestamp: 2026-07-29T00:00:00Z
 ---
 
 # Visión

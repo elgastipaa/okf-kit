@@ -4,7 +4,7 @@ title: Bootstrapear OKF en un repo (resumen del GUIDE)
 description: La secuencia de init — perfil, estructura, siembra, índices, log, entrypoint, verificación.
 resource: ../../GUIDE.md
 tags: [ops, bootstrap, init]
-timestamp: 2026-07-26T00:00:00Z
+timestamp: 2026-07-29T00:00:00Z
 ---
 
 # Cuándo
@@ -12,10 +12,13 @@ Una sola vez por repo, para montar el contexto OKF desde cero. El procedimiento
 autoritativo y completo es `GUIDE.md`; esto es el mapa. La versión skill es `okf-init`.
 
 # Pasos
-Los pasos 3 a 6 son **mecánicos y los ejecuta el instalador** en un comando — ver
-[plomería vs criterio](../decisions/0017-plomeria-determinista-vs-criterio.md). Lo que queda
-para el agente son 1, 2, 7 y 8, que son los que requieren criterio. La lista completa está acá
-porque es también la referencia del camino a mano (máquinas sin Python).
+Los pasos **mecánicos** (estructura, índices, log, sello de versión, entrypoint y tooling) los
+ejecuta el instalador en un comando — ver
+[plomería vs criterio](../decisions/0017-plomeria-determinista-vs-criterio.md). Los de
+**criterio** (entender el repo, elegir perfil y nivel, sembrar los conceptos, verificar) son
+del agente. La lista completa está acá porque es también la referencia del camino a mano
+(máquinas sin Python). El corte por número de paso lo dice `GUIDE.md` §4, una sola vez — acá no
+se repite para que no derive.
 
 1. **Entendé el repo** (`GUIDE.md` §3): manifiestos/stack, docs existentes, contexto de IA
    ya presente, `git log`, memoria de la herramienta. Lo que no se deduce de la fuente

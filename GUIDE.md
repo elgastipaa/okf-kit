@@ -32,9 +32,9 @@ Te dijeron algo como *"cloná okf-kit y aplicalo a mi repo X"*. Antes de nada:
 4. **¿Hay Python en la máquina? Entonces no hagas la plomería a mano.** El
    `scripts/okf_install.py` de este kit ejecuta **todo lo mecánico** del init (esqueleto del
    bundle sellado, contrato recortado, skills, scripts, CI, hook) en un comando, verifica su
-   salida con el linter y te lista lo que falta. El procedimiento de abajo describe lo mismo
-   **a mano**: seguilo entero solo si no hay Python. Con el instalador, tu trabajo son los
-   pasos **2, 3 y 7** (el perfil, sembrar los conceptos, verificar) — el resto es el script.
+   salida con el linter y te lista lo que falta. El procedimiento de §4 describe lo mismo
+   **a mano**: seguilo entero solo si no hay Python. Qué queda para vos y qué hace el script,
+   está dicho **una sola vez**, al principio de §4.
 5. Recién entonces, leé el resto y procedé.
 
 ---
@@ -180,13 +180,15 @@ No inventes. Primero **investigá** el repo destino:
 
 ## 4. Procedimiento
 
-> **El camino corto.** Los pasos 1, 4, 5 y 6 de acá abajo son mecánicos y los ejecuta
+> **El camino corto — y la única enumeración de qué es mecánico y qué es criterio.**
+> Los **Pasos 1, 3, 4, 5 y 6** son mecánicos y los ejecuta en un comando:
 > `python3 scripts/okf_install.py <repo-destino> --profile <perfil> --name "<Proyecto>"`
 > (agregá `--minimal` si el usuario declinó la capa de futuro, `--no-claude` si no usa Claude
-> Code). Al terminar corre el linter sobre lo instalado y lista lo que falta. Con eso, de este
-> procedimiento te quedan el **Paso 2** (sembrar el bundle) y el **Paso 7** (verificar) —
-> los dos que requieren criterio. Lo de abajo es la referencia **a mano**, para cuando no hay
-> Python o querés entender qué hace el script.
+> Code). Al terminar corre el linter sobre lo instalado y lista lo que falta.
+>
+> Te quedan los **Pasos 2** (sembrar el bundle) y **7** (verificar): los dos que requieren
+> criterio, y donde está todo el valor. Lo de abajo es la referencia **a mano**, para cuando
+> no hay Python o querés entender qué hace el script.
 
 ### Paso 1 — Estructura
 

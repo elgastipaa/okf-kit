@@ -105,7 +105,9 @@ def main() -> int:
 
     rows = []
     out.write_text("", encoding="utf-8")
-    print(f"{'id':<6}{'cat':<9}{'in_tok':>8}{'turns':>7}{'secs':>6}{'cost':>8}  acierto")
+    # `ctx_tok` = cache_read: el contexto que el agente REALMENTE leyó (85K-300K). El
+    # `input_tokens` de la API son los tokens no-cacheados del último turno (6-12): ruido.
+    print(f"{'id':<6}{'cat':<9}{'ctx_tok':>9}{'turns':>7}{'secs':>6}{'cost':>8}  acierto")
     print("-" * 78)
     for q in parse_golden(golden):
         prompt = q["query"] + ASK_SUFFIX
@@ -135,7 +137,7 @@ def main() -> int:
         if failed:
             print(f"{row['id']:<6}{row['category']:<9}{'ERROR — la corrida falló':>29}")
         else:
-            print(f"{row['id']:<6}{row['category']:<9}{row['input_tokens']:>8}"
+            print(f"{row['id']:<6}{row['category']:<9}{row['cache_read']:>9}"
                   f"{row['num_turns']:>7}{row['duration_ms']//1000:>6}"
                   f"{round(row['cost_usd'], 3):>8}  {grade}")
 
@@ -150,8 +152,10 @@ def main() -> int:
         "preguntas": len(rows),
         "corridas_ok": len(good),
         "corridas_fallidas": bad,
-        "input_tokens_total": sum(r["input_tokens"] for r in good),
-        "input_tokens_prom": sum(r["input_tokens"] for r in good) // n,
+        "ctx_tokens_prom": sum(r["cache_read"] for r in good) // n,
+        "ctx_tokens_total": sum(r["cache_read"] for r in good),
+        # se conserva para poder auditar la diferencia, pero NO es la métrica a comparar
+        "input_tokens_prom_no_cacheados": sum(r["input_tokens"] for r in good) // n,
         "turns_prom": round(sum(r["num_turns"] for r in good) / n, 1),
         "segundos_total": sum(r["duration_ms"] for r in good) // 1000,
         "cost_usd_total": round(sum(r["cost_usd"] for r in good), 3),

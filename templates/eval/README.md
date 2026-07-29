@@ -17,7 +17,7 @@ Por cada pregunta se registra:
 
 | columna | de dónde sale | qué mide |
 |---|---|---|
-| `input_tokens` (+ `cache_read`) | `usage` del JSON headless | cuánto contexto tuvo que tragar (sube con cada grep/read) |
+| `ctx_tok` = `cache_read` | `usage` del JSON headless | **la métrica de contexto**: cuánto tuvo que tragar de verdad (sube con cada grep/read). Órdenes de 85K–300K. El `input_tokens` de la API son los tokens **no cacheados** del último turno (6–12): es ruido, y compararlo entre corridas no mide nada. Se guarda en el scorecard como `input_tokens_prom_no_cacheados` solo para poder auditar la diferencia. |
 | `num_turns` | `num_turns` | cuántas vueltas de tool-use (fan-out de búsqueda) |
 | `duration_ms` | `duration_ms` | latencia real |
 | **acierto** | juez (`--grade`) vs `expect` | **una respuesta rápida y equivocada es peor que una lenta y correcta** |
