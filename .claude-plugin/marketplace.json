@@ -1,0 +1,24 @@
+{
+  "name": "okf-kit",
+  "description": "El kit OKF: ingeniería de contexto duradera para cualquier repo, en markdown + git.",
+  "owner": {
+    "name": "Gaston Mendoza",
+    "url": "https://github.com/elgastipaa"
+  },
+  "plugins": [
+    {
+      "name": "okf",
+      "source": "./",
+      "description": "Ingeniería de contexto OKF: monta el bundle knowledge/, el contrato AGENTS.md y los procedimientos en cualquier repo. Markdown + git, sin apps externas ni pip install.",
+      "homepage": "https://github.com/elgastipaa/okf-kit",
+      "license": "Apache-2.0",
+      "category": "productivity",
+      "keywords": [
+        "context-engineering",
+        "okf",
+        "documentation",
+        "agents-md"
+      ]
+    }
+  ]
+}

@@ -30,9 +30,11 @@ Exit: 0 si todo pasa, 1 si hay algún FAIL.
 """
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 KIT = Path(__file__).resolve().parents[1]
@@ -255,8 +257,11 @@ check(_starts == _ends and _starts >= 3 and _alternating,
       "templates/AGENTS.md marca la capa de futuro con pares start/end alternados",
       f"{_starts} start / {_ends} end, alternados={_alternating} (mínimo 3 pares)")
 
-# Los conteos escritos en prosa tienen que seguir al número real de marcadores.
-for rel in ["templates/AGENTS.md", "GUIDE.md", "templates/skills/okf-init/SKILL.md"]:
+# Los conteos escritos en prosa tienen que seguir al número real de marcadores. `okf-init`
+# quedó afuera a propósito: el recorte lo ejecuta `okf_install.py`, así que el skill ya no
+# describe los marcadores — declarar su tamaño sin nombrarlos sería prosa muerta. Los dos que
+# quedan son los que SÍ enseñan el recorte a mano (el comentario del template y el GUIDE).
+for rel in ["templates/AGENTS.md", "GUIDE.md"]:
     txt = read_required(rel) or ""
     ok = f"{2 * _starts} líneas" in txt and (f"{_starts} pares" in txt or f"{_starts} bloques" in txt)
     check(ok, f"{rel} declara el número real de marcadores ({2 * _starts} líneas / {_starts} bloques)",
@@ -334,6 +339,115 @@ check("upgrading.md" in _init and "kit_version" in _init,
 check("upgrading.md" in (read_required("GUIDE.md") or ""),
       "GUIDE.md ofrece el camino de actualización entre init y migrate")
 
+# ------------------------------- 3k. El instalador: se verifica la SALIDA, no el template
+# Todos los asserts de recorte de arriba miden el TEMPLATE. Lo que llega al repo destino es
+# la salida del instalador, y ahí es donde históricamente se rompía (un marcador que
+# sobrevive, un `{{KIT_VERSION}}` sin sellar, un bundle que no lintea el día uno). Se
+# instala de verdad en un tmpdir y se mira el resultado.
+_INSTALLER = "scripts/okf_install.py"
+check((KIT / _INSTALLER).is_file(), f"{_INSTALLER} existe (la plomería del init es determinista)")
+
+if (KIT / _INSTALLER).is_file():
+    for _mode, _flags in (("completa", []), ("mínima", ["--minimal"])):
+        with tempfile.TemporaryDirectory() as _tmp:
+            _dst = Path(_tmp) / "repo"
+            _dst.mkdir()
+            subprocess.run(["git", "init", "-q", str(_dst)], capture_output=True)
+            _r = subprocess.run(
+                [sys.executable, _INSTALLER, str(_dst), "--name", "Proyecto de Prueba", *_flags],
+                cwd=KIT, capture_output=True, text=True,
+            )
+            check(_r.returncode == 0,
+                  f"okf_install.py deja una instalación {_mode} que el linter acepta (--strict)",
+                  (_r.stdout + _r.stderr).strip()[-700:] if _r.returncode != 0 else "")
+
+            # Andamiaje y sellos, sobre TODO lo escrito (no solo el contrato).
+            _files = [p for p in _dst.rglob("*") if p.is_file() and ".git/" not in p.as_posix()]
+            _residue = sorted({
+                f"{p.relative_to(_dst)}:{tok}"
+                for p in _files for tok in ("OKF:future-layer", "{{KIT_VERSION}}")
+                if tok in p.read_text(encoding="utf-8", errors="replace")
+            })
+            check(not _residue,
+                  f"la instalación {_mode} no deja andamiaje ni el placeholder de versión",
+                  f"quedó: {', '.join(_residue)}" if _residue else "")
+
+            _idx = (_dst / "knowledge" / "index.md")
+            _got = re.search(r'^kit_version:\s*"?([^"\s]+)"?', frontmatter(
+                _idx.read_text(encoding="utf-8") if _idx.is_file() else ""), re.M)
+            check(_got is not None and _got.group(1) == ver,
+                  f"la instalación {_mode} estampa kit_version == VERSION",
+                  f"esperaba {ver!r}, encontré {_got.group(1)!r}" if _got else "no hay kit_version")
+
+            # La mínima no puede quedar hablando de una capa que no instaló — mismo
+            # criterio que el assert del template, pero medido sobre el archivo instalado.
+            if _flags:
+                _inst_agents = (_dst / "AGENTS.md")
+                _o = [t for t in ORPHAN_TOKENS
+                      if t in _inst_agents.read_text(encoding="utf-8", errors="replace").lower()]
+                check(not _o, "el AGENTS.md de una instalación mínima no menciona la capa de futuro",
+                      f"huérfanos: {', '.join(_o)}" if _o else "")
+                for _absent in ("knowledge/roadmap.md", ".claude/skills/okf-plan/SKILL.md"):
+                    check(not (_dst / _absent).exists(),
+                          f"la instalación mínima no instala {_absent}")
+
+# Una verdad, un lugar: si el skill vuelve a describir la plomería en prosa, hay dos
+# fuentes que van a derivar (la regla dura #1 del kit y su causa raíz de bugs).
+_init_txt = read_required("templates/skills/okf-init/SKILL.md") or ""
+# El procedimiento de este skill vive en headings `## N.`, no en items de lista: se mide ahí
+# (buscarlo con numbered_steps daba un FAIL que no era el que el assert dice cuidar).
+_init_steps = [s for s in re.split(r"^## ", strip_comments(_init_txt), flags=re.M)
+               if re.match(r"\d+\.", s)]
+check(any("okf_install.py" in s for s in _init_steps),
+      "okf-init delega la plomería al instalador en un paso de su procedimiento",
+      "ningún paso nombra okf_install.py: la prosa volvió a ser la fuente del procedimiento")
+_restated = [t for t in ("chmod +x", "OKF:future-layer") if t in strip_comments(_init_txt)]
+check(not _restated, "okf-init no re-statea los pasos mecánicos que ahora son del instalador",
+      f"vuelve a describir: {', '.join(_restated)}" if _restated else "")
+
+# ------------------------------------------- 3l. Distribución como plugin de Claude Code
+# El plugin es el PROPIO repo del kit (`"source": "./"`) y apunta a `templates/skills/` con
+# rutas custom: si copiara los skills, habría dos copias = la deriva que el kit existe para
+# evitar. Lo que hay que cuidar es que esas rutas resuelvan y que la versión no derive.
+_PLUGIN = ".claude-plugin/plugin.json"
+_MARKET = ".claude-plugin/marketplace.json"
+_pl_raw, _mk_raw = read_required(_PLUGIN), read_required(_MARKET)
+_pl: dict = {}
+_mk: dict = {}
+try:
+    _pl = json.loads(_pl_raw) if _pl_raw else {}
+    _mk = json.loads(_mk_raw) if _mk_raw else {}
+    _json_err = ""
+except json.JSONDecodeError as e:
+    _json_err = str(e)
+check(bool(_pl) and bool(_mk) and not _json_err,
+      "los manifiestos del plugin existen y son JSON válido",
+      _json_err or "falta plugin.json o marketplace.json")
+
+# Segunda copia de la versión (VERSION es la fuente): sin este assert, `/plugin install`
+# entrega una revisión y el bundle estampa otra.
+check(_pl.get("version") == ver, f"{_PLUGIN} declara la misma versión que VERSION",
+      f"VERSION={ver!r} pero el plugin declara {_pl.get('version')!r}")
+
+# Un `skills` que no resuelve = plugin instalado sin procedimientos, en silencio.
+_pl_skills = _pl.get("skills") or []
+_bad_skill = [s for s in _pl_skills if not (KIT / str(s).lstrip("./")).is_dir()]
+check(_pl_skills and not _bad_skill, f"los skills que declara {_PLUGIN} existen en disco",
+      f"no resuelven: {', '.join(_bad_skill)}" if _bad_skill else "no declara ninguno")
+
+# El plugin ship**ea solo el par de BOOTSTRAP: `okf-update`/`okf-verify`/`okf-plan` se COPIAN
+# al repo destino, porque quien clone ese repo sin el plugin tiene que seguir teniéndolos
+# (decisión 0013). Shippearlos por plugin sería una dependencia oculta del entorno.
+_leaked = sorted(s for s in map(str, _pl_skills)
+                 if any(k in s for k in ("okf-update", "okf-verify", "okf-plan")))
+check(not _leaked, f"{_PLUGIN} no ship**ea los procedimientos que van instalados en el repo",
+      f"los ship**ea por plugin: {', '.join(_leaked)}" if _leaked else "")
+
+_mk_sources = [p.get("source") for p in (_mk.get("plugins") or [])]
+check(_mk_sources and all(isinstance(s, str) and (KIT / s).is_dir() for s in _mk_sources),
+      f"{_MARKET} apunta a un directorio de plugin que existe",
+      f"sources: {_mk_sources}")
+
 # ---------------------------------------------------------------- 3f. Autosuficiencia
 # El material instalado no puede citar rutas que solo existen en el kit: el repo destino
 # no las recibe. Se listan por nombre exacto — un charclass genérico (`templates/[a-z]+/`)
@@ -342,7 +456,7 @@ KIT_ONLY = [
     r"reference/[a-z][a-z0-9-]*\.md",
     r"templates/(?:AGENTS|CLAUDE)\.md",
     r"templates/(?:knowledge|skills|scripts|ci|hooks|eval)/",
-    r"scripts/okf_selfcheck\.py",
+    r"scripts/okf_(?:selfcheck|install)\.py",
     r"OKF-SPEC\.md", r"GUIDE\.md", r"DEVELOPING\.md",
 ]
 _kitpath_re = re.compile("(" + "|".join(KIT_ONLY) + ")")

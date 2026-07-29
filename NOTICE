@@ -1,0 +1,22 @@
+okf-kit
+Copyright 2026 Gaston Mendoza
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+--------------------------------------------------------------------------------
+
+This product includes material derived from the Open Knowledge Format (OKF),
+published by Google LLC in:
+
+    https://github.com/GoogleCloudPlatform/knowledge-catalog  (okf/SPEC.md)
+    Copyright Google LLC, licensed under the Apache License, Version 2.0.
+
+Specifically, `OKF-SPEC.md` in this repository is a condensed and generalized
+restatement of that specification. Changes made: the format is generalized from
+data catalogs to project context of any domain (code, data, wikis); the vocabulary
+of `type:` is treated as open; and normative rules on authority (§3.5), volatile
+facts (§3.4) and the future-work layer were added by this project. Those additions
+are original to okf-kit and are not part of, nor endorsed by, the upstream OKF.
+
+The rest of this repository — the guide, templates, skills, linter, installer and
+tooling — is original work of this project.

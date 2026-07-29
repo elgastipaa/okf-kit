@@ -11,8 +11,10 @@ El kit OKF (carpeta `okf-kit`) **no es una app**: es una **guía ejecutable + un
 librería de templates** que un agente sigue para montar un sistema de "ingeniería de
 contexto" duradero sobre *cualquier* repo. El producto entregado al repo destino es un
 bundle `knowledge/` (markdown + frontmatter) más, opcionalmente, un entrypoint y unos
-procedimientos. El kit en sí casi no tiene código: lo único ejecutable son dos scripts
-Python opcionales (linter + coldtest), un workflow de CI y un git hook.
+procedimientos. El código del kit es todo **stdlib y todo opcional**: los scripts que se
+instalan en el repo destino (linter, coldtest, stale), un workflow de CI y un git hook; más
+los que son solo del kit (el instalador y el gate). Nada de esto hace falta para *usar* un
+bundle: se puede montar y leer a mano.
 
 La distinción clave: este bundle (el que estás leyendo) documenta **el kit como
 proyecto** — qué es OKF, su modelo mental, sus decisiones de diseño y su ciclo de vida.
@@ -24,9 +26,18 @@ El kit aplicado a sí mismo es un acto de dogfooding.
 - **`reference/`** — perfiles, ejemplos, verificación, mantenimiento, casos especiales,
   install-per-tool, herramientas opcionales.
 - **`templates/`** — entrypoint (`AGENTS.md`/`CLAUDE.md`), `knowledge/` (index, log,
-  tipos de concepto), skills, scripts, CI, hook.
+  tipos de concepto), skills, scripts, CI, hook. Es lo único que se copia a un repo destino.
+- **`scripts/`** — lo kit-only: el **instalador** (`okf_install.py`, que ejecuta la parte
+  mecánica del init y del upgrade — ver
+  [plomería vs criterio](../decisions/0017-plomeria-determinista-vs-criterio.md)) y el **gate**
+  (`okf_selfcheck.py` + sus tests de rotura).
+- **`.claude-plugin/`** — los manifiestos de plugin/marketplace. El plugin *es* este repo y
+  shippea solo el par de bootstrap
+  ([0018](../decisions/0018-plugin-shippea-solo-el-bootstrap.md)).
 - **`VERSION` / `CHANGELOG.md`** — la revisión del kit. Ver
   [kit_version vs okf_version](../decisions/0003-kit-version-vs-okf-version.md).
+- **`LICENSE` / `NOTICE`** — Apache-2.0, por el origen del `OKF-SPEC.md`
+  ([0019](../decisions/0019-licencia-apache-2.md)).
 
 # Las tres capas
 El contexto de un proyecto se parte en capas; OKF (el bundle) es solo una. Ver

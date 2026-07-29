@@ -1,5 +1,9 @@
 # OKF — Guía para implementar ingeniería de contexto en cualquier repo
 
+> 🇬🇧 **English speaker?** Start at [`README.en.md`](README.en.md) — install instructions and
+> the mental model. The rest of the docs are in Spanish; any coding agent will translate or
+> follow them as-is. · Licencia: **Apache-2.0** ([`LICENSE`](LICENSE), [`NOTICE`](NOTICE)).
+
 Esta carpeta es una **guía self-contained + librería de templates** para montar
 un sistema de contexto duradero en cualquier proyecto, usando el **Open Knowledge
 Format (OKF)**.
@@ -29,9 +33,36 @@ sin `pip install`**. No hay nada que adoptar para *usar* el bundle.
 
 ---
 
+## Cómo se instala
+
+**Como plugin de Claude Code (el camino corto):**
+
+```
+/plugin marketplace add elgastipaa/okf-kit
+/plugin install okf@okf-kit
+```
+
+Eso te deja `/okf-init` (repo limpio) y `/okf-migrate` (repo con docs/ADRs dispersos), y ya
+podés decirle en tu idioma: *"armá el contexto OKF en este repo"*.
+
+**Sin plugin, o con cualquier otra IA** — clonalo y corré el instalador:
+
+```bash
+git clone https://github.com/elgastipaa/okf-kit
+python3 okf-kit/scripts/okf_install.py <tu-repo> --profile codigo --name "Tu Proyecto"
+```
+
+El instalador hace **todo lo mecánico** (esqueleto del bundle, el contrato `AGENTS.md`
+recortado según el nivel, procedimientos, linter, CI, git hook), verifica su propia salida
+con el linter y **te lista lo que falta** — que es la parte que requiere criterio: **sembrar
+los conceptos**, el *por qué* que el código no dice. Esa parte la hacés con un agente.
+Flags: `--minimal` (sin capa de futuro) · `--no-claude` (procedimientos a `docs/okf/`) ·
+`--dry-run` · `--upgrade` (subir la maquinaria de un repo que ya tiene OKF, sin tocar su
+bundle). Es stdlib puro y todo lo que escribe se revierte con `git checkout`.
+
 ## Cómo se usa (los "prompts mágicos")
 
-Esta carpeta está pensada para que se la cites a un agente en frío. Abrís un
+También podés citarle el kit a un agente en frío, sin instalar nada. Abrís un
 Claude Code (o cualquier CLI de IA) **sin contexto previo** y le decís:
 
 **Para montar OKF en un repo (lo más común):**
@@ -44,10 +75,6 @@ El agente debe entonces abrir el **`GUIDE.md`** del kit y arrancar por su **Paso
 dentro de `okf-kit`), confirmá su ruta, y elegí init (repo limpio) o `okf-migrate`
 (repo con docs/contexto dispersos). Todos los paths de la doc son **relativos a la raíz
 del kit**, así que apuntá al agente a donde clonaste `okf-kit`.
-
-> **Tip:** instalá el skill `okf-init` (de `templates/skills/okf-init/`) en
-> `~/.claude/skills/okf-init/` para que ese prompt dispare un procedimiento
-> estructurado, en vez de depender de que el agente lea bien el `GUIDE`.
 
 **Para actualizar el contexto de un repo que ya tiene OKF:**
 ```
@@ -86,9 +113,13 @@ Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 | `templates/ci/okf.yml` | Workflow de GitHub Actions que corre el linter en cada push. **Cero tokens** (Python puro). Copialo a `.github/workflows/`. |
 | `templates/eval/` | Harness **opcional** para medir el bundle contra un golden-set de preguntas (turnos, tokens, acierto). Sirve para comparar antes/después de un cambio de contexto; no se instala por defecto. |
 | `templates/hooks/pre-commit` | Git hook **universal** (cualquier IA/herramienta): bloquea commits no conformes y avisa si cambió código sin actualizar `knowledge/`. |
+| `README.en.md` | Puerta de entrada en **inglés**: qué es, cómo se instala, el modelo mental. |
+| `LICENSE` / `NOTICE` | **Apache-2.0** (la misma que el OKF de Google Cloud, del que deriva `OKF-SPEC.md`) + el aviso de atribución. |
 | `VERSION` | Revisión semver de **este kit** (no del formato). `okf-init` la estampa como `kit_version` en el bundle del repo. |
 | `CHANGELOG.md` | Historial de revisiones del kit. Aclara `kit_version` (kit) vs `okf_version` (formato OKF). |
 | `DEVELOPING.md` | Proceso interno para **desarrollar el kit**: el gate de release (selfcheck + cold-review de 4 lentes). |
+| `scripts/okf_install.py` | **El instalador** (kit-only, stdlib): ejecuta todo lo mecánico del init/upgrade en un comando y verifica su salida con el linter. Lo que requiere criterio se lo deja al agente. |
+| `.claude-plugin/` | Manifiestos de **plugin + marketplace** de Claude Code. El plugin *es* este repo (apunta a `templates/skills/`, no copia nada) y shippea solo el par de bootstrap. |
 | `scripts/okf_selfcheck.py` | Meta-linter de consistencia *interna* del kit (kit-only, NO se instala en repos destino). |
 | `scripts/okf_selfcheck_test.py` | Verifica que el gate **falle cuando debe**: inyecta cada rotura sobre una copia del kit. Un assert sin su rotura probada es decoración. |
 | `knowledge/` | Bundle **dogfood**: el kit documentándose en su propio formato OKF (prueba viva del init). |

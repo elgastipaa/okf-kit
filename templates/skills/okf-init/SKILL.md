@@ -42,17 +42,41 @@ el repo ya está al día y lo que haga falta es mantenimiento normal (`okf-updat
 sembrar de cero. Para repos grandes, empaquetalos primero con Repomix y leé ese único
 archivo en vez de caminar todo (opcional — ver `reference/optional-tools.md`, uso 1).
 
-## 1. Elegí el perfil
-Decidí el dominio → define carpetas y `type` (detalle en `reference/profiles.md`):
-- **Código** — `architecture/ decisions/ domain/ schema/ runbooks/ references/`
-- **Datos** — `datasets/ tables/ references/{metrics,joins}/ glossary/`
-- **Wiki** — organizado por tema + `playbooks/ glossary`
-- **Mixto** — combiná o inventá carpetas/tipos. Para monorepos/migración, ver
+## 1. Elegí el perfil y el nivel (las dos decisiones que el instalador necesita)
+
+**El perfil** = el dominio → define carpetas y `type` (detalle en `reference/profiles.md`):
+- **Código** (`codigo`) — `architecture/ decisions/ domain/ schema/ runbooks/ references/`
+- **Datos** (`datos`) — `datasets/ tables/ references/{metrics,joins}/ glossary/`
+- **Wiki** (`wiki`) — organizado por tema + `playbooks/ glossary`
+- **Mixto** (`mixto`) — combiná o inventá carpetas/tipos. Para monorepos/migración, ver
   `reference/special-cases.md`.
 
-## 2. Creá la estructura
-`knowledge/` con `index.md`, `log.md` y solo las carpetas del perfil que vayas a
-llenar. No crees carpetas vacías.
+**El nivel** = ¿va la **capa de futuro** (rumbo + cambios en curso)? Es el default, y decide si
+la instalación es completa o `--minimal`. Preguntale al usuario **en su idioma, no en el del
+kit** — *"¿querés que además lleve el rumbo del proyecto —qué estás haciendo, qué sigue— para
+retomar sin explicarme todo de nuevo? Suma un poco de ida y vuelta antes de codear."*
+Sí (o duda) → completa. "Andá directo al código" → `--minimal`.
+
+## 2. Instalá el esqueleto y la maquinaria (un comando, cero criterio)
+
+Todo lo mecánico —esqueleto del bundle con las fechas y el `kit_version` sellados, contrato
+`AGENTS.md` recortado según el nivel de instalación, skills, `okf_lint.py` / `okf_coldtest.py`
+/ `okf_stale.py`, CI y git hook— lo hace el instalador del kit. **No lo hagas a mano: es
+plomería, se ejecuta mal y se paga en tokens.**
+
+```
+python3 <ruta-al-kit>/scripts/okf_install.py <repo-destino> --profile <perfil> --name "<Proyecto>"
+```
+
+- Instalado como **plugin** de Claude Code, la ruta del kit es `${CLAUDE_PLUGIN_ROOT}`.
+- Flags: `--minimal` (sin capa de futuro, ver §3) · `--no-claude` (procedimientos a `docs/okf/`
+  en vez de `.claude/skills/`) · `--no-ci` · `--no-hook` · `--dry-run` (mostrar sin escribir).
+- **No pisa un `knowledge/` existente**: aborta y te rutea (§0).
+- Al terminar corre el linter sobre lo instalado y **lista lo que falta**, que es exactamente
+  lo que sigue acá abajo. Si el linter no pasa, es un bug del kit — reportalo.
+
+**¿La máquina no tiene Python?** Entonces el procedimiento mecánico es el `GUIDE.md` §4 del
+kit (pasos 1, 5, 6 y 7), a mano. Es la única razón para hacerlo a mano.
 
 ## 3. Sembrá los conceptos (lo más importante)
 Un archivo por concepto, con frontmatter `type`(req) + `title` + `description`
@@ -62,53 +86,34 @@ el *por qué* que la fuente no dice; no copies lo que se deduce del código —l
 `templates/knowledge/_*.md` como base: copialos a archivos **sin** el `_` y **borrá
 el comentario HTML** (el archivo debe empezar con `---`).
 
-**Capa de futuro (default; es lo que decide si la instalación es "completa" o "mínima"):**
-preguntale al usuario **en su idioma, no en el del kit** — *"¿querés que además lleve el
-rumbo del proyecto —qué estás haciendo, qué sigue— para retomar sin explicarme todo de nuevo?
-Suma un poco de ida y vuelta antes de codear."* Sí (o duda) → completa; "andá directo al
-código" → mínima (saltá esta capa y seguí las instrucciones de borrado en §5 y §6).
+**Las carpetas del perfil todavía no existen** — el instalador no crea carpetas vacías. Creá
+cada una, con su `index.md`, recién cuando tenga un concepto real adentro, y **sumala al
+`# Subdirectories`** del `knowledge/index.md`. Cada `index.md` de hoja agrupa sus conceptos
+bajo un heading por `type`: `* [Título](archivo.md) - <description>`.
 
-Si va: sembrá `knowledge/roadmap.md` (template `_roadmap.md`) **preguntándole** la visión, lo
-próximo y los no-goals — no se deducen de ninguna fuente. **Si no contesta o dice "hacelo
-vos": escribí lo que sí puedas inferir del código/README y marcá cada hueco con un
-blockquote `> Pendiente de confirmar: …`. No omitas el archivo** — el contrato instalado lo
-linkea. El trabajo en curso va como docs en `knowledge/_changes/` (template `_change.md`; el
-linter la ignora). Ciclo completo: skill `okf-plan`.
+**Si va la capa de futuro** (§1): el instalador ya dejó `knowledge/roadmap.md` con la
+estructura, pero su contenido **es tuyo**: preguntale al usuario la visión, lo próximo y los
+no-goals — no se deducen de ninguna fuente. **Si no contesta o dice "hacelo vos": escribí lo
+que sí puedas inferir del código/README y marcá cada hueco con un blockquote
+`> Pendiente de confirmar: …`. No lo dejes con los `{{placeholders}}` puestos** — un roadmap
+que no dice nada cuesta más que no tenerlo. El trabajo en curso va como docs en
+`knowledge/_changes/` (template `_change.md`; el linter la ignora). Ciclo completo: `okf-plan`.
 
-## 4. Índices, log y sello de versión
-`index.md` en la raíz (subdirectorios bajo `# Subdirectories`, y los conceptos que vivan en
-la raíz —`roadmap.md`, `glossary.md`— antes, agrupados por `# {type}`) y en cada hoja
-(conceptos agrupados por `# {type}`), links relativos. `log.md` con una entrada de
-hoy (`## YYYY-MM-DD`). Reemplazá el placeholder `{{KIT_VERSION}}` (en el `index.md`
-raíz y en la línea de `Initialization` del `log.md`) con el contenido de
-`VERSION` — la fuente única de la versión; si no está accesible, usá la
-versión que conozcas. El `index.md` raíz lleva además `okf_version: "0.1"`.
+## 4. Completá lo que el instalador dejó marcado
 
-## 5. Entrypoint
-Si un agente de código va a trabajar el repo: copiá `templates/AGENTS.md` a la raíz
-(+ `CLAUDE.md` shim). Si es wiki/datos navegado a mano: omití `AGENTS.md` y poné un
-puntero a `knowledge/` en el `README`.
+Su reporte final lista los archivos con `{{placeholders}}`. Los que importan:
 
-**Borrá el andamiaje, mecánicamente** (si no, el contrato manda al agente a archivos que no
-existen): siempre, las 8 líneas de marcadores `<!-- OKF:future-layer:… -->`; y **si no
-instalaste la capa de futuro** (§3), además todo lo que quede **entre** cada par de
-marcadores `:start`/`:end` (4 bloques) y el bloque `# Roadmap` del `knowledge/index.md`.
+- **`AGENTS.md`**: el nombre y el stack en una o dos frases, las **reglas duras** del proyecto
+  (linkeando al concepto que explica cada una) y las **capas NO autoritativas** (dirs scratch,
+  legacy, planes viejos que NO son estado; si el repo no tiene ninguna, borrá esa sección).
+- **`knowledge/index.md`**: la `description` del roadmap y una línea por carpeta sembrada.
+- **`knowledge/log.md`**: qué conceptos sembraste en este primer pase.
 
-## 6. Instalá mantenimiento, testeo y CI
-- `templates/skills/okf-update/` y `templates/skills/okf-verify/` → `.claude/skills/`; sumá
-  `templates/skills/okf-plan/` **solo si instalaste la capa de futuro** (§3). Si no se usa
-  Claude Code, copiá cada `SKILL.md` a `docs/okf/okf-<nombre>.md` — **renombrando** (los tres
-  se llaman igual y si no se pisan entre sí) y **fuera de `knowledge/`**, o el linter los
-  rechaza (traen frontmatter sin `type`).
-- `templates/scripts/okf_lint.py`, `okf_coldtest.py` y `okf_stale.py` → `scripts/`.
-- `templates/ci/okf.yml` → `.github/workflows/okf.yml` (linter en cada push, cero tokens).
-- `templates/hooks/pre-commit` → git hook **universal** (corre con cualquier IA): `cp` a
-  `.git/hooks/pre-commit` + `chmod +x`, o `git config core.hooksPath`. Bloquea si el bundle
-  no es conforme y avisa si cambió código sin tocar `knowledge/`.
-- **Para herramientas que no sean Claude Code** (Cursor/Copilot/Gemini…), seguí
-  `reference/install-per-tool.md` para apuntarlas al contrato `AGENTS.md`.
+Si es un repo de **wiki o datos** que se navega a mano y no lo va a trabajar un agente de
+código: borrá el `AGENTS.md` y el `CLAUDE.md`, y poné un puntero a `knowledge/` en el `README`.
+Para herramientas que no sean Claude Code (Cursor/Copilot/Gemini…), `reference/install-per-tool.md`.
 
-## 7. Verificá
+## 5. Verificá
 Corré `python3 scripts/okf_lint.py knowledge` (o el skill `okf-verify`). Mostrale al
 usuario el árbol final, el perfil elegido, qué sembraste, y **qué te faltó por no
 tener la info**. Ver `reference/verification.md`.

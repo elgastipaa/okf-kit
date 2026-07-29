@@ -56,6 +56,11 @@ hagan falta (el contrato los nombra).
 - `CLAUDE.md` = una línea: `@AGENTS.md` (shim, no dupliques).
 - Procedimientos → `.claude/skills/okf-*/` (auto-disparo por `description`).
 - Enforcement → el **git hook** universal (recomendado), o un hook en `.claude/settings.json`.
+- **Bootstrap**: el kit se distribuye como plugin —
+  `/plugin marketplace add elgastipaa/okf-kit` + `/plugin install okf@okf-kit` — que shippea
+  `/okf-init` y `/okf-migrate`. **Solo ese par**: los procedimientos de mantenimiento
+  (`okf-update`, `okf-verify`, `okf-plan`) se **copian al repo**, no vienen del plugin, para
+  que quien clone el repo sin el plugin los tenga igual.
 
 ### Cursor
 - Cursor lee `AGENTS.md`. Para reforzar, creá `.cursor/rules/okf.mdc` (con `alwaysApply`)

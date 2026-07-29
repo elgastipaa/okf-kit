@@ -173,7 +173,102 @@ def _(d):
             md.write_text(t.replace("reference/", "ref-x/"), encoding="utf-8")
 
 
+# ---- el instalador: lo que se verifica es la SALIDA, así que se rompe el que la produce
+@case("el instalador no existe", True)
+def _(d): (d / "scripts/okf_install.py").unlink()
+
+
+@case("el instalador deja marcadores en el contrato instalado", True)
+def _(d):
+    edit(d, "scripts/okf_install.py", '    text = _MARKER_LINE_RE.sub("", text)\n', "")
+    edit(d, "scripts/okf_install.py",
+         '    assert "OKF:future-layer" not in text, "quedó un marcador en el contrato instalado"\n', "")
+
+
+@case("el instalador no sella {{KIT_VERSION}}", True)
+def _(d):
+    edit(d, "scripts/okf_install.py",
+         '    text = text.replace("{{KIT_VERSION}}", version)\n'
+         '    # El comentario YAML de la línea de kit_version es instrucción de instalación.',
+         '    # El comentario YAML de la línea de kit_version es instrucción de instalación.')
+
+
+@case("la instalación mínima no recorta la capa de futuro", True)
+def _(d):
+    edit(d, "scripts/okf_install.py",
+         "    if minimal:\n        text = _MARKED_BLOCK_RE.sub(\"\", text)",
+         "    if False:\n        text = _MARKED_BLOCK_RE.sub(\"\", text)")
+
+
+@case("el instalador produce un bundle que no lintea (link roto el día uno)", True)
+def _(d):
+    edit(d, "scripts/okf_install.py",
+         '"`* [nombre](nombre/index.md) - qué hay en esta carpeta`}}\\n"',
+         '"* [nombre](nombre/index.md) - qué hay en esta carpeta}}\\n"')
+
+
+@case("la instalación mínima igual instala okf-plan", True)
+def _(d):
+    edit(d, "scripts/okf_install.py",
+         "skills = list(SKILLS_ALWAYS) + ([] if minimal else [SKILL_FUTURE])",
+         "skills = list(SKILLS_ALWAYS) + [SKILL_FUTURE]")
+
+
+# ---- una verdad, un lugar: el skill delega, no re-statea
+@case("okf-init deja de nombrar al instalador", True)
+def _(d):
+    edit(d, "templates/skills/okf-init/SKILL.md",
+         "python3 <ruta-al-kit>/scripts/okf_install.py", "copiá los archivos a mano")
+
+
+@case("okf-init vuelve a describir la plomería en prosa", True)
+def _(d):
+    append(d, "templates/skills/okf-init/SKILL.md",
+           "\nAcordate de hacer `chmod +x` en el hook.\n")
+
+
+# ---- distribución como plugin
+@case("la versión del plugin deriva de VERSION", True)
+def _(d): edit(d, ".claude-plugin/plugin.json", '"version": "', '"version": "9.9.9", "_v": "')
+
+
+@case("el plugin apunta a un skill que no existe", True)
+def _(d): edit(d, ".claude-plugin/plugin.json", "./templates/skills/okf-init", "./skills/okf-init")
+
+
+@case("el plugin ship**ea los procedimientos que van instalados en el repo", True)
+def _(d): edit(d, ".claude-plugin/plugin.json", '"./templates/skills/okf-migrate"',
+               '"./templates/skills/okf-migrate",\n    "./templates/skills/okf-update"')
+
+
+@case("el marketplace apunta a un plugin que no está ahí", True)
+def _(d): edit(d, ".claude-plugin/marketplace.json", '"source": "./"', '"source": "./plugins/okf"')
+
+
+@case("un manifiesto del plugin con JSON roto", True)
+def _(d): edit(d, ".claude-plugin/plugin.json", '{\n  "name"', '{\n  "name",')
+
+
 # ---- FALSOS POSITIVOS: redacción legítima que NO debe romper el gate
+@case("el plugin declara metadata extra (keywords, homepage)", False)
+def _(d): edit(d, ".claude-plugin/plugin.json", '"license": "Apache-2.0",',
+               '"license": "Apache-2.0",\n  "homepage": "https://example.com",')
+
+
+@case("okf-init menciona el hook sin describir su instalación", False)
+def _(d):
+    append(d, "templates/skills/okf-init/SKILL.md",
+           "\nEl git hook queda instalado y corre con cualquier IA.\n")
+
+
+@case("el instalador escribe un archivo extra que no es del bundle", False)
+def _(d):
+    edit(d, "scripts/okf_install.py",
+         "    plan.copy(KIT / \"templates\" / \"CLAUDE.md\", target / \"CLAUDE.md\")",
+         "    plan.copy(KIT / \"templates\" / \"CLAUDE.md\", target / \"CLAUDE.md\")\n"
+         "    plan.write(target / \".editorconfig\", \"root = true\\n\")")
+
+
 @case("kit_version con un comentario YAML al lado", False)
 def _(d):
     p = d / "knowledge/index.md"

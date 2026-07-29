@@ -10,7 +10,7 @@
 ---
 type: Roadmap
 title: {{Rumbo de <proyecto>}}
-description: {{Una frase: hacia dónde va el proyecto hoy y qué es lo próximo.}}
+description: "{{Una frase: hacia dónde va el proyecto hoy y qué es lo próximo.}}"
 tags: [roadmap]
 timestamp: {{YYYY-MM-DDTHH:MM:SSZ}}
 ---

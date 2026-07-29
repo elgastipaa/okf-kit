@@ -24,14 +24,30 @@ salir **proactivamente**, antes de cada release.
    `reference/*.md` resuelve. Exit 0 = OK. (Es kit-only: vive en `scripts/`, no en
    `templates/`, así que no se instala en repos destino.)
 
-2. **Linter sobre el dogfood:**
+   Además **instala de verdad** en un repo temporal (completa y mínima) y verifica la
+   **salida**, no el template: que el linter la acepte en `--strict`, que no sobreviva
+   ningún marcador ni `{{KIT_VERSION}}`, que `kit_version` == `VERSION`, y que la mínima no
+   quede hablando de la capa de futuro. Y valida los manifiestos del plugin (versión ==
+   `VERSION`, los `skills` resuelven, no ship**ea los procedimientos que van instalados).
+
+2. **Manifiestos del plugin (si tenés el CLI a mano):**
+   ```
+   claude plugin validate .claude-plugin/marketplace.json --strict
+   claude plugin validate .claude-plugin/plugin.json
+   ```
+   El segundo va **sin** `--strict` a propósito: avisa que el `CLAUDE.md` de la raíz no se
+   carga como contexto del plugin, y ese archivo existe porque el kit se auto-aplica OKF
+   (es su shim de entrypoint). Es un warning correcto para un plugin cualquiera y esperado
+   para este. Lo estructural ya lo cubre el selfcheck, que corre sin el CLI.
+
+3. **Linter sobre el dogfood:**
    ```
    python3 templates/scripts/okf_lint.py knowledge --strict
    ```
    El bundle `knowledge/` documenta al propio kit en formato OKF (dogfood). Debe dar 0/0.
    Si falla, el init no es self-sufficient — arreglalo antes de release.
 
-3. **Cold-review de 4 lentes (para cambios grandes):** lanzar subagentes en frío,
+4. **Cold-review de 4 lentes (para cambios grandes):** lanzar subagentes en frío,
    independientes y restringidos a `okf-kit`, con estas lentes:
    - **A — Consistencia:** matriz regla×archivo; ¿el mismo procedimiento coincide en
      todos los lugares donde se afirma? (caza la deriva, p.ej. el bug del index/log).
@@ -73,9 +89,14 @@ Una **fuente canónica por regla/procedimiento**; el resto **apunta**, no re-esc
 - Capa de futuro (rumbo + `_changes/` + harvest): canónico = `templates/skills/okf-plan/SKILL.md`;
   el *cuándo* se dispara vive en `templates/AGENTS.md` (es lo que lee toda herramienta).
 - Qué se borra del contrato en la instalación mínima: canónico = los **marcadores**
-  `OKF:future-layer` del propio `templates/AGENTS.md` — el rango manda. `GUIDE §1` y
-  `okf-init §5` explican *cómo* aplicarlos, pero **no enumeran qué se borra**: eso lo dicen
-  los marcadores. El selfcheck verifica que el resultado no quede huérfano.
+  `OKF:future-layer` del propio `templates/AGENTS.md` — el rango manda. Quien los **aplica**
+  es `okf_install.py`; `GUIDE §4` explica el recorte a mano (para máquinas sin Python) y
+  ninguno de los dos **enumera qué se borra**: eso lo dicen los marcadores. El selfcheck
+  verifica que el resultado instalado no quede huérfano.
+- **Procedimiento mecánico** de init/upgrade (qué archivo va a dónde, con qué nombre, con qué
+  permisos, qué se sella): canónico = el código de `scripts/okf_install.py`. `okf-init` y
+  `reference/upgrading.md` **delegan** — si vuelven a describirlo en prosa hay dos fuentes que
+  derivan, y el selfcheck lo caza. Lo que esos docs **sí** dicen es lo que requiere criterio.
 
 Si agregás una regla nueva, definila en UN lugar y apuntá desde el resto. El
 `okf_selfcheck.py` debería crecer con un assert por cada regla que pueda derivar — y

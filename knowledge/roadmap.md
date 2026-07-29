@@ -20,6 +20,26 @@ git, sin apps externas.
 
 # Después (próximo, en orden)
 
+**Adopción: lo que falta para que el kit se pueda usar sin conocer al autor.**
+
+- **Un repo de ejemplo clonable** (antes/después de un init real, con el diff visible). Hoy la
+  única prueba navegable es el dogfood `knowledge/`, que está enterrado, y los mini-bundles de
+  `reference/examples.md`. Es lo que convierte a un desconocido.
+- Mueblería de adopción: badges, topics de GitHub, `CONTRIBUTING.md`, un asciinema de 30s del
+  init. Barato y hoy no existe nada.
+- Publicar la medición del harness de eval (turnos/tokens/acierto en los tres conejillos).
+  **Es el diferencial que ningún competidor tiene** —el kit es el único que se mide a sí
+  mismo— y hoy `/eval/` está gitignoreado. Requiere decidir qué se publica y qué no.
+
+**De la comparación con `harness-sdd` (lo que ese repo tiene y el kit no):**
+
+- **Estado de sesión en vivo**: un `_changes/` captura el *cambio*, no *dónde quedó la sesión*
+  si el contexto se corta a mitad de una tarea. Medir si hace falta antes de agregar archivos.
+- **Estado WIP machine-readable**: el roadmap es prosa, así que "≤1 cosa en curso" no lo puede
+  enforcear ni el linter ni el hook. Convertirlo en invariante chequeable, sin ceremonia.
+- Roles/subagentes (leader/spec_author/implementer/reviewer): el kit no tiene capa de
+  orquestación. **Probable no-goal** — habría que medir que paga antes de sumar una cuarta capa.
+
 **Cerrar lo que quedó escrito y sin medir.**
 
 - Los dos escenarios que la [0015](decisions/0015-rankear-el-drift-antes-de-auditarlo.md) dejó

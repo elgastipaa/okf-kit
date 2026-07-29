@@ -10,7 +10,7 @@
 ---
 type: Change
 title: {{El cambio, como resultado. Ej: "Los usuarios pueden guardar la partida"}}
-description: {{Una frase: qué va a ser distinto cuando esté hecho.}}
+description: "{{Una frase: qué va a ser distinto cuando esté hecho.}}"
 status: active                    # active | done (done = falta solo el harvest)
 timestamp: {{YYYY-MM-DDTHH:MM:SSZ}}
 ---

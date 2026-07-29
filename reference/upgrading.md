@@ -26,6 +26,12 @@ que te estás perdiendo — y de lo que hay que re-copiar.
 
 ## Procedimiento
 
+> **Los pasos 3 y 5 son mecánicos y los hace el instalador:**
+> `python3 scripts/okf_install.py <repo> --upgrade`. Reemplaza scripts, skills, CI y hook
+> (detecta solo el nivel de instalación y si el hook es del kit), re-estampa `kit_version`,
+> deja la línea en `log.md`, corre el linter sobre el resultado y **no toca el `AGENTS.md`
+> ni el contenido del bundle**. Los pasos 1, 2, 4 y 6 siguen siendo tuyos: son criterio.
+
 1. **Leé el `CHANGELOG` desde la versión del repo hasta la actual.** No es ceremonia: te dice
    qué archivos cambiaron y si alguna regla cambió de forma (p.ej. de 0.5.0 a 0.6.x el
    contrato ganó la capa de futuro y la regla descriptivo/normativo, y aparecieron marcadores
@@ -34,10 +40,11 @@ que te estás perdiendo — y de lo que hay que re-copiar.
    rumbo ni `_changes/`, o no existe `knowledge/roadmap.md`, está en **mínimo** — y la
    actualización **lo respeta**: no le metas la capa de futuro por la ventana. Preguntale al
    usuario si la quiere ahora, en su idioma (ver `GUIDE.md` §1).
-3. **Los scripts y los skills se reemplazan enteros.** No tienen estado del proyecto:
-   `templates/scripts/*.py` → `<repo>/scripts/`, `templates/skills/{okf-update,okf-verify}`
-   (+ `okf-plan` si va la capa de futuro) → `<repo>/.claude/skills/`, `templates/ci/okf.yml` y
-   `templates/hooks/pre-commit` si estaban instalados.
+3. **Los scripts y los skills se reemplazan enteros** (esto lo hace `--upgrade`). No tienen
+   estado del proyecto: `templates/scripts/*.py` → `<repo>/scripts/`,
+   `templates/skills/{okf-update,okf-verify}` (+ `okf-plan` si va la capa de futuro) →
+   `<repo>/.claude/skills/`, `templates/ci/okf.yml` y `templates/hooks/pre-commit` si estaban
+   instalados. Un `pre-commit` que **no** es del kit no se pisa: puede ser del usuario.
 4. **El `AGENTS.md` NO se reemplaza entero** — es el único que lleva contenido del proyecto
    mezclado con el del kit. Lo que es del proyecto y **se conserva**: el título y la
    descripción del stack, las **reglas duras** propias, y los `{{placeholders}}` completados
@@ -45,7 +52,8 @@ que te estás perdiendo — y de lo que hay que re-copiar.
    y Procedimientos. Mostrale al usuario qué conservaste y qué reemplazaste **antes** de
    escribir: acá es donde se pierde conocimiento si se hace en silencio.
 5. **Re-estampá `kit_version`** en `knowledge/index.md` con el `VERSION` nuevo, y dejá una
-   línea en `log.md` (`## YYYY-MM-DD` · qué revisión, desde cuál).
+   línea en `log.md` (`## YYYY-MM-DD` · qué revisión, desde cuál). Esto también lo hace
+   `--upgrade`; si el repo no mantiene `log.md`, lo omite.
 6. **Verificá**: `python3 scripts/okf_lint.py knowledge` tiene que pasar. Si la revisión nueva
    trajo convenciones nuevas (p.ej. conceptos en la raíz del bundle agrupados por `type`), el
    linter las va a marcar acá — arreglalas ahora, no después.

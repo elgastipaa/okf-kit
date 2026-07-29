@@ -1,5 +1,11 @@
 # Update Log
 
+## 2026-07-29
+* **Update**: v0.7.0 — la plomería del init/upgrade pasa a `scripts/okf_install.py` (un comando, determinista, verifica su propia salida con el linter) y el kit se distribuye como **plugin** de Claude Code. Decisiones [0017](decisions/0017-plomeria-determinista-vs-criterio.md) y [0018](decisions/0018-plugin-shippea-solo-el-bootstrap.md).
+* **Update**: El corte es **mecánico vs criterio**: `okf-init` **delega** en el script en vez de re-statear la plomería (con assert que lo verifica) y se queda con lo que requiere inteligencia — entender el repo, sembrar los conceptos, completar `{{placeholders}}`, mergear el contrato al actualizar. `--upgrade` es ahora el camino mecánico de la [0016](decisions/0016-material-instalado-vs-contenido.md).
+* **Update**: El gate pasa a **instalar de verdad** en un repo temporal y verificar la SALIDA (antes todos los asserts medían el template): 80 → 96 asserts, 22 → 39 roturas probadas. Destapó dos bugs latentes del `_roadmap.md` — un `description` con `:` sin comillas (ERROR de YAML en un roadmap recién sembrado) y un ejemplo que linkeaba un `_changes/` inexistente.
+* **Update**: `LICENSE` (**Apache-2.0**) + `NOTICE` acreditando el OKF de Google Cloud ([0019](decisions/0019-licencia-apache-2.md)) — el repo no tenía licencia, que era el bloqueante de adopción más barato del kit — y `README.en.md` como puerta de entrada en inglés (la prosa sigue en español).
+
 ## 2026-07-26
 * **Update**: v0.6.2 — `okf_stale.py` (rankear el drift sin leer codigo), metodo para el Nivel 2, camino de actualizacion del material instalado, y el gate de 74 a 80 asserts + `okf_stale_test.py`.
 * **Update**: El drift entre bundle y código se **rankea** antes de auditarse ([0015](decisions/0015-rankear-el-drift-antes-de-auditarlo.md)): `okf_stale.py` usa `resource` + `timestamp` + git para decir dónde mirar sin leer código ni gastar tokens, y el Nivel 2 gana el método que solo tenía el 4. Encontró drift real en el propio kit en su primera corrida.

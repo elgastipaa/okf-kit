@@ -29,7 +29,13 @@ Te dijeron algo como *"cloná okf-kit y aplicalo a mi repo X"*. Antes de nada:
      `knowledge/index.md` contra el `VERSION` de acá)? → no es init ni migración: es
      **actualización**, y va por `reference/upgrading.md`. El bundle no se toca; lo que
      envejeció es el material instalado.
-4. Recién entonces, leé el resto y procedé.
+4. **¿Hay Python en la máquina? Entonces no hagas la plomería a mano.** El
+   `scripts/okf_install.py` de este kit ejecuta **todo lo mecánico** del init (esqueleto del
+   bundle sellado, contrato recortado, skills, scripts, CI, hook) en un comando, verifica su
+   salida con el linter y te lista lo que falta. El procedimiento de abajo describe lo mismo
+   **a mano**: seguilo entero solo si no hay Python. Con el instalador, tu trabajo son los
+   pasos **2, 3 y 7** (el perfil, sembrar los conceptos, verificar) — el resto es el script.
+5. Recién entonces, leé el resto y procedé.
 
 ---
 
@@ -173,6 +179,14 @@ No inventes. Primero **investigá** el repo destino:
 ---
 
 ## 4. Procedimiento
+
+> **El camino corto.** Los pasos 1, 4, 5 y 6 de acá abajo son mecánicos y los ejecuta
+> `python3 scripts/okf_install.py <repo-destino> --profile <perfil> --name "<Proyecto>"`
+> (agregá `--minimal` si el usuario declinó la capa de futuro, `--no-claude` si no usa Claude
+> Code). Al terminar corre el linter sobre lo instalado y lista lo que falta. Con eso, de este
+> procedimiento te quedan el **Paso 2** (sembrar el bundle) y el **Paso 7** (verificar) —
+> los dos que requieren criterio. Lo de abajo es la referencia **a mano**, para cuando no hay
+> Python o querés entender qué hace el script.
 
 ### Paso 1 — Estructura
 

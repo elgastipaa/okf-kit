@@ -14,8 +14,13 @@ ingeniería de contexto (OKF) en *otros* repos. Es el **toolsmith**, no un repo 
   tocás una regla, editá su archivo canónico y dejá punteros desde el resto.
 - **Las herramientas se consumen desde `templates/`; NO se instalan en la raíz del kit.** El
   `scripts/okf_selfcheck.py` corre `templates/scripts/okf_lint.py`. Copiar el linter o los skills a
-  la raíz crearía **dos copias** = la deriva que el kit existe para evitar. (Lo único kit-only en
-  `scripts/` es `okf_selfcheck.py`.)
+  la raíz crearía **dos copias** = la deriva que el kit existe para evitar. Lo kit-only en
+  `scripts/` son `okf_selfcheck.py`, `okf_install.py` y sus tests; el plugin
+  (`.claude-plugin/`) tampoco copia skills: apunta a `templates/skills/` con rutas custom.
+- **La plomería del init/upgrade vive en `scripts/okf_install.py`, no en prosa.** Es la fuente
+  única del procedimiento **mecánico**; `okf-init` y `reference/upgrading.md` **delegan** y no
+  lo re-statean (el gate lo verifica). Lo que requiere **criterio** —sembrar conceptos,
+  completar `{{placeholders}}`, mergear el `AGENTS.md` al actualizar— se queda en el agente.
 - **`VERSION` es la fuente de verdad de la versión.** Los templates usan `{{KIT_VERSION}}`; el
   dogfood `knowledge/index.md` debe estampar el mismo valor (el selfcheck lo exige).
 - **Cada fix se testea adversarialmente antes de darlo por hecho** — la lección de esta historia:

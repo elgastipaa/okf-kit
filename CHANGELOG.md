@@ -10,7 +10,66 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
-## No publicado
+## 0.7.0 — La plomería deja de gastar criterio, y el kit se distribuye
+
+### Agregado — `scripts/okf_install.py`: el init mecánico en un comando
+El kit resolvía bien el problema difícil (qué contexto capturar y por qué) y mal el fácil
+(copiar archivos). `okf-init` le pedía a una IA ~40 operaciones de archivo, de las cuales
+**una sola requiere inteligencia**: sembrar los conceptos. El resto —`mkdir`, `cp`, `chmod`,
+sellar `{{KIT_VERSION}}`, borrar los bloques entre marcadores, renombrar los tres `SKILL.md`
+que se llaman igual, dejarlos fuera de `knowledge/` para que el linter no los rechace— estaba
+**explicado en prosa** porque no había código que lo garantizara: se pagaba en tokens en cada
+init y se podía ejecutar mal.
+
+- **Un comando:** `python3 scripts/okf_install.py <repo> --profile codigo --name "X"`.
+  Flags: `--minimal`, `--no-claude`, `--no-ci`, `--no-hook`, `--upgrade`, `--dry-run`.
+- **Verifica su propia salida** con el linter en `--strict` y **lista lo que falta**, que es
+  exactamente lo que requiere criterio: sembrar conceptos y completar `{{placeholders}}`.
+- **No pisa** un `knowledge/` existente: aborta y rutea a `--upgrade`.
+- `--upgrade` **es** ahora el camino mecánico de `reference/upgrading.md` (pasos 3 y 5):
+  reemplaza scripts/skills/CI/hook, detecta solo el nivel de instalación, re-estampa
+  `kit_version`, deja la línea en `log.md`, y **no toca `AGENTS.md`** ni el contenido del
+  bundle — el merge del contrato sigue siendo criterio del agente. Un `pre-commit` que no es
+  del kit tampoco se pisa.
+- **Una verdad, un lugar:** `okf-init` **delega** en el script en vez de re-statear la
+  plomería, y un assert del gate verifica que no vuelva a describirla. Era el riesgo real de
+  esta feature (dos fuentes del mismo procedimiento = la causa raíz de los bugs del kit).
+- Sigue valiendo la [decisión 0004](knowledge/decisions/0004-vendor-neutral-no-external-apps.md):
+  stdlib, sin `pip`, y el camino manual del `GUIDE` §4 sigue existiendo para máquinas sin Python.
+
+### Agregado — distribución como plugin de Claude Code
+`/plugin marketplace add elgastipaa/okf-kit` + `/plugin install okf@okf-kit` deja `/okf-init`
+y `/okf-migrate` sin clonar nada a mano. El plugin **es este repo** (`"source": "./"`) y
+apunta a `templates/skills/` con rutas custom: **no copia skills**, así que no hay dos copias.
+Shippea **solo el par de bootstrap** — `okf-update`/`okf-verify`/`okf-plan` se siguen copiando
+al repo destino, porque quien clone ese repo sin el plugin tiene que seguir teniéndolos
+([decisión 0013](knowledge/decisions/0013-installed-material-is-self-sufficient.md)).
+
+### Agregado — licencia (bloqueante de adopción) y puerta de entrada en inglés
+- **`LICENSE` (Apache-2.0) + `NOTICE`.** No había ninguna: legalmente nadie en una empresa
+  podía adoptarlo. Apache-2.0 y no MIT porque el `OKF-SPEC.md` es un derivado condensado del
+  OKF de Google Cloud, que es Apache-2.0 — el `NOTICE` acredita el upstream y declara qué se
+  cambió, como pide esa licencia.
+- **`README.en.md`**: qué es, cómo se instala y el modelo mental, en inglés. La prosa del kit
+  sigue en español a propósito; cualquier agente traduce el resto bajo demanda.
+
+### Arreglado — dos bugs latentes que el instalador destapó
+Los encontró el linter corriendo sobre la salida real del init, algo que hasta ahora nadie
+hacía (todos los asserts medían el **template**):
+
+- **`_roadmap.md` tenía un `description` con `:` sin comillas** → un `roadmap.md` sembrado
+  desde el template daba **ERROR** de YAML en el linter. Igual en `_change.md`. Ahora van
+  entrecomillados.
+- **El ejemplo de "Ahora" del `_roadmap.md` linkeaba un `_changes/` inexistente** → link roto
+  el día uno. El instalador lo reemplaza por `- (nada activo)`, que además es la verdad.
+
+### Cambiado — el gate crece sobre la salida, no sobre el template
+`okf_selfcheck.py`: 80 → **96 asserts**. Los nuevos **instalan de verdad** en un repo temporal
+(completa y mínima) y verifican el resultado: linter en `--strict`, cero marcadores
+sobrevivientes, cero `{{KIT_VERSION}}`, `kit_version` == `VERSION`, y que la instalación mínima
+no quede nombrando la capa de futuro ni instalando `okf-plan`. Más los manifiestos del plugin
+(versión == `VERSION`, los `skills` resuelven, no ship**ea lo que va instalado en el repo).
+`okf_selfcheck_test.py`: 22 → **39 casos** de rotura probada.
 
 ### Arreglado — pasada en frío sobre el `GUIDE` (sin blockers, 5 majors)
 Un agente sin contexto caminó la guía entera sobre un repo de juguete y llegó al final solo:
