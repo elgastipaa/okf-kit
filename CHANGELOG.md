@@ -10,6 +10,71 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.7.3 — Cuatro lentes en frío: pérdida de datos y veredictos falsos
+
+Corrido el cold-review de 4 lentes sobre las tres releases del día (vibecoder en frío,
+consistencia, adversarial de tooling, y mercado). Esta entrada cubre **solo lo destructivo y
+los veredictos falsos**; el resto de los hallazgos está en el rumbo.
+
+### Arreglado — el instalador destruía trabajo del usuario (BLOCKER)
+Verificado sobre un repo real: instalar sobre un repo con `AGENTS.md` escrito a mano (con la
+ubicación de los secretos y el procedimiento de deploy), un `CLAUDE.md` propio y un
+`pre-commit` con `lint-staged && npm test` **los sobreescribía los tres, exit 0, sin backup y
+sin mención** — irrecuperable si no estaban commiteados.
+
+- Ahora **aborta** (exit 2) si hay un `AGENTS.md`/`CLAUDE.md` que no es del kit, y rutea a
+  `okf-migrate`, que existe justamente para ese repo. `--force` para reemplazarlo a propósito.
+- El `pre-commit` ajeno **no se pisa nunca**, ni con `--force`: la guarda `_hook_is_ours()` ya
+  existía y solo se consultaba en `--upgrade`. Pisarlo apaga los tests del usuario en silencio.
+- La guarda anti-auto-instalación era igualdad exacta, así que `okf-kit/reference` era un
+  destino válido: ahora rechaza cualquier anidamiento con el kit.
+
+### Arreglado — `okf_coldtest.py --force` hacía `rm -rf` del repo (BLOCKER)
+`--force` estaba documentado como "sobreescribe el destino" y ejecutaba `shutil.rmtree(dest)`
+sin mirar qué era: apuntarlo al repo borraba el código y el **`.git`**, y después crasheaba, así
+que el stacktrace hacía creer que no había pasado nada. Ahora se niega si el destino contiene al
+bundle, está adentro del bundle, es el cwd, tiene un `.git/`, o tiene archivos que no puso él.
+
+### Arreglado — el gate MENTÍA (BLOCKER)
+- **Con `templates/scripts/okf_lint.py` vacío, el gate declaraba `104/104 OK`.** Solo miraba el
+  returncode, y un linter vacío sale 0. Ahora corre el linter contra una **rotura conocida** y
+  exige que la detecte: se prueba que funciona, no que calla.
+- **Borrar material instalado bajaba el denominador** (104 → `102/102 OK`) porque `INSTALLED` se
+  armaba con un glob de lo que existe. Ahora es un **inventario literal**, más un assert de que
+  no quede en disco un template sin sus asserts. Viola la regla de diseño 1 del propio archivo:
+  un archivo que falta tiene que FALLAR, no desaparecer del reporte.
+- `AGENTS.md` §3 nombraba dos suites; el CI corre cuatro. Ahora dice las cuatro.
+
+### Arreglado — el linter daba verde a bundles inválidos
+- **`type:concept` (sin espacio) contaba como la clave `type`.** Para cualquier parser YAML ese
+  frontmatter es **un solo escalar**: no tiene ninguna clave. El linter bendecía conceptos que
+  GitHub u Obsidian leen sin metadata, y `type` es el único requisito duro de OKF.
+- **Marcadores de conflicto de merge pasaban limpios** — por el linter, por `--strict` y por el
+  hook. Es el estado más peligroso que puede tener un bundle: deja dos verdades contradictorias
+  afirmadas como vigentes. Ahora es ERROR.
+- **Un link absoluto indentado con 4 espacios era invisible** (se trataba como code-block, pero
+  `    * item` es una lista anidada). El link absoluto es el único ERROR de links de la spec, y
+  se esquivaba indentando.
+
+### Arreglado — falsos positivos que habrían puesto en rojo la CI de los usuarios
+- La `description` de una entrada de índice **envuelta en dos líneas** (envolver prosa a 90
+  columnas es la norma, y los docs del kit lo hacen) se marcaba como divergente, mostrando los
+  dos textos **idénticos** en el mensaje. Regresión del chequeo nuevo de 0.7.1.
+- `authority: normative # comentario` se marcaba como fuera del vocabulario.
+
+### Arreglado — dos herramientas del kit se contradecían
+`okf_lint.py` acepta `timestamp: 2026-01-01` (sin offset) como ISO 8601 válido — la forma que un
+humano escribe primero — y `okf_stale.py` **crasheaba con `TypeError`** al restarlo de un `now`
+con timezone: un solo concepto se llevaba el reporte entero. Nunca salió en casa porque el
+dogfood usa `Z` en el 100% de los conceptos.
+
+### Arreglado — el hook se auto-desactivaba en silencio
+Si `mktemp` fallaba (TMPDIR inválido, disco lleno, sandbox de CI), quedaba `tmp=""` y el
+`--prefix="/"` intentaba escribir el bundle en la **raíz**; el chequeo bloqueante desaparecía sin
+una línea de aviso, al revés que la rama sin python3, que sí avisa. Ahora avisa.
+
+Gate: 104 → **108 asserts**, 47 → **52 roturas**, 15 → **20 casos del linter**, 8 → **9 del ranker**.
+
 ## 0.7.2 — La auditoría del bundle deja de auto-aprobarse
 
 ### Agregado — `okf-reviewer`: el revisor con contexto fresco

@@ -59,8 +59,9 @@ código hace hoy.
 Corré **`python3 scripts/okf_selfcheck.py`** (consistencia interna: linter limpio sobre el
 dogfood, `kit_version` sembrado, keep-alive y capa de futuro coincidentes, rama normativa
 presente, presupuesto del contrato, instalación mínima sin huérfanos, material instalado
-autosuficiente, referencias que resuelven) y **`python3 scripts/okf_selfcheck_test.py`**, que
-verifica que el gate **falle cuando debe** — si tocaste un assert, este es el que lo prueba.
+autosuficiente, referencias que resuelven) y las **tres suites de roturas** —`okf_selfcheck_test.py` (¿el gate falla cuando debe?),
+`okf_lint_test.py` y `okf_stale_test.py` (¿la herramienta reporta cuando debe?)—, que son las
+mismas cuatro que corre el CI. Si tocaste un assert o un criterio, ahí se prueba.
 Si bumpeás `VERSION`, re-estampá el dogfood. Para cambios grandes, corré el cold-review de 4 lentes. Detalle en `DEVELOPING.md`.
 
 ## Mapa rápido

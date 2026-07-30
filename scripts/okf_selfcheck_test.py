@@ -242,6 +242,32 @@ def _(d):
            "\nAcordate de hacer `chmod +x` en el hook.\n")
 
 
+# ---- pérdida de datos: lo que la pasada adversarial encontró destruyendo trabajo ajeno
+@case("el instalador vuelve a pisar el AGENTS.md del usuario", True)
+def _(d):
+    edit(d, "scripts/okf_install.py", "    if not args.upgrade and not args.force:",
+         "    if False:")
+
+
+@case("el instalador vuelve a pisar el pre-commit del usuario", True)
+def _(d):
+    edit(d, "scripts/okf_install.py",
+         "    elif (target / \".git\" / \"hooks\" / \"pre-commit\").is_file() and not _hook_is_ours(target):",
+         "    elif False:")
+
+
+@case("el gate deja de probar que el linter FUNCIONA (linter vaciado)", True)
+def _(d): (d / "templates/scripts/okf_lint.py").write_text("", encoding="utf-8")
+
+
+@case("borrar material instalado ya no puede bajar el denominador", True)
+def _(d): (d / "templates/knowledge/_decision.md").unlink()
+
+
+@case("un template nuevo sin sus asserts (inventario corto)", True)
+def _(d): (d / "templates/knowledge/_nuevo.md").write_text("---\ntype: X\n---\n", encoding="utf-8")
+
+
 # ---- la auditoría no se auto-aprueba
 @case("el revisor con contexto fresco no existe", True)
 def _(d): (d / "templates/agents/okf-reviewer.md").unlink()

@@ -24,10 +24,16 @@ BUNDLE="knowledge"
 # El output del linter solo se muestra si algo falla: un hook que escupe texto en cada
 # commit limpio se vuelve ruido que se deja de leer.
 if command -v python3 >/dev/null 2>&1 && [ -f scripts/okf_lint.py ]; then
-  tmp=$(mktemp -d)
-  trap 'rm -rf "$tmp"' EXIT
-  git ls-files -- "$BUNDLE" | git checkout-index --prefix="$tmp/" -f --stdin 2>/dev/null
-  if [ -d "$tmp/$BUNDLE" ]; then
+  # Sin verificar, un mktemp que falla (TMPDIR inválido, disco lleno, sandbox de CI) dejaba
+  # tmp="" y el --prefix="/" intentaba escribir el bundle en la RAÍZ; el chequeo bloqueante
+  # desaparecía sin una sola línea de aviso, al revés que la rama sin python3.
+  if ! tmp=$(mktemp -d); then
+    echo "OKF: no pude crear un directorio temporal; chequeo de conformidad OMITIDO." >&2
+    tmp=""
+  fi
+  trap '[ -n "$tmp" ] && rm -rf "$tmp"' EXIT
+  [ -n "$tmp" ] && git ls-files -- "$BUNDLE" | git checkout-index --prefix="$tmp/" -f --stdin 2>/dev/null
+  if [ -n "$tmp" ] && [ -d "$tmp/$BUNDLE" ]; then
     out=$(python3 scripts/okf_lint.py "$tmp/$BUNDLE" 2>&1) || {
       printf '%s\n' "$out" >&2
       echo "OKF: el bundle staged no es conforme (ver arriba). Corregí, o 'git commit --no-verify' para saltar." >&2

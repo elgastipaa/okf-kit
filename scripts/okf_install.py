@@ -235,7 +235,11 @@ def install_machinery(plan: Plan, target: Path, *, minimal: bool, no_claude: boo
     if not want_hook:
         plan.skip("git hook (--no-hook)")
     elif not (target / ".git").is_dir():
-        plan.skip("git hook (el destino no es un repo git)")
+        plan.skip("git hook (el destino no es un repo git — SIN enforcement)")
+    elif (target / ".git" / "hooks" / "pre-commit").is_file() and not _hook_is_ours(target):
+        # Pisarlo apaga en silencio los tests o el lint-staged del usuario, y no se entera
+        # hasta que mergea algo roto. La guarda existía y solo se consultaba en --upgrade.
+        plan.skip("git hook (ya hay un pre-commit que NO es del kit: no se pisa — ver abajo)")
     else:
         plan.copy(KIT / "templates" / "hooks" / "pre-commit",
                   target / ".git" / "hooks" / "pre-commit", executable=True)
@@ -310,6 +314,16 @@ def install_upgrade(plan: Plan, target: Path, args, version: str) -> str | None:
     return old
 
 
+# Una frase que el contrato instalado SIEMPRE trae y que nadie escribiría por su cuenta.
+_KIT_ENTRYPOINT_MARK = "Empezá por [`knowledge/index.md`](knowledge/index.md)"
+
+
+def _is_kit_entrypoint(path: Path) -> bool:
+    """¿Este AGENTS.md/CLAUDE.md lo escribió el kit? El shim CLAUDE.md es `@AGENTS.md`."""
+    txt = path.read_text(encoding="utf-8", errors="replace")
+    return _KIT_ENTRYPOINT_MARK in txt or txt.strip() == "@AGENTS.md"
+
+
 def _hook_is_ours(target: Path) -> bool:
     hook = target / ".git" / "hooks" / "pre-commit"
     if not hook.is_file():
@@ -353,6 +367,8 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--no-hook", action="store_true", help="no instalar el git hook")
     ap.add_argument("--upgrade", action="store_true",
                     help="reemplazar solo la maquinaria (no toca AGENTS.md ni el bundle)")
+    ap.add_argument("--force", action="store_true",
+                    help="reemplazar un AGENTS.md/CLAUDE.md escrito a mano (commiteá antes)")
     ap.add_argument("--dry-run", action="store_true", help="mostrar el plan, no escribir nada")
     args = ap.parse_args(argv[1:])
 
@@ -361,12 +377,30 @@ def main(argv: list[str]) -> int:
         print(f"okf_install: el destino '{target}' no existe o no es un directorio",
               file=sys.stderr)
         return 2
-    if target == KIT:
-        print("okf_install: el destino NO puede ser el kit — el kit tiene su propio "
-              "knowledge/ dogfood. Apuntá al repo del usuario.", file=sys.stderr)
+    # Igualdad exacta dejaba pasar `okf-kit/reference` (y un kit clonado dentro del repo).
+    if target == KIT or KIT in target.parents or target in KIT.parents:
+        print("okf_install: el destino no puede ser el kit, ni estar anidado con él — el kit "
+              "tiene su propio knowledge/ dogfood. Apuntá al repo del usuario.", file=sys.stderr)
         return 2
 
     version = kit_version()
+
+    # El `AGENTS.md`/`CLAUDE.md` de un repo con vida propia es contenido del USUARIO —
+    # reglas, procedimientos, dónde están los secretos— y pisarlo es pérdida de datos
+    # irreversible si no estaba commiteado. Para ese repo existe `okf-migrate`, que
+    # consolida en vez de reemplazar.
+    if not args.upgrade and not args.force:
+        _theirs = [f for f in ("AGENTS.md", "CLAUDE.md")
+                   if (target / f).is_file() and not _is_kit_entrypoint(target / f)]
+        if _theirs:
+            print(f"okf_install: '{target}' ya tiene {' y '.join(_theirs)} escrito a mano y "
+                  "NO se pisa.\n"
+                  "  → para consolidar ese contexto en un bundle OKF sin perderlo: el skill "
+                  "`okf-migrate`\n"
+                  "  → para instalar igual y REEMPLAZARLO (commiteá antes): --force",
+                  file=sys.stderr)
+            return 2
+
     bundle_exists = (target / "knowledge" / "index.md").is_file()
     if bundle_exists and not args.upgrade:
         print(f"okf_install: '{target}' ya tiene knowledge/index.md y no se pisa.\n"

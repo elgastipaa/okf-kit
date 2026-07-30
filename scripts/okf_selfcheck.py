@@ -42,18 +42,31 @@ results: list[tuple[bool, str, str]] = []
 
 # El material que se COPIA al repo destino. `okf-init`/`okf-migrate` quedan afuera a
 # propósito: corren en el bootstrap, con el kit todavía en disco.
-INSTALLED = sorted(
+# Inventario LITERAL, no un glob de lo que existe: con el glob, borrar un archivo instalado
+# le borraba sus asserts y el gate seguía diciendo OK con un denominador más chico (104 → 102).
+# Un archivo que falta tiene que FALLAR, no desaparecer del reporte (regla de diseño 1).
+INSTALLED = [
+    "templates/AGENTS.md",
+    "templates/CLAUDE.md",
+    "templates/agents/okf-reviewer.md",
+    *(f"templates/knowledge/{n}.md" for n in (
+        "_change", "_concept", "_decision", "_generated", "_glossary", "_reference",
+        "_roadmap", "_runbook", "index", "log")),
+    *(f"templates/skills/{s}/SKILL.md" for s in ("okf-update", "okf-verify", "okf-plan")),
+]
+
+# Y que el inventario no se quede corto en silencio si mañana se agrega un template.
+_on_disk = sorted(
     p.relative_to(KIT).as_posix()
     for p in [
-        KIT / "templates" / "AGENTS.md",
-        KIT / "templates" / "CLAUDE.md",
         *(KIT / "templates" / "knowledge").glob("*.md"),
-        *(KIT / "templates" / "skills" / s / "SKILL.md"
-          for s in ("okf-update", "okf-verify", "okf-plan")),
-        KIT / "templates" / "agents" / "okf-reviewer.md",
-    ]
-    if p.is_file()
+        *(KIT / "templates" / "agents").glob("*.md"),
+        *(KIT / "templates" / "skills").glob("*/SKILL.md"),
+        KIT / "templates" / "AGENTS.md", KIT / "templates" / "CLAUDE.md",
+    ] if p.is_file()
 )
+_uninventoried = [f for f in _on_disk
+                  if f not in INSTALLED and "okf-init" not in f and "okf-migrate" not in f]
 
 
 def check(ok: bool, name: str, detail: str = "") -> None:
@@ -131,6 +144,9 @@ for rel in ("templates/AGENTS.md", "templates/skills/okf-plan/SKILL.md",
         _missing.append(rel)
 check(not _missing, "existen los archivos que el resto de los asserts consume",
       f"faltan: {', '.join(sorted(set(_missing)))}" if _missing else "")
+check(not _uninventoried,
+      "todo el material instalado está en el inventario literal INSTALLED",
+      f"en disco pero sin asserts: {', '.join(_uninventoried)}" if _uninventoried else "")
 
 # ------------------------------------------------- 0b. Los comentarios HTML están bien formados
 # Un `-->` dentro del cuerpo de un comentario es markup INVÁLIDO: por regla de HTML el primer
@@ -157,6 +173,20 @@ if (KIT / "knowledge").is_dir():
 else:
     check(False, "linter pasa limpio (--strict) sobre el bundle dogfood knowledge/",
           "no se montó el dogfood knowledge/")
+
+# El assert de arriba mide "el linter no se queja". Un linter VACÍO tampoco se queja: salía
+# 0 y el gate declaraba 104/104 con la herramienta más usada del kit destruida. Hay que
+# probar que el linter FUNCIONA, no solo que calla — se lo corre contra una rotura conocida.
+with tempfile.TemporaryDirectory() as _tmp:
+    _b = Path(_tmp) / "knowledge"
+    _b.mkdir(parents=True)
+    (_b / "index.md").write_text("# Concept\n\n* [Roto](roto.md) - Sin type.\n", encoding="utf-8")
+    (_b / "roto.md").write_text("---\ntitle: Sin type\n---\n\ncuerpo\n", encoding="utf-8")
+    _r = subprocess.run([sys.executable, "templates/scripts/okf_lint.py", str(_b)],
+                        cwd=KIT, capture_output=True, text=True)
+    check(_r.returncode == 1 and "type" in (_r.stdout + _r.stderr),
+          "el linter DETECTA una rotura conocida (no solo calla ante el dogfood)",
+          f"exit={_r.returncode}; un linter vacío o roto pasaría este bundle sin `type`")
 
 # ---------------------------------------------------------------- 2. kit_version
 ver = (read_required("VERSION") or "").strip()
@@ -393,6 +423,32 @@ if (KIT / _INSTALLER).is_file():
                 for _absent in ("knowledge/roadmap.md", ".claude/skills/okf-plan/SKILL.md"):
                     check(not (_dst / _absent).exists(),
                           f"la instalación mínima no instala {_absent}")
+
+# El instalador NO puede pisar el entrypoint ni el hook del usuario: es pérdida de datos
+# irreversible si no estaba commiteado, y para ese repo existe `okf-migrate`. Se mide sobre
+# la conducta real, no sobre la prosa (una pasada adversarial lo encontró destruyendo un
+# AGENTS.md con la ubicación de los secretos, un CLAUDE.md y un pre-commit con los tests).
+if (KIT / _INSTALLER).is_file():
+    with tempfile.TemporaryDirectory() as _tmp:
+        _dst = Path(_tmp) / "repo"
+        _dst.mkdir()
+        subprocess.run(["git", "init", "-q", str(_dst)], capture_output=True)
+        (_dst / "AGENTS.md").write_text("# Mi contrato propio\n- No toques legacy/\n", encoding="utf-8")
+        _hook = _dst / ".git" / "hooks" / "pre-commit"
+        _hook.parent.mkdir(parents=True, exist_ok=True)
+        _hook.write_text("#!/bin/sh\nnpm test\n", encoding="utf-8")
+        _r = subprocess.run([sys.executable, _INSTALLER, str(_dst), "--name", "X"],
+                            cwd=KIT, capture_output=True, text=True)
+        check(_r.returncode == 2 and "No toques legacy/" in (_dst / "AGENTS.md").read_text(),
+              "okf_install.py aborta en vez de pisar un AGENTS.md escrito a mano",
+              f"exit={_r.returncode}; el contrato del usuario "
+              f"{'sobrevivió' if 'legacy' in (_dst / 'AGENTS.md').read_text() else 'SE PERDIÓ'}")
+        # Con --force sí instala, pero el hook ajeno sigue sin pisarse.
+        _r2 = subprocess.run([sys.executable, _INSTALLER, str(_dst), "--name", "X", "--force"],
+                             cwd=KIT, capture_output=True, text=True)
+        check("npm test" in _hook.read_text(encoding="utf-8"),
+              "okf_install.py no pisa un pre-commit que no es del kit (ni con --force)",
+              "le apagó los tests al usuario sin avisar")
 
 # Una verdad, un lugar: si el skill vuelve a describir la plomería en prosa, hay dos
 # fuentes que van a derivar (la regla dura #1 del kit y su causa raíz de bugs).

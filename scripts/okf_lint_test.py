@@ -103,6 +103,20 @@ def _(d): edit(d, "log.md", "## 2026-07-29", "## 29 de julio")
 def _(d): (d / "vacia").mkdir()
 
 
+# ---- lo que la pasada adversarial de 0.7.3 encontró (falsos negativos del linter)
+@case("`type:` sin espacio (escalar YAML, no mapping: no hay ninguna clave)", "no es 'clave: valor'")
+def _(d): edit(d, "decisions/0001-relative-links-over-absolute.md", "type: Decision", "type:Decision")
+
+
+@case("marcador de conflicto de merge sin resolver", "conflicto de merge")
+def _(d): edit(d, "roadmap.md", "# Visión", "# Visión\n<<<<<<< HEAD\nuna cosa\n=======\notra cosa\n>>>>>>> rama")
+
+
+@case("link absoluto escondido en un ítem de lista anidado", "link absoluto")
+def _(d): edit(d, "index.md", "# Subdirectories",
+               "# Subdirectories\n\n* nivel 1\n    * [absoluto](/knowledge/x.md) escondido")
+
+
 # ---- REDACCIÓN LEGÍTIMA: no debe reportar nada
 @case("bundle dogfood intacto", None)
 def _(d): pass
@@ -117,6 +131,20 @@ def _(d): edit(d, "decisions/0012-descriptive-vs-normative.md",
 def _(d): edit(d, "decisions/index.md",
                "- Se usan links relativos (../x.md) porque los absolutos (/x.md) rompen en GitHub.",
                "— Se usan links **relativos** (`../x.md`) porque los absolutos (/x.md) rompen en GitHub")
+
+
+@case("entrada de index con la `description` envuelta en dos líneas", None)
+def _(d):
+    # Envolver prosa a 90 columnas es la norma (los docs del kit lo hacen). Cortar en el
+    # primer \n daba un falso positivo que mostraba los dos textos IDÉNTICOS.
+    edit(d, "decisions/index.md",
+         "- Se usan links relativos (../x.md) porque los absolutos (/x.md) rompen en GitHub.",
+         "- Se usan links relativos (../x.md) porque los absolutos\n  (/x.md) rompen en GitHub.")
+
+
+@case("`authority` válido con un comentario YAML al lado", None)
+def _(d): edit(d, "decisions/0012-descriptive-vs-normative.md", "type: Decision",
+               "type: Decision\nauthority: normative   # la clase la da el type")
 
 
 @case("carpeta que solo tiene index.md (sembrada, todavía sin conceptos)", None)

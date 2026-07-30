@@ -91,6 +91,19 @@ def main() -> int:
         build(clean_root, dirty=False)
         d, c = out(dirty_root), out(clean_root)
 
+        # Un `timestamp` sin offset (`2026-01-01`) es ISO 8601 válido para `okf_lint.py`, y es
+        # la forma que un humano escribe primero. Antes tiraba TypeError (naive vs aware) y un
+        # solo concepto se llevaba el reporte entero.
+        naive_root = tmp / "sinOffset"
+        build(naive_root, dirty=False)
+        concept(naive_root / "knowledge" / "fechacorta.md", ts="2026-01-01")
+        (naive_root / "knowledge" / "index.md").write_text(
+            (naive_root / "knowledge" / "index.md").read_text(encoding="utf-8")
+            + "* [fechacorta](fechacorta.md) - Concepto.\n", encoding="utf-8")
+        run(naive_root, "git", "add", "-A")
+        run(naive_root, "git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "naive")
+        naive = out(naive_root)
+
         casos = [
             ("encuentra el resource que ya no existe", "DRIFT CONFIRMADO" in d and "roto.md" in d),
             ("encuentra el sello podrido",             "SELLO PODRIDO" in d and "sello.md" in d),
@@ -100,6 +113,8 @@ def main() -> int:
             ("sobre limpio no inventa drift",          "DRIFT CONFIRMADO" not in c),
             ("sobre limpio no inventa sello podrido",  "SELLO PODRIDO" not in c),
             ("sobre limpio no inventa sospechosos",    "SOSPECHOSOS" not in c),
+            ("no crashea con timestamp sin offset (ISO válido para el linter)",
+             "Traceback" not in naive and "fechacorta.md" in naive),
         ]
         print(f"{'caso':<48}veredicto")
         for name, ok in casos:
@@ -109,7 +124,7 @@ def main() -> int:
             print("\n--- salida con drift ---\n" + d + "\n--- salida limpia ---\n" + c)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
-    print(f"\nokf_stale_test: {8 - bad}/8 casos se comportan como corresponde")
+    print(f"\nokf_stale_test: {len(casos) - bad}/{len(casos)} casos se comportan como corresponde")
     return 1 if bad else 0
 
 

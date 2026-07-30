@@ -71,9 +71,13 @@ def parse_ts(raw: str) -> datetime | None:
     if not raw:
         return None
     try:
-        return datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        dt = datetime.fromisoformat(raw.replace("Z", "+00:00"))
     except ValueError:
         return None
+    # `okf_lint.py` acepta `2026-01-01` y `2026-01-01T10:00:00` (sin offset) como ISO 8601
+    # válidos, y son la forma que un humano escribe primero. Sin normalizar a UTC, restarlos
+    # de un `now` aware tiraba TypeError y un solo concepto se llevaba el reporte entero.
+    return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
 
 
 def resolve(repo: Path, concept: Path, resource: str) -> Path | None:

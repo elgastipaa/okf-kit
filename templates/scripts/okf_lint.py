@@ -17,6 +17,7 @@ Chequeos (OKF v0.1 — ver OKF-SPEC.md §8). FAIL (exit 1) = cualquier ERROR:
   ERROR  - concepto sin frontmatter o sin cerrar
   ERROR  - frontmatter con YAML inválido (`:` sin comillas, comilla/bracket sin cerrar, tab, línea malformada)
   ERROR  - `type` ausente o vacío
+  ERROR  - marcador de conflicto de merge sin resolver (<<<<<<< / ======= / >>>>>>>)
   ERROR  - cross-link que empieza con "/" (rompe en GitHub; usá relativo al archivo)
 Todo lo demás es WARN (no hace fallar, salvo --strict):
   WARN   - falta title/description/timestamp en un concepto
@@ -58,8 +59,15 @@ LINK_RE = re.compile(r"\[[^\]]*\]\(\s*([^)\s]+)")
 # Una entrada de index: `* [Título](archivo.md) - description del concepto`. El guion
 # puede ser ASCII o em-dash, y el bullet `*` o `-`.
 INDEX_ENTRY_RE = re.compile(
-    r"^\s*[*+-]\s*\[[^\]]*\]\(\s*([^)\s#]+)[^)]*\)\s*[-–—:]\s*(.+?)\s*$", re.M)
-TOPKEY_RE = re.compile(r"^([A-Za-z0-9_][A-Za-z0-9_-]*):(.*)$")
+    r"^[ \t]*[*+-][ \t]*\[[^\]]*\]\([ \t]*([^)\s#]+)[^)]*\)[ \t]*[-–—:][ \t]*"
+    # El texto sigue hasta la próxima línea que NO sea continuación: envolver la prosa a
+    # 90 columnas es la norma (los docs del kit lo hacen), y cortar en el primer \n
+    # producía un falso positivo que mostraba los dos textos idénticos.
+    r"(.+?(?:\n[ \t]+\S[^\n]*)*)[ \t]*$", re.M)
+# El espacio después de `:` NO es opcional: `type:concept` es un ESCALAR en YAML, no un
+# mapping, así que un frontmatter así no tiene ninguna clave. Sin esto, el linter
+# bendecía conceptos que cualquier parser real lee sin metadata.
+TOPKEY_RE = re.compile(r"^([A-Za-z0-9_][A-Za-z0-9_-]*):(\s.*|)$")
 ISO_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
 ISO_DT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$")
 URL_PREFIXES = ("http://", "https://", "mailto:", "tel:", "data:")
@@ -179,7 +187,7 @@ class Linter:
         ts = keys.get("timestamp", "").strip().strip('"').strip("'")
         if ts and not ISO_DT_RE.match(ts):
             self.add("WARN", path, 1, f"`timestamp` no parece ISO 8601: '{ts}'")
-        auth = keys.get("authority", "").strip().strip('"').strip("'").lower()
+        auth = keys.get("authority", "").split(" #", 1)[0].strip().strip('"').strip("'").lower()
         if auth and auth not in AUTHORITY_VALUES:
             self.add("WARN", path, 1,
                      f"`authority: {auth}` no está en el vocabulario "
@@ -190,6 +198,7 @@ class Linter:
             self.add("WARN", path, 1, "`description` muy larga (>200 chars) — acortala a una frase")
         elif desc and re.search(r"[.!?]\s+[A-ZÁÉÍÓÚ¿¡]", desc):
             self.add("WARN", path, 1, "`description` parece tener más de una frase")
+        self.check_conflict_markers(path, body, body_start)
         self.check_links(path, body, body_start)
 
     def check_index(self, path: Path, is_root: bool) -> None:
@@ -197,7 +206,20 @@ class Linter:
         fm, _body, _ = self.split_fm(text)
         if fm not in (None, "UNTERMINATED") and not is_root:
             self.add("WARN", path, 1, "index.md no debería llevar frontmatter (salvo okf_version en la raíz)")
+        self.check_conflict_markers(path, text.splitlines(), 1)
         self.check_links(path, text.splitlines(), 1)
+
+    def check_conflict_markers(self, path: Path, lines: list[str], start: int) -> None:
+        """Un merge sin resolver deja DOS verdades afirmadas como vigentes en el mismo doc.
+
+        Pasaba limpio por el linter, por `--strict` y por el hook: un agente que lea ese
+        concepto no tiene forma de saber cuál de las dos rige.
+        """
+        for i, ln in enumerate(lines):
+            if re.match(r"^(<{7}[ \t]|={7}$|>{7}[ \t])", ln.rstrip("\n")):
+                self.add("ERROR", path, start + i,
+                         "marcador de conflicto de merge sin resolver")
+                return
 
     def check_log(self, path: Path) -> None:
         text = path.read_text(encoding="utf-8", errors="replace")
@@ -236,8 +258,12 @@ class Linter:
                 continue
             if in_fence:
                 continue
-            if ln.startswith("    ") or ln.startswith("\t"):
-                continue  # code-block indentado (≥4 espacios / tab): tratar como código
+            # Un code-block indentado se trata como código, PERO un ítem de lista anidado
+            # (`    * ...`) no lo es: tratarlo así escondía links absolutos —el único ERROR
+            # de links que define la spec— con solo indentarlos.
+            if (ln.startswith("    ") or ln.startswith("\t")) and not re.match(
+                    r"^[ \t]+[*+-][ \t]|^[ \t]+\d+\.[ \t]", ln):
+                continue
             work = re.sub(r"`[^`]*`", "", work)  # quitar inline-code
             for m in LINK_RE.finditer(work):
                 target = m.group(1).strip()

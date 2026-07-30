@@ -74,9 +74,28 @@ def main(argv: list[str]) -> int:
 
     if args.out:
         dest = Path(args.out)
-        if dest.exists() and any(dest.iterdir()) and not args.force:
-            return die(f"'{dest}' no está vacío (usá --force para sobreescribir)")
-        if dest.exists() and args.force:
+        # `--force` hacía `shutil.rmtree(dest)` sin mirar QUÉ era dest: apuntarlo al repo
+        # (o a `.`) borraba el código y el `.git` del usuario y después crasheaba, así que
+        # el stacktrace le hacía creer que no había pasado nada. Un flag que dice
+        # "sobreescribir el destino" no puede significar "borrar tu repo".
+        _d, _b = dest.resolve(), bundle.resolve()
+        _unsafe = (
+            "es el bundle mismo" if _d == _b else
+            "contiene al bundle" if _d in _b.parents else
+            "está adentro del bundle" if _b in _d.parents else
+            "es el directorio actual" if _d == Path.cwd().resolve() else
+            "es un repo git (tiene .git/)" if (dest / ".git").exists() else
+            "tiene un archivo que no puso este script" if dest.is_dir() and any(
+                c.name not in ("knowledge", "README.md") for c in dest.iterdir()) else ""
+        )
+        if dest.exists() and any(dest.iterdir()):
+            if _unsafe:
+                return die(f"me niego a escribir en '{dest}': {_unsafe}.\n"
+                           "  El destino tiene que ser un directorio nuevo o uno que este "
+                           "script haya creado antes.\n"
+                           "  Omití --out y te armo uno temporal.")
+            if not args.force:
+                return die(f"'{dest}' no está vacío (usá --force para sobreescribir)")
             shutil.rmtree(dest)
         dest.mkdir(parents=True, exist_ok=True)
     else:
