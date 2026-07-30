@@ -269,7 +269,9 @@ def main() -> int:
     if a.repeat < 1:
         print("--repeat tiene que ser >= 1", file=sys.stderr)
         return 2
-    if subprocess.run(["which", CLI], capture_output=True).returncode != 0:
+    # shutil.which y no `which`: el binario no existe en todos los contenedores mínimos
+    # (ni en Windows), y este harness tiene que poder correr en un runner de CI pelado.
+    if shutil.which(CLI) is None:
         print(f"falta '{CLI}' en PATH", file=sys.stderr)
         return 2
 
