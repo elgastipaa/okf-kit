@@ -258,10 +258,10 @@ check(_starts == _ends and _starts >= 3 and _alternating,
       f"{_starts} start / {_ends} end, alternados={_alternating} (mínimo 3 pares)")
 
 # Los conteos escritos en prosa tienen que seguir al número real de marcadores. `okf-init`
-# quedó afuera a propósito: el recorte lo ejecuta `okf_install.py`, así que el skill ya no
-# describe los marcadores — declarar su tamaño sin nombrarlos sería prosa muerta. Los dos que
-# quedan son los que SÍ enseñan el recorte a mano (el comentario del template y el GUIDE).
-for rel in ["templates/AGENTS.md", "GUIDE.md"]:
+# y el `GUIDE` quedaron afuera a propósito: el recorte lo ejecuta `okf_install.py`, así que ya
+# no describen los marcadores. Los dos que quedan son los que SÍ enseñan el recorte a mano (el
+# comentario del template y la referencia del camino manual).
+for rel in ["templates/AGENTS.md", "reference/manual-install.md"]:
     txt = read_required(rel) or ""
     ok = f"{2 * _starts} líneas" in txt and (f"{_starts} pares" in txt or f"{_starts} bloques" in txt)
     check(ok, f"{rel} declara el número real de marcadores ({2 * _starts} líneas / {_starts} bloques)",
@@ -319,7 +319,9 @@ for rel in ["reference/verification.md", "templates/skills/okf-verify/SKILL.md"]
           "falta la mitad de inclusion (solo la seccion Ahora) o la de exclusion (intencion pura)" if not ok2 else "")
 
 # `okf-verify` manda a correr okf_stale.py: si la instalación no lo copia, manda a la nada.
-for rel in ["GUIDE.md", "templates/skills/okf-init/SKILL.md"]:
+# `okf-verify` manda a correr okf_stale.py: quien instala tiene que copiarlo. Son los dos
+# caminos de instalación — el skill (que delega al script) y la referencia manual.
+for rel in ["reference/manual-install.md", "templates/skills/okf-init/SKILL.md"]:
     check("okf_stale.py" in (read_required(rel) or ""),
           f"{rel} instala okf_stale.py en el repo destino",
           "okf-verify lo manda a correr y no estaría" )

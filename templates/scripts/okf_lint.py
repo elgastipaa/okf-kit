@@ -21,11 +21,14 @@ Chequeos (OKF v0.1 — ver OKF-SPEC.md §8). FAIL (exit 1) = cualquier ERROR:
 Todo lo demás es WARN (no hace fallar, salvo --strict):
   WARN   - falta title/description/timestamp en un concepto
   WARN   - `description` con más de una frase
+  WARN   - `authority` con un valor fuera de {normative, descriptive}
   WARN   - index.md (no raíz) con frontmatter (solo se permite okf_version, en la raíz)
   WARN   - log.md con un heading de fecha que no es ISO (## YYYY-MM-DD)
   WARN   - cross-link relativo roto (la spec lo tolera, pero se reporta)
   WARN   - carpeta con conceptos sin index.md
   WARN   - concepto no listado en el index.md de su carpeta
+  WARN   - subcarpeta no listada en el index.md de su carpeta padre (invisible al navegar)
+  WARN   - entrada del index.md cuyo texto no coincide con la `description` del concepto
   WARN   - carpeta vacía (sin conceptos debajo)
   WARN   - el bundle no tiene index.md raíz (navegación/entrypoint)
 
@@ -48,7 +51,14 @@ from pathlib import Path
 
 RESERVED = {"index.md", "log.md"}
 AUTHORING_DEFAULTS = ("title", "description", "timestamp")
+# Vocabulario CERRADO de `authority` (OKF-SPEC.md §3.1). Sin esto, `authority: banana`
+# pasaba en silencio: una clave que se escribe y nadie lee no declara nada.
+AUTHORITY_VALUES = ("normative", "descriptive")
 LINK_RE = re.compile(r"\[[^\]]*\]\(\s*([^)\s]+)")
+# Una entrada de index: `* [Título](archivo.md) - description del concepto`. El guion
+# puede ser ASCII o em-dash, y el bullet `*` o `-`.
+INDEX_ENTRY_RE = re.compile(
+    r"^\s*[*+-]\s*\[[^\]]*\]\(\s*([^)\s#]+)[^)]*\)\s*[-–—:]\s*(.+?)\s*$", re.M)
 TOPKEY_RE = re.compile(r"^([A-Za-z0-9_][A-Za-z0-9_-]*):(.*)$")
 ISO_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
 ISO_DT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?)?$")
@@ -65,6 +75,8 @@ class Linter:
         self.bundle = bundle
         self.strict = strict
         self.issues: list[tuple[str, str, int, str]] = []
+        # description de cada concepto, para cruzarla contra el texto de su entrada de index
+        self.descriptions: dict[Path, str] = {}
 
     def add(self, sev: str, path: Path, line: int, msg: str) -> None:
         rel = "." if path == self.bundle else str(path.relative_to(self.bundle))
@@ -167,7 +179,13 @@ class Linter:
         ts = keys.get("timestamp", "").strip().strip('"').strip("'")
         if ts and not ISO_DT_RE.match(ts):
             self.add("WARN", path, 1, f"`timestamp` no parece ISO 8601: '{ts}'")
+        auth = keys.get("authority", "").strip().strip('"').strip("'").lower()
+        if auth and auth not in AUTHORITY_VALUES:
+            self.add("WARN", path, 1,
+                     f"`authority: {auth}` no está en el vocabulario "
+                     f"({' | '.join(AUTHORITY_VALUES)}) — no declara nada")
         desc = keys.get("description", "")
+        self.descriptions[path.resolve()] = desc.strip().strip('"').strip("'")
         if desc and len(desc) > 200:
             self.add("WARN", path, 1, "`description` muy larga (>200 chars) — acortala a una frase")
         elif desc and re.search(r"[.!?]\s+[A-ZÁÉÍÓÚ¿¡]", desc):
@@ -251,7 +269,7 @@ class Linter:
             index = d / "index.md"
             if concepts and not index.exists():
                 self.add("WARN", d, 0, "carpeta con conceptos sin index.md")
-            if concepts and index.exists():
+            if index.exists():
                 itext = index.read_text(encoding="utf-8", errors="replace")
                 linked = set()
                 for m in LINK_RE.finditer(itext):
@@ -261,6 +279,42 @@ class Linter:
                 for c in concepts:
                     if c.resolve() not in linked:
                         self.add("WARN", index, 0, f"el concepto '{c.name}' no está linkeado en el index")
+                # Una subcarpeta que el index del padre no lista es un subárbol INVISIBLE
+                # para quien navega desde el entrypoint: el contenido existe y nadie llega.
+                for sub in sorted(p for p in d.iterdir() if p.is_dir()):
+                    if self._ignored(sub) or not any(True for _ in sub.rglob("*.md")):
+                        continue
+                    if (sub / "index.md").resolve() not in linked and sub.resolve() not in linked:
+                        self.add("WARN", index, 0,
+                                 f"la subcarpeta '{sub.name}/' no está listada en este index "
+                                 "(invisible al navegar desde la raíz)")
+                self.check_index_descriptions(index, itext)
+
+    @staticmethod
+    def _norm(s: str) -> str:
+        """Normaliza para comparar prosa: espacios, énfasis markdown y punto final."""
+        s = re.sub(r"[*_`]", "", s)
+        s = re.sub(r"\s+", " ", s).strip().rstrip(".")
+        return s.lower()
+
+    def check_index_descriptions(self, index: Path, itext: str) -> None:
+        """El texto de cada entrada del index debe ser la `description` del concepto.
+
+        El index es lo PRIMERO que lee un agente: si su resumen dice otra cosa que el
+        concepto, lo rutea mal (o lo hace bajar a un archivo que no necesitaba). Hasta
+        ahora podían divergir sin aviso.
+        """
+        for m in INDEX_ENTRY_RE.finditer(itext):
+            target, text = m.group(1).strip(), m.group(2).strip()
+            if target.startswith(("http://", "https://", "/")):
+                continue
+            desc = self.descriptions.get((index.parent / target).resolve())
+            if not desc:
+                continue  # no es un concepto de este bundle, o no declara description
+            if self._norm(text) != self._norm(desc):
+                self.add("WARN", index, 0,
+                         f"la entrada de '{target}' no coincide con su `description` "
+                         f"(index: {text[:60]!r} · concepto: {desc[:60]!r})")
 
     def check_navigable(self) -> None:
         # El linter valida que el bundle sea navegable (index.md raíz). El wiring

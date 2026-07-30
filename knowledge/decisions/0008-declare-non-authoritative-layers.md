@@ -2,9 +2,9 @@
 type: Decision
 status: accepted
 title: Declarar capas no-autoritativas en el entrypoint para no reconciliar basura
-description: El AGENTS.md template gana una sección para listar dirs scratch/legacy que NO son estado, porque las preguntas adversariales (código vs notas viejas) explotan en turnos.
+description: El AGENTS.md template lista los dirs scratch/legacy que NO son estado, porque las preguntas adversariales (código vs notas viejas) explotan en turnos.
 tags: [okf, authority, staleness, efficiency, eval]
-timestamp: 2026-06-18T00:00:00Z
+timestamp: 2026-07-29T00:00:00Z
 ---
 
 # Contexto

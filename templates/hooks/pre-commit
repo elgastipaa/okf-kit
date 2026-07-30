@@ -8,9 +8,10 @@
 #   mkdir -p .githooks && cp templates/hooks/pre-commit .githooks/ && chmod +x .githooks/pre-commit
 #   git config core.hooksPath .githooks
 #
-# Hace dos cosas:
+# Hace tres cosas:
 #   1) Conformidad (BLOQUEA el commit): linta el contenido STAGED de knowledge/.
 #   2) Frescura (solo AVISA): si cambió código pero knowledge/ no, lo recuerda.
+#   3) Sello (solo AVISA): si un concepto se editó y su `timestamp` quedó igual.
 # Para saltarlo puntualmente: git commit --no-verify
 
 BUNDLE="knowledge"
@@ -44,5 +45,35 @@ echo "$staged" | grep -vE "(^$BUNDLE/|\.md$)" | grep -q . && code_changed=yes ||
 if [ "$code_changed" = yes ] && [ "$bundle_changed" = no ]; then
   echo "OKF: cambió código pero knowledge/ no se tocó. ¿Este cambio amerita actualizar el" >&2
   echo "     contexto (una decisión, un cambio de schema, un gotcha)? Si sí: usá okf-update." >&2
+fi
+
+# --- 3. Sello de frescura (aviso, no bloquea) ---
+# Un concepto editado sin bumpear su `timestamp` deja el sello MINTIENDO, y eso no es
+# cosmético: `okf_stale.py` rankea dónde buscar drift calculando TODAS sus señales desde ese
+# valor. Un sello podrido no solo no avisa: envenena la detección del resto.
+seals=$(mktemp) || seals=""
+if [ -n "$seals" ]; then
+  git diff --cached --name-only --diff-filter=M -- "$BUNDLE" | while IFS= read -r f; do
+    case "$f" in
+      *.md) ;;
+      *) continue ;;
+    esac
+    # index.md / log.md no son conceptos; los `_*` son plantillas o capas efímeras.
+    case "$f" in
+      */index.md|index.md|*/log.md|log.md|*/_*|_*) continue ;;
+    esac
+    old=$(git show "HEAD:$f" 2>/dev/null | sed -n 's/^timestamp:[[:space:]]*//p' | head -1)
+    new=$(git show ":$f" 2>/dev/null | sed -n 's/^timestamp:[[:space:]]*//p' | head -1)
+    # Sin timestamp previo no hay sello que bumpear (el linter ya avisa que falta).
+    [ -n "$old" ] || continue
+    [ "$old" = "$new" ] && echo "$f" >> "$seals"
+  done
+  if [ -s "$seals" ]; then
+    echo "OKF: estos conceptos se editaron y su \`timestamp\` quedó igual:" >&2
+    sed 's/^/       /' "$seals" >&2
+    echo "     Bumpealo a la fecha de hoy (ISO 8601). El sello es la base con la que" >&2
+    echo "     okf_stale.py rankea el drift: si miente, la señal del bundle entero se degrada." >&2
+  fi
+  rm -f "$seals"
 fi
 exit 0

@@ -49,22 +49,10 @@ git, sin apps externas.
   corrida, y si el umbral debería ser "¿podría no terminar en esta sesión?" en vez de "¿es no
   trivial?" ([0014](decisions/0014-future-layer-measured.md)).
 
-**Que el linter valide lo que hoy solo valida el criterio humano** (los tres salieron del
-cold-review de 0.6.0):
-
-- `authority:` — vocabulario cerrado, hoy `authority: banana` pasa `--strict` en silencio. Es
-  la última clave del kit que se escribe y no lee nadie; el patrón está en la
-  [0016](decisions/0016-material-instalado-vs-contenido.md).
-- Que cada carpeta esté listada en el `# Subdirectories` de su padre: hoy se puede agregar un
-  subárbol entero invisible desde el entrypoint.
-- Que el texto de cada entrada de `index.md` coincida con la `description` del concepto: hoy
-  pueden divergir sin aviso, y el índice es lo primero que lee un agente.
-
 **Deudas del tooling.**
 
-- El harness de medición: `run-eval.py` reporta `input_tokens` (ruido: 6–12) en vez de
-  `cache_read` (85K–300K), que es el contexto realmente leído; y el juez `--grade` no sirve
-  para preguntas de comportamiento — puntuó bien una respuesta con premisa falsa.
+- El juez `--grade` del harness de medición no sirve para preguntas de comportamiento: puntuó
+  bien una respuesta con premisa falsa. (La métrica de contexto ya se arregló en 0.7.1.)
 - El pre-commit hook del kit valida el working tree en vez de lo staged, al revés que el que
   el kit shippea a otros repos. CI ataja el escape, por eso no es urgente.
 - Higiene de `_changes/` (cambios zombie) en el linter — **solo si** la medición muestra que

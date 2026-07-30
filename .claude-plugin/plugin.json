@@ -1,7 +1,7 @@
 {
   "name": "okf",
   "displayName": "OKF — ingeniería de contexto para cualquier repo",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Monta un sistema de contexto duradero (markdown + git, sin apps externas) en cualquier repo: el bundle knowledge/, el contrato AGENTS.md y los procedimientos de mantenimiento, testeo y planificación.",
   "author": {
     "name": "Gaston Mendoza"

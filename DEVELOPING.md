@@ -15,6 +15,8 @@ salir **proactivamente**, antes de cada release.
    ```
    python3 scripts/okf_selfcheck.py        # el gate
    python3 scripts/okf_selfcheck_test.py   # ¿el gate falla cuando debe?
+   python3 scripts/okf_lint_test.py        # ¿el linter reporta cuando debe?
+   python3 scripts/okf_stale_test.py       # ¿el ranker encuentra el drift, y se calla si no hay?
    ```
    Valida la consistencia *interna*: el linter pasa limpio sobre el bundle dogfood
    `knowledge/`, `kit_version` no se "cae" en ejemplos/skills, el keep-alive y la capa de

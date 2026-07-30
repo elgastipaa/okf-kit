@@ -22,5 +22,7 @@ jobs:
         run: python3 scripts/okf_selfcheck.py
       - name: ¿el gate falla cuando debe?
         run: python3 scripts/okf_selfcheck_test.py
+      - name: ¿el linter reporta cuando debe (y se calla con redacción legítima)?
+        run: python3 scripts/okf_lint_test.py
       - name: ¿okf_stale encuentra el drift y se calla si no hay?
         run: python3 scripts/okf_stale_test.py

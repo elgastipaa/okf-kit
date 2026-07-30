@@ -1,5 +1,11 @@
 # Update Log
 
+## 2026-07-30
+* **Update**: v0.7.1 — pasada de optimización con las **propias herramientas del kit**. El `okf_stale.py` encontró tres conceptos con el sello podrido (editados en 0.7.0 sin bumpear `timestamp`), y de ahí salió que el hook ahora lo **previene** en el commit ([0020](decisions/0020-el-sello-se-enforcea-en-el-commit.md)): antes solo existía la mitad que detecta, y la señal del ranker se degradaba sola con el uso.
+* **Update**: El linter gana los **tres chequeos** que el cold-review de 0.6.0 dejó pendientes: vocabulario cerrado de `authority:`, subcarpetas ausentes del `# Subdirectories` del padre (subárbol invisible al navegar), y entradas de `index.md` que divergieron de la `description` del concepto. El tercero encontró **tres divergencias reales en el dogfood** y un bug del instalador (sembraba dos placeholders distintos para la misma frase).
+* **Update**: Nuevo `scripts/okf_lint_test.py` (15 casos): el linter era la herramienta más usada del kit —CI, hook, `okf-verify`— y la única sin test de roturas. Un criterio de FAIL sin su rotura probada es decoración.
+* **Update**: El fallback manual del init sale del `GUIDE` a [`reference/manual-install.md`](../reference/manual-install.md): el `GUIDE` baja de 27.4K a 21.3K chars (**−1546 tokens en cada init**) y deja de mezclar la plomería con el criterio. Era el propio `GUIDE` violando la [divulgación progresiva](concepts/progressive-disclosure.md) que el kit predica. De paso, tres referencias a "Paso N" apuntaban al paso equivocado (numeración vieja): la numeración frágil de §4 se eliminó.
+
 ## 2026-07-29
 * **Update**: v0.7.0 — la plomería del init/upgrade pasa a `scripts/okf_install.py` (un comando, determinista, verifica su propia salida con el linter) y el kit se distribuye como **plugin** de Claude Code. Decisiones [0017](decisions/0017-plomeria-determinista-vs-criterio.md) y [0018](decisions/0018-plugin-shippea-solo-el-bootstrap.md).
 * **Update**: El corte es **mecánico vs criterio**: `okf-init` **delega** en el script en vez de re-statear la plomería (con assert que lo verifica) y se queda con lo que requiere inteligencia — entender el repo, sembrar los conceptos, completar `{{placeholders}}`, mergear el contrato al actualizar. `--upgrade` es ahora el camino mecánico de la [0016](decisions/0016-material-instalado-vs-contenido.md).

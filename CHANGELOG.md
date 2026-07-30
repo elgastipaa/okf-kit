@@ -10,6 +10,65 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.7.1 — Pasada de optimización, hecha con las propias herramientas del kit
+
+Se corrió `okf_stale.py` sobre el dogfood, se midió el bloat en vez de estimarlo y se cerraron
+los tres gaps del linter que el roadmap arrastraba desde el cold-review de 0.6.0.
+
+### Agregado — el hook previene el sello podrido
+`okf_stale.py` encontró **tres conceptos editados en 0.7.0 sin bumpear su `timestamp`**. No es
+cosmético: el ranker calcula *todas* sus señales desde ese valor, así que un sello podrido
+degrada la detección de drift del bundle entero — y la señal se deterioraba **sola** con el uso.
+El hook instalado gana una tercera función: **avisa** (no bloquea) si un concepto staged cambió
+con su `timestamp` igual al de `HEAD`. Se juzga lo staged, no el working tree.
+Decisión [0020](knowledge/decisions/0020-el-sello-se-enforcea-en-el-commit.md).
+
+### Agregado — los tres chequeos que el linter no hacía
+- **`authority:` con vocabulario cerrado** (`normative | descriptive`). Hasta ahora
+  `authority: banana` pasaba `--strict` en silencio: una clave que se escribe y nadie lee.
+- **Subcarpeta ausente del `# Subdirectories` del padre.** Se podía agregar un subárbol entero
+  **invisible** para quien navega desde el entrypoint.
+- **Entrada de `index.md` que divergió de la `description` del concepto.** El índice es lo
+  primero que lee un agente; si su resumen dice otra cosa, lo rutea mal. Encontró **tres
+  divergencias reales en el dogfood** (una de ellas era una `description` que narraba el cambio
+  en vez de describir el estado) y un **bug del instalador**: sembraba dos placeholders
+  distintos para la misma frase, o sea divergencia por construcción.
+
+### Agregado — `scripts/okf_lint_test.py` (15 casos)
+El linter es la herramienta más usada del kit —CI, pre-commit hook y `okf-verify`— y era la
+única sin test de roturas: el gate y el ranker ya tenían el suyo. Cada caso inyecta **una**
+rotura y verifica que el reporte falle **por ese motivo** (no alcanza con que falle); los casos
+limpios prueban que la redacción legítima no se marque. Corre en CI.
+
+### Cambiado — el fallback manual sale del GUIDE
+Los pasos mecánicos del init (estructura, `index.md`, `log.md`, entrypoint, tooling) se movieron
+a **`reference/manual-install.md`**, que existe para un solo caso: la máquina no tiene Python.
+El `GUIDE` baja de **27.4K a 21.3K chars (−1546 tokens en cada init)** y queda con lo que
+requiere criterio: sembrar el bundle y verificar. Era el propio `GUIDE` violando la divulgación
+progresiva que el kit predica.
+
+### Arreglado — deriva de numeración, y el instrumento de medición
+- **Tres referencias a "Paso N" del `GUIDE` apuntaban al paso equivocado** (numeración vieja:
+  mandaban al Paso 3 para el entrypoint, que era el 5). La numeración frágil de §4 se eliminó:
+  los dos pasos que quedan no se referencian por número.
+- El corte "mecánico vs criterio" estaba enumerado en **tres** lugares, dos de ellos mal.
+  Ahora se dice una sola vez.
+- **`run-eval.py` reportaba `input_tokens`** (6–12: los tokens **no cacheados** del último
+  turno, puro ruido) en vez de **`cache_read`** (85K–300K: el contexto realmente leído). El dato
+  ya se capturaba; la tabla y el resumen miraban la columna equivocada. Es el instrumento con el
+  que se decide si un cambio de contexto paga, así que medía mal toda comparación antes/después.
+- Los tres sellos podridos del dogfood, y las tres entradas de índice divergentes.
+
+### Medido — dónde está (y dónde no está) el bloat
+- **Duplicación literal entre docs: 2 frases en todo el kit**, ambas intencionales (la
+  [0013](knowledge/decisions/0013-installed-material-is-self-sufficient.md) obliga a que el
+  material instalado se repita). El kit está bien factoreado en ese eje.
+- **El contrato instalado está al 95% de su presupuesto** (6692/7000 chars ≈ 1673 tokens *por
+  turno*), con **77 tokens de headroom**. Queda anotado como restricción de diseño: una mejora
+  nueva tiene que costar cero en el contrato, o hay que recortar antes.
+
+Gate: 96 → **97 asserts**, 39 → **41 roturas probadas**, más los 15 casos del linter.
+
 ## 0.7.0 — La plomería deja de gastar criterio, y el kit se distribuye
 
 ### Agregado — `scripts/okf_install.py`: el init mecánico en un comando

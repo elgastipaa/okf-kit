@@ -1,0 +1,172 @@
+#!/usr/bin/env python3
+"""okf_lint_test.py — ¿el linter REPORTA cuando tiene que reportar?
+
+El `okf_lint.py` es la herramienta más usada del kit (corre en CI, en el pre-commit hook y
+dentro de `okf-verify`) y era la única sin test de roturas: el `selfcheck` y el `okf_stale`
+ya tenían el suyo. Un criterio de FAIL que nunca se probó rompiendo lo que dice cuidar es
+decoración — la misma regla que `okf_selfcheck_test.py` aplica al gate.
+
+Cada caso inyecta UNA rotura sobre una copia del bundle dogfood y verifica el veredicto y
+que el mensaje sea el que corresponde (no alcanza con que falle: tiene que fallar *por eso*).
+Los casos `expect=None` son **redacción legítima** que NO debe reportar nada.
+
+Es kit-only (vive en `scripts/`, no en `templates/`) y no toca el repo real.
+
+Uso:  python3 scripts/okf_lint_test.py
+Exit: 0 si todos los casos se comportan como corresponde, 1 si alguno no.
+"""
+from __future__ import annotations
+
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+KIT = Path(__file__).resolve().parents[1]
+LINT = KIT / "templates" / "scripts" / "okf_lint.py"
+CASES: list[tuple[str, str | None, object]] = []
+
+
+def case(name: str, expect: str | None):
+    """expect = substring que el reporte DEBE contener; None = no debe reportar nada."""
+    def deco(fn):
+        CASES.append((name, expect, fn))
+        return fn
+    return deco
+
+
+def edit(d: Path, rel: str, old: str, new: str) -> None:
+    p = d / rel
+    t = p.read_text(encoding="utf-8")
+    if old not in t:
+        raise AssertionError(f"el caso no aplica: no encontré en {rel}: {old[:50]!r}")
+    p.write_text(t.replace(old, new, 1), encoding="utf-8")
+
+
+def a_concept(d: Path) -> Path:
+    return d / "decisions" / "0001-relative-links-over-absolute.md"
+
+
+# ---- ERRORES (hacen fallar el linter incluso sin --strict)
+@case("concepto sin `type`", "falta `type`")
+def _(d): edit(d, "decisions/0001-relative-links-over-absolute.md", "type: Decision", "kind: Decision")
+
+
+@case("cross-link absoluto (rompe en GitHub)", "link absoluto")
+def _(d): edit(d, "index.md", "](decisions/index.md)", "](/decisions/index.md)")
+
+
+@case("valor de frontmatter con `:` sin comillas", "sin comillas")
+def _(d): edit(d, "roadmap.md", 'description: "Hacia', "description: Hacia")
+
+
+@case("frontmatter sin cerrar", "sin cerrar")
+def _(d):
+    # Se borra SOLO el delimitador de cierre: borrar los dos daría "falta frontmatter",
+    # que es otro criterio (y el caso pasaría por el motivo equivocado).
+    p = a_concept(d)
+    t = p.read_text(encoding="utf-8")
+    close = t.index("\n---", 3)
+    p.write_text(t[:close] + t[close + 4:], encoding="utf-8")
+
+
+# ---- los tres chequeos que hasta 0.7.1 solo validaba el criterio humano
+@case("`authority` con un valor fuera del vocabulario", "no está en el vocabulario")
+def _(d): edit(d, "decisions/0012-descriptive-vs-normative.md",
+               "type: Decision", "type: Decision\nauthority: banana")
+
+
+@case("subcarpeta que el index del padre no lista (subárbol invisible)", "no está listada")
+def _(d): edit(d, "index.md", "* [decisions](decisions/index.md)", "* ~~decisions~~")
+
+
+@case("entrada del index que divergió de la `description` del concepto", "no coincide")
+def _(d): edit(d, "decisions/index.md", "Se usan links relativos", "Se usan links raros")
+
+
+# ---- WARNs de siempre (se prueban porque --strict los vuelve bloqueantes)
+@case("concepto no linkeado en el index de su carpeta", "no está linkeado")
+def _(d): shutil.copy(a_concept(d), a_concept(d).with_name("9999-huerfano.md"))
+
+
+@case("link relativo roto", "link roto")
+def _(d): edit(d, "index.md", "](decisions/index.md)", "](decisiones/index.md)")
+
+
+@case("heading de fecha no ISO en log.md", "no ISO")
+def _(d): edit(d, "log.md", "## 2026-07-29", "## 29 de julio")
+
+
+@case("carpeta vacía", "carpeta vacía")
+def _(d): (d / "vacia").mkdir()
+
+
+# ---- REDACCIÓN LEGÍTIMA: no debe reportar nada
+@case("bundle dogfood intacto", None)
+def _(d): pass
+
+
+@case("`authority` con un valor válido", None)
+def _(d): edit(d, "decisions/0012-descriptive-vs-normative.md",
+               "type: Decision", "type: Decision\nauthority: normative")
+
+
+@case("entrada del index con énfasis markdown y em-dash", None)
+def _(d): edit(d, "decisions/index.md",
+               "- Se usan links relativos (../x.md) porque los absolutos (/x.md) rompen en GitHub.",
+               "— Se usan links **relativos** (`../x.md`) porque los absolutos (/x.md) rompen en GitHub")
+
+
+@case("carpeta que solo tiene index.md (sembrada, todavía sin conceptos)", None)
+def _(d):
+    (d / "domain").mkdir()
+    (d / "domain" / "index.md").write_text("# Concept\n", encoding="utf-8")
+    edit(d, "index.md", "# Subdirectories\n", "# Subdirectories\n\n* [domain](domain/index.md) - vacía aún.\n")
+
+
+def main() -> int:
+    if not LINT.is_file():
+        print(f"okf_lint_test: no encontré {LINT}", file=sys.stderr)
+        return 1
+    root = Path(tempfile.mkdtemp(prefix="okf-lint-test-"))
+    print(f"{'caso':<62} {'espera':<8} {'real':<8} veredicto")
+    bad = 0
+    try:
+        for name, expect, fn in CASES:
+            # Se copia el KIT entero, no solo `knowledge/`: el dogfood linkea archivos de
+            # afuera del bundle (`../../OKF-SPEC.md`) y en una copia aislada serían links
+            # rotos — un falso positivo del harness que enmascararía los casos limpios.
+            kit = root / re.sub(r"\W+", "_", name)[:40]
+            shutil.copytree(KIT, kit, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+            d = kit / "knowledge"
+            try:
+                fn(d)
+            except AssertionError as e:
+                print(f"{name:<62} {'—':<8} {'—':<8} SETUP ROTO: {e}")
+                bad += 1
+                continue
+            r = subprocess.run([sys.executable, str(LINT), str(d), "--strict"],
+                               capture_output=True, text=True)
+            out = r.stdout + r.stderr
+            if expect is None:
+                ok = r.returncode == 0
+                real = "limpio" if ok else "reporta"
+            else:
+                # No alcanza con que falle: tiene que fallar POR ESTO.
+                ok = r.returncode != 0 and expect in out
+                real = ("reporta" if r.returncode != 0 else "limpio") + ("" if ok else " (otro)")
+            bad += not ok
+            print(f"{name:<62} {'limpio' if expect is None else 'reporta':<8} {real:<8} "
+                  f"{'ok' if ok else '<<< MAL'}")
+            if not ok and expect:
+                print(f"{'':<62} → esperaba {expect!r} en el reporte; salió:\n{out.strip()[:400]}")
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
+    print(f"\nokf_lint_test: {len(CASES) - bad}/{len(CASES)} casos se comportan como corresponde")
+    return 1 if bad else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

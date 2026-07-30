@@ -141,7 +141,8 @@ def build_agents(version: str, minimal: bool, name: str | None) -> str:
     return text
 
 
-def build_index(version: str, minimal: bool, name: str | None) -> str:
+def build_index(version: str, minimal: bool, name: str | None,
+                roadmap_desc: str = "") -> str:
     """`knowledge/index.md`: version estampada, y sin links a carpetas que aún no existen.
 
     Las entradas de ejemplo del template apuntan a `decisions/index.md` etc.: dejarlas
@@ -152,10 +153,12 @@ def build_index(version: str, minimal: bool, name: str | None) -> str:
     # El comentario YAML de la línea de kit_version es instrucción de instalación.
     text = re.sub(r"(^kit_version:.*?)\s+#.*$", r"\1", text, flags=re.M)
 
+    # La entrada del index es, por convención, la `description` del concepto — y el linter
+    # ahora lo verifica. Se copia la del roadmap tal cual en vez de sembrar un segundo
+    # placeholder: dos textos distintos para la misma frase divergen por construcción.
     roadmap_block = (
         "# Roadmap\n\n"
-        f"* [Rumbo de {name or '{{proyecto}}'}](roadmap.md) - "
-        "{{copiá acá la description del frontmatter de roadmap.md}}\n"
+        f"* [Rumbo de {name or '{{proyecto}}'}](roadmap.md) - {roadmap_desc}\n"
     )
     # El formato de la entrada va en backticks a propósito: el linter quita el inline-code
     # antes de buscar links, así que la consigna no cuenta como link roto el día uno.
@@ -228,11 +231,14 @@ def install_machinery(plan: Plan, target: Path, *, minimal: bool, no_claude: boo
 def install_fresh(plan: Plan, target: Path, args, version: str) -> None:
     plan.write(target / "AGENTS.md", build_agents(version, args.minimal, args.name))
     plan.copy(KIT / "templates" / "CLAUDE.md", target / "CLAUDE.md")
+    roadmap = "" if args.minimal else build_roadmap(args.name)
+    _m = re.search(r"^description:\s*(.+)$", roadmap, re.M)
     plan.write(target / "knowledge" / "index.md",
-               build_index(version, args.minimal, args.name))
+               build_index(version, args.minimal, args.name,
+                           (_m.group(1).strip().strip('"') if _m else "")))
     plan.write(target / "knowledge" / "log.md", build_log(version))
     if not args.minimal:
-        plan.write(target / "knowledge" / "roadmap.md", build_roadmap(args.name))
+        plan.write(target / "knowledge" / "roadmap.md", roadmap)
         # `_changes/` la ignora el linter; el `.gitkeep` la hace sobrevivir un clone.
         plan.write(target / "knowledge" / "_changes" / ".gitkeep", "")
     install_machinery(plan, target, minimal=args.minimal, no_claude=args.no_claude,

@@ -137,7 +137,22 @@ def _(d):
 
 @case("la instalación deja de copiar okf_stale.py", True)
 def _(d):
-    edit(d, "GUIDE.md", "y **`okf_stale.py`** (rankea dónde buscar", "y ~~okf_stale~~ (rankea dónde buscar")
+    edit(d, "reference/manual-install.md", "y **`okf_stale.py`** (rankea dónde buscar",
+         "y ~~okf_stale~~ (rankea dónde buscar")
+
+
+@case("el camino manual pierde el conteo de marcadores", True)
+def _(d):
+    edit(d, "reference/manual-install.md", "las 8 líneas de marcadores", "los marcadores")
+
+
+@case("el instalador siembra dos placeholders para la misma frase", True)
+def _(d):
+    # index y roadmap describiendo lo mismo con textos distintos: divergen por construcción,
+    # y el linter (que ahora cruza la entrada del index con la description) lo caza.
+    edit(d, "scripts/okf_install.py",
+         'f"* [Rumbo de {name or \'{{proyecto}}\'}](roadmap.md) - {roadmap_desc}\\n"',
+         'f"* [Rumbo de {name or \'{{proyecto}}\'}](roadmap.md) - {{completá la description}}\\n"')
 
 
 @case("término de la capa huérfano fuera de los marcadores", True)

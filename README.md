@@ -95,6 +95,7 @@ Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 | `reference/verification.md` | Cómo **testear** un bundle: conformidad (PASS/FAIL), calidad, el test de comportamiento en frío, y la auditoría de cumplimiento (¿el código respeta lo normativo?). |
 | `reference/maintaining.md` | El ciclo de vida **después del init**: cómo el contexto se mantiene fresco y las capas de enforcement. |
 | `reference/upgrading.md` | Subir un repo que ya tiene OKF a la revisión actual del kit. El bundle es tuyo y no se toca; lo que se reemplaza es el material instalado. |
+| `reference/manual-install.md` | El camino **manual** de los pasos mecánicos del init. Solo si la máquina no tiene Python — con Python, `scripts/okf_install.py` los hace sellados y verificados. |
 | `reference/install-per-tool.md` | Cómo conectar OKF a **cualquier IA** (Claude/Cursor/Copilot/Gemini…) — punteros a `AGENTS.md`, sin lock-in. |
 | `reference/special-cases.md` | Monorepos, migración desde contexto existente, escala (cuándo partir), e idioma. |
 | `reference/optional-tools.md` | Aceleradores externos **opcionales** (Repomix): entender el repo al bootstrapear y medir el tamaño del bundle en tokens. |
@@ -121,6 +122,7 @@ Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 | `scripts/okf_install.py` | **El instalador** (kit-only, stdlib): ejecuta todo lo mecánico del init/upgrade en un comando y verifica su salida con el linter. Lo que requiere criterio se lo deja al agente. |
 | `.claude-plugin/` | Manifiestos de **plugin + marketplace** de Claude Code. El plugin *es* este repo (apunta a `templates/skills/`, no copia nada) y shippea solo el par de bootstrap. |
 | `scripts/okf_selfcheck.py` | Meta-linter de consistencia *interna* del kit (kit-only, NO se instala en repos destino). |
+| `scripts/okf_lint_test.py` | Verifica que el **linter** reporte cuando debe (y que no reporte ante redacción legítima). Kit-only. |
 | `scripts/okf_selfcheck_test.py` | Verifica que el gate **falle cuando debe**: inyecta cada rotura sobre una copia del kit. Un assert sin su rotura probada es decoración. |
 | `knowledge/` | Bundle **dogfood**: el kit documentándose en su propio formato OKF (prueba viva del init). |
 
@@ -143,7 +145,7 @@ como skill de Claude *o* se sigue directo. Cómo conectar tu IA: `reference/inst
 La capa **Conocimiento** (`knowledge/`) es el corazón y siempre va. Las otras dos
 son convenientes cuando un *agente de código* trabaja el repo; para una wiki o un
 bundle de datos que se navega a mano, podés omitirlas y usar `knowledge/index.md`
-como entrypoint. (Ver `GUIDE.md`, Paso 5.)
+como entrypoint. (Ver `GUIDE.md` §1, "Cuánto instalar".)
 
 Hay una cuarta capa que es una trampa: la **memoria privada de la herramienta**
 (ej. la memoria de Claude Code en `~/.claude/...`). Es útil pero NO es portable

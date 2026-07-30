@@ -24,7 +24,7 @@ Te dijeron algo como *"cloná okf-kit y aplicalo a mi repo X"*. Antes de nada:
      es un `README` —por sustancioso que sea— es **init**. `okf-migrate` es solo si hay
      artefactos de *contexto para IA* (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`,
      `GEMINI.md`), ADRs, o una carpeta `/docs` con varios documentos. Ante la duda, init: el
-     `README` se harvestea igual en el Paso 3.
+     `README` se harvestea igual al sembrar el bundle (§4).
    - ¿**Ya tiene OKF**, de una revisión anterior del kit (mirá el `kit_version` de su
      `knowledge/index.md` contra el `VERSION` de acá)? → no es init ni migración: es
      **actualización**, y va por `reference/upgrading.md`. El bundle no se toca; lo que
@@ -50,13 +50,14 @@ Documentos hermanos que vas a necesitar:
   el dominio (código / datos / wiki / mixto). **Leelo: define la universalidad.**
 - `reference/examples.md` — bundles de ejemplo bien hechos, en los tres dominios.
 - `reference/special-cases.md` — monorepos, migración desde contexto existente, y escala.
-- `reference/verification.md` — cómo testear el bundle (lo usás en el Paso 7).
+- `reference/verification.md` — cómo testear el bundle (lo usás al verificar, §4).
 - `reference/maintaining.md` — el ciclo de vida DESPUÉS del init (cómo no perder frescura).
 - `reference/upgrading.md` — subir un repo que ya tiene OKF a la revisión actual del kit.
 - `reference/install-per-tool.md` — conectar OKF a cualquier IA (Claude/Cursor/Copilot/Gemini).
 - `reference/spec-driven-interop.md` — cómo se relaciona con OpenSpec/Spec Kit (si el repo
   ya usa una de esas, leelo **antes** de montar la capa de futuro: no montes dos).
 - `templates/` — archivos para copiar y completar.
+- `reference/manual-install.md` — el camino manual de los pasos mecánicos (solo si la máquina no tiene Python).
 
 ---
 
@@ -66,7 +67,7 @@ Hasta tres capas de contexto en el repo destino:
 
 ```
 <repo>/
-├── AGENTS.md            # Entrypoint para agentes (OPCIONAL — ver Paso 3)
+├── AGENTS.md            # Entrypoint para agentes (OPCIONAL — ver abajo)
 ├── CLAUDE.md            # Shim de 1 línea → @AGENTS.md (si usás Claude Code)
 ├── .claude/skills/      # Procedimientos como skills (OPCIONAL, tool-específico)
 │   ├── okf-update/      # mantener el bundle
@@ -83,7 +84,7 @@ Hasta tres capas de contexto en el repo destino:
 El **bundle `knowledge/` es el corazón y es obligatorio**. Las otras dos capas
 (`AGENTS.md` y los skills) son convenientes cuando un *agente de código* va a
 trabajar el repo; para una wiki pura o un bundle de datos que humanos navegan,
-podés omitirlas y dejar que el entrypoint sea `knowledge/index.md` (ver Paso 3).
+podés omitirlas y dejar que el entrypoint sea `knowledge/index.md`.
 
 ### Cuánto instalar (el costo permanente es el contrato)
 
@@ -110,13 +111,9 @@ un default y no una decisión. Se puede subir de mínimo a completo después: ag
 al contrato y sembrar el roadmap. En **los dos** niveles, el contrato ya dice que si el
 usuario pide ir directo al código, se respeta.
 
-**Para instalar el nivel mínimo, el borrado es mecánico** (no interpretes prosa). Se hace
-**sobre las copias ya en el repo destino**, nunca sobre los `templates/` del kit (Paso 0): en
-el `AGENTS.md` que copiaste, borrá todo lo que esté entre cada par de marcadores
-`<!-- OKF:future-layer:start -->` / `<!-- OKF:future-layer:end -->` (4 bloques) y los
-marcadores mismos; en su `knowledge/index.md`, borrá el bloque `# Roadmap`; y no
-copies el skill `okf-plan` ni creés `roadmap.md`/`_changes/`. En el nivel **completo** solo
-borrás las 8 líneas de marcadores.
+El nivel elegido es un flag del instalador (`--minimal`), no un trabajo: el recorte del
+contrato lo hace él. **A mano** —solo si no hay Python— el borrado es mecánico y está en
+[`reference/manual-install.md`](reference/manual-install.md).
 
 Las carpetas dentro de `knowledge/` **dependen del perfil** del proyecto. No las
 asumas: elegilas en §2 (Elegí el perfil).
@@ -180,23 +177,24 @@ No inventes. Primero **investigá** el repo destino:
 
 ## 4. Procedimiento
 
-> **El camino corto — y la única enumeración de qué es mecánico y qué es criterio.**
-> Los **Pasos 1, 3, 4, 5 y 6** son mecánicos y los ejecuta en un comando:
-> `python3 scripts/okf_install.py <repo-destino> --profile <perfil> --name "<Proyecto>"`
-> (agregá `--minimal` si el usuario declinó la capa de futuro, `--no-claude` si no usa Claude
-> Code). Al terminar corre el linter sobre lo instalado y lista lo que falta.
->
-> Te quedan los **Pasos 2** (sembrar el bundle) y **7** (verificar): los dos que requieren
-> criterio, y donde está todo el valor. Lo de abajo es la referencia **a mano**, para cuando
-> no hay Python o querés entender qué hace el script.
+**Lo mecánico ya está hecho: un comando.** La estructura, los `index.md`, el `log.md`, el
+entrypoint recortado y el tooling los instala, sellados y verificados:
 
-### Paso 1 — Estructura
+```
+python3 scripts/okf_install.py <repo-destino> --profile <perfil> --name "<Proyecto>"
+```
 
-Creá el árbol `knowledge/` con las carpetas del **perfil elegido** (§2). Empezá
-mínimo (`index.md`, `log.md`, y las carpetas que vayas a llenar). No crees carpetas
-vacías "por las dudas".
+(`--minimal` si el usuario declinó la capa de futuro · `--no-claude` si no se usa Claude Code ·
+`--dry-run` para ver el plan sin escribir). Al terminar corre el linter sobre lo instalado y
+lista lo que falta, que es exactamente lo que sigue acá abajo.
 
-### Paso 2 — Sembrá el bundle (lo más importante)
+> **¿La máquina no tiene Python?** Entonces esos pasos van a mano:
+> [`reference/manual-install.md`](reference/manual-install.md). Es el único motivo para
+> hacerlo a mano — y también sirve si querés saber qué hace el script.
+
+**Los dos pasos que quedan son los que requieren criterio, y donde está todo el valor.**
+
+### A. Sembrá el bundle (lo más importante — y lo único que ningún script puede hacer)
 
 Escribí los conceptos iniciales como archivos OKF (formato exacto en `OKF-SPEC.md`
 §3; tipos y carpetas por perfil en `reference/profiles.md`). **Qué priorizar según
@@ -233,7 +231,7 @@ colapsa esas preguntas de muchos turnos a ~1 — medido ~−60% de turnos en un 
 término, sin copiar el valor (linkealo). **El ROI escala con el tamaño/ambigüedad del
 código** (repos grandes, forked, con sistemas v1/v2 coexistiendo); en repos chicos y bien
 nombrados rinde poco — no lo agregues por reflejo. Para que se use, ruteá hacia él desde el
-`index.md` y desde el entrypoint (ver Paso 5).
+`index.md` y desde el entrypoint (`AGENTS.md`).
 
 > **Cubrí los términos-mecánica calientes, no solo los stats.** Un *hueco* de cobertura es
 > peligroso: si falta el término que preguntan, el agente agarra lo más parecido que tenga a
@@ -296,97 +294,7 @@ tendrías dos — leé `reference/spec-driven-interop.md` para hacerlas convivir
 > **borrá el comentario HTML del encabezado**: el archivo debe **empezar con `---`**,
 > o no es un concepto OKF válido (el linter daría `ERROR — falta frontmatter`).
 
-### Paso 3 — `index.md` (progressive disclosure)
-
-Generá un `index.md` en la raíz del bundle y en cada subcarpeta. Convención
-(detalle y ejemplos en `OKF-SPEC.md` §5):
-- En la **raíz**: lista los subdirectorios bajo `# Subdirectories`, cada uno con su
-  descripción. Si hay **conceptos en la raíz** (`roadmap.md`, un `glossary.md`), van
-  **antes**, agrupados por `type` como en una hoja — si no, el linter los marca sin linkear.
-- En las **hojas**: agrupá los conceptos bajo un heading por su `type`, cada
-  entrada `* [Título](archivo.md) - <description del frontmatter>`.
-- Links **relativos al archivo**. Sin frontmatter, salvo el `index.md` **raíz**, que
-  lleva `okf_version` (formato) y `kit_version` (revisión del kit; estampala desde
-  `VERSION`).
-
-Esto es lo que deja a un agente navegar sin cargar todo el bundle.
-
-### Paso 4 — `log.md` (opcional)
-
-> Si partís del template `templates/knowledge/log.md`, reemplazá su `{{KIT_VERSION}}` en la
-> línea de `Initialization` con el contenido de `VERSION` — igual que en el `index.md` raíz.
-
-Si vas a llevar un log curado, inicializá `knowledge/log.md` con una entrada de hoy
-(fecha ISO `YYYY-MM-DD`) marcando la creación del bundle (formato en `OKF-SPEC.md` §6).
-**En un repo bajo git podés saltarlo:** el historial ya son `git log` + las `decisions/`.
-Elegí uno; no dupliques ambos.
-
-### Paso 5 — Entrypoint (adaptá a cómo se va a consumir el repo)
-
-- **Si un agente de código va a trabajar el repo** (caso típico de perfil Código):
-  copiá `templates/AGENTS.md` a la raíz y completá los placeholders. Mantenelo
-  **chico** — es un índice: qué es el proyecto, las reglas duras, y "el contexto
-  vive en `knowledge/`, empezá por `knowledge/index.md`". Copiá también
-  `templates/CLAUDE.md` (un shim `@AGENTS.md`) si se usa Claude Code; para otra
-  herramienta, hacé el equivalente (symlink o puntero de una línea).
-- **Si es una wiki o un bundle de datos que humanos/otros agentes navegan**:
-  `AGENTS.md` es opcional. El entrypoint natural es `knowledge/index.md`; agregá un
-  puntero de una línea en el `README.md` del repo ("el conocimiento vive en
-  `knowledge/`").
-
-### Paso 6 — Mantenimiento, testeo y enforcement
-
-Si se usa Claude Code, copiá **tres** skills a `<repo>/.claude/skills/`:
-- `templates/skills/okf-update/` → para que futuros agentes mantengan el bundle al día.
-- `templates/skills/okf-verify/` → para testear el bundle (conformidad + calidad +
-  test de comportamiento). Ver `reference/verification.md`.
-- `templates/skills/okf-plan/` → para gestionar el rumbo y los cambios en curso
-  (abrir/retomar/cerrar con harvest). Si omitiste la capa de futuro, saltealo.
-
-Copiá también los scripts a `<repo>/scripts/`: **`okf_lint.py`** (chequeador de conformidad
-determinista, solo stdlib, sin `pip install`, ideal para CI), **`okf_coldtest.py`** (arma el
-entorno aislado para el test en frío del Nivel 3) y **`okf_stale.py`** (rankea dónde buscar
-divergencia entre el bundle y el código, con git + frontmatter: no es un gate, es el paso 1
-del Nivel 2). Sirven aunque no uses Claude Code.
-
-**Si decidís NO instalar el linter**, ajustá la línea de §3 del `AGENTS.md` que manda correrlo:
-si no, el contrato ordena un comando inexistente en cada turno.
-
-Para correrlo en cada push, copiá **`templates/ci/okf.yml`** a
-`<repo>/.github/workflows/okf.yml`. Es Python puro: **cero tokens, cero LLM** (el
-test "en frío" del Nivel 3 sí usa tokens, así que ese NO va en CI — se corre manual).
-
-Instalá el **git hook universal** `templates/hooks/pre-commit` (`cp` a
-`.git/hooks/pre-commit` + `chmod +x`, o `git config core.hooksPath`): bloquea el commit si
-el bundle no es conforme y avisa si cambió código sin tocar `knowledge/`. Corre con
-**cualquier** IA, porque es a nivel git.
-
-**Si no se usa Claude Code** (no hay skills que se auto-disparen), copiá igual los tres
-procedimientos a `<repo>/docs/okf/` como docs legibles, **renombrando cada uno** (los tres
-archivos fuente se llaman `SKILL.md`: si los copiás con `cp` a la misma carpeta, se pisan y
-te quedás con uno solo, sin ningún error):
-
-```
-mkdir -p <repo>/docs/okf
-cp templates/skills/okf-update/SKILL.md <repo>/docs/okf/okf-update.md
-cp templates/skills/okf-verify/SKILL.md <repo>/docs/okf/okf-verify.md
-cp templates/skills/okf-plan/SKILL.md   <repo>/docs/okf/okf-plan.md   # si instalaste la capa de futuro
-```
-
-**Van fuera de `knowledge/`**: traen su propio frontmatter (`name`/`description`, sin `type`),
-así que adentro del bundle serían conceptos inválidos y harían fallar el linter, el hook y el
-CI. Y **dejá el disparador en `AGENTS.md`** — que sí lee toda herramienta. Ese es el punto: el
-contrato ya trae *cuándo* actuar (rumbo, cambio no trivial, harvest); el skill solo agrega el
-*cómo* detallado. Sin skills el sistema funciona igual, apenas menos automático. El ciclo de
-mantenimiento completo está en `reference/maintaining.md`; cómo conectar cada herramienta
-(Cursor/Copilot/Gemini…), en `reference/install-per-tool.md`.
-
-> **El usuario nunca tiene que nombrar un procedimiento.** Ni "okf-plan" ni "okf-update":
-> habla en lenguaje natural ("quiero que haga X", "¿en qué estábamos?") y el agente
-> reconoce el momento por el contrato. Si al instalar dejás algo que **exija** que el
-> usuario recuerde un comando, el sistema se va a dejar de usar en dos semanas.
-
-### Paso 7 — Verificá (testeá el resultado)
+### B. Verificá (testeá el resultado)
 
 Seguí **`reference/verification.md`** (o corré el skill `okf-verify`). Son tres
 niveles (más un cuarto opcional y periódico, **Cumplimiento**: ¿el código viola alguna
