@@ -77,16 +77,30 @@ Todo lo demás que encontraron las cuatro lentes. No entra acá, va al
 
 # Plan / Tareas
 
-- [ ] `run-eval.py --repeat N`: N corridas por pregunta, mediana + spread en el scorecard.
-- [ ] Reporte final: marcar por pregunta si el efecto supera el spread observado.
-- [ ] Juez con `cwd=repo` y prompt que exija verificar contra el código.
-- [ ] Contabilizar el costo del juez (hoy se tiran `total_cost_usd`/`usage`).
-- [ ] Segundo veredicto del juez: ¿la respuesta acepta una premisa falsa?
-- [ ] Brazo `nokit` real: mover los archivos fuera del repo durante la corrida.
-- [ ] Brazo `--mode agentsmd`: solo contrato convencional, sin bundle.
+- [x] `run-eval.py --repeat N`: N corridas por pregunta, mediana + spread en el scorecard.
+- [x] Reporte final: tabla por pregunta con mediana/min/max/spread + el ruido observado, y la
+      advertencia explícita de que con n<3 el scorecard no sostiene una comparación.
+- [x] Juez con `cwd=repo` y prompt que exija verificar contra el código.
+- [x] Contabilizar el costo del juez (`cost_usd_juez`, `turnos_juez`, sumados al total).
+- [x] Segundo veredicto del juez: `premisa-ok` / `premisa-falsa-aceptada`.
+- [x] Brazo `nokit` real: aparta la capa a un temporal y la restaura siempre; solo corre si
+      el repo es git y esas rutas están limpias.
+- [x] Brazo `--mode agentsmd` (con `--agentsmd-file`, que es la condición de control y la
+      escribe el que mide, no el harness).
+- [x] Docs del harness al día (`README.md`, `grade.md`) — el comportamiento viejo ya no se
+      describe en ningún lado.
 - [ ] Re-medir idlerpg con n≥3 y hand-verify; actualizar `eval/COMPARISON.md` con el número
-      calificado (y corregir la afirmación de `−31%`).
-- [ ] Gate del propio kit en verde (`okf_selfcheck.py` + las tres suites).
+      calificado (y corregir la afirmación de `−31%`). **Cuesta plata y tiempo real: es el
+      próximo paso y necesita decisión del usuario.**
+- [x] Gate del propio kit en verde (`okf_selfcheck.py` + las tres suites).
+
+**Probado adversarialmente** (regla dura del repo) con un `claude` falso, 9 escenarios:
+`--repeat` agrega bien y contabiliza el juez · el brazo `nokit` deja al agente sin ver la capa
+(testificado desde adentro del proceso) y restaura el working tree intacto · aborta si el
+destino no es git · aborta si la capa tiene cambios sin commitear · restaura la capa aunque la
+corrida explote a mitad · `agentsmd` sirve el contrato de control y devuelve el original ·
+`agentsmd` sin `--agentsmd-file` sale 2 · la premisa falsa se marca en la tabla y en stderr ·
+una corrida fallida sigue sin inventar números (exit 1).
 
 # Decisiones y descubrimientos en el camino
 

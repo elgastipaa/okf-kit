@@ -5,8 +5,11 @@ Por eso cada corrida debería tener una columna de **acierto**.
 
 ## Automático (`--grade`)
 
-`run-eval.py --grade` llama a un **juez** (`claude -p`) por pregunta, comparando la
-respuesta del agente contra el `expect` del golden-set, y devuelve una etiqueta:
+`run-eval.py --grade` llama a un **juez** (`claude -p`) por corrida, **parado en el repo bajo
+prueba** (`cwd=repo`) y con la consigna de verificar contra el código antes de dictaminar.
+Devuelve **dos** veredictos.
+
+**Hechos** — contra el `expect` del golden-set:
 
 | etiqueta | significa |
 |---|---|
@@ -15,7 +18,28 @@ respuesta del agente contra el `expect` del golden-set, y devuelve una etiqueta:
 | `incorrecta` | hechos equivocados, o **inventó** |
 | `trampa-ok` | era una `trap` y el agente admitió "no está documentado" |
 
-Aprueba = `correcta` ∪ `trampa-ok`. El resumen del runner cuenta esos como `aciertos`.
+**Premisa** — sobre la pregunta, no sobre la respuesta:
+
+| etiqueta | significa |
+|---|---|
+| `premisa-ok` | no había premisa falsa, o el agente la corrigió |
+| `premisa-falsa-aceptada` | la pregunta daba por sentado algo que en el código no existe, y el agente **le siguió la corriente** |
+
+Aprueba = `correcta` ∪ `trampa-ok`, **y** `premisa-ok`. El resumen cuenta los primeros como
+`aciertos` y los segundos aparte, en `premisas_falsas_aceptadas`.
+
+**Por qué son dos y no uno:** una respuesta que acepta una premisa falsa **puede contener
+igual todos los hechos del `expect`**, así que un juez que solo pregunta "¿están los hechos?"
+la aprueba. Es el agujero por el que este kit ya vio pasar una respuesta con premisa falsa
+puntuada como buena.
+
+**El juez cuesta y ese costo se cuenta.** Una corrida `--grade` es ~1 llamada extra por
+corrida; el resumen la suma en `cost_usd_total` y la desglosa en `cost_usd_juez`. Un
+instrumento que no se mide a sí mismo subreporta lo que mide.
+
+Un `expect` que dice "a verificar contra código" no es ground truth, es una nota: el juez
+tiene instrucción de que ante la duda **manda el código**. Congelar los `expect` a un hecho
+chequeable (`archivo:símbolo`) es trabajo del golden-set, no del juez.
 
 ## El falso positivo: rápido Y mal (por qué `--grade` no es opcional)
 
@@ -28,16 +52,22 @@ parece una mejora; es una regresión de correctitud disfrazada.
 > matcheó "anti-waste" con la sección *"no reconcilies basura"* del contrato y respondió mal en
 > 1 turno (vs 5 turnos y correcto sin la capa).
 
-**Regla dura del loop:** una mejora de turnos que introduce **un `incorrecta` nuevo se
-rechaza**, por más que baje el promedio. Por eso cada iteración corre `--grade` y compara
-acierto, no solo turnos/tokens.
+**Regla dura del loop:** una mejora de turnos que introduce **un `incorrecta` o una
+`premisa-falsa-aceptada` nuevos se rechaza**, por más que baje el promedio. Por eso cada
+iteración corre `--grade` y compara acierto, no solo turnos/tokens.
 
 ## Cuándo calificar a mano
 
 El juez automático es el **mismo modelo**: bueno para iterar rápido, no para el veredicto
 final. Antes de declarar una mejora "ganada", revisá a mano las `parcial`/`incorrecta` y,
-para portabilidad cross-vendor, pasá el golden-set por otra IA (ver
-[`reference/verification.md`](../../reference/verification.md)).
+para portabilidad cross-vendor, corré el golden-set con `OKF_EVAL_CLI=<otra-cli>` o pasalo a
+mano por otra IA (ver [`reference/verification.md`](../../reference/verification.md)).
+
+**Corré con `--repeat 3` y verificá a mano los desacuerdos.** Si la misma pregunta sale
+`correcta` en una réplica e `incorrecta` en otra, el runner la marca `⚠ INESTABLE`: eso no es
+un veredicto, es una señal de que el juez o la pregunta están mal. El juez tuvo un 29% de
+falsos negativos medidos en este kit, así que un veredicto único no alcanza para tirar un
+mecanismo a la basura ni para bendecirlo.
 
 ## Qué hacer con cada fallo
 
