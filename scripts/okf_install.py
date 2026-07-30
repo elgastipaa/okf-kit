@@ -144,6 +144,18 @@ def build_agents(version: str, minimal: bool, name: str | None) -> str:
     return text
 
 
+def build_claude() -> str:
+    """El shim instalado: `@AGENTS.md` y nada más.
+
+    Se construye igual que el contrato en vez de copiarse crudo. Copiado, el comentario de
+    cabecera —que le explica al lector cómo instalar el kit— viajaba al repo destino y se
+    pagaba en cada turno, contradiciendo al `GUIDE` que promete un shim de una línea.
+    """
+    text = strip_header_comment(read_template("CLAUDE.md"))
+    assert "<!--" not in text, "quedó un comentario en el shim instalado"
+    return text
+
+
 def build_index(version: str, minimal: bool, name: str | None,
                 roadmap_desc: str = "") -> str:
     """`knowledge/index.md`: version estampada, y sin links a carpetas que aún no existen.
@@ -247,7 +259,7 @@ def install_machinery(plan: Plan, target: Path, *, minimal: bool, no_claude: boo
 
 def install_fresh(plan: Plan, target: Path, args, version: str) -> None:
     plan.write(target / "AGENTS.md", build_agents(version, args.minimal, args.name))
-    plan.copy(KIT / "templates" / "CLAUDE.md", target / "CLAUDE.md")
+    plan.write(target / "CLAUDE.md", build_claude())
     roadmap = "" if args.minimal else build_roadmap(args.name)
     _m = re.search(r"^description:\s*(.+)$", roadmap, re.M)
     plan.write(target / "knowledge" / "index.md",
@@ -319,9 +331,28 @@ _KIT_ENTRYPOINT_MARK = "Empezá por [`knowledge/index.md`](knowledge/index.md)"
 
 
 def _is_kit_entrypoint(path: Path) -> bool:
-    """¿Este AGENTS.md/CLAUDE.md lo escribió el kit? El shim CLAUDE.md es `@AGENTS.md`."""
+    """¿Este AGENTS.md/CLAUDE.md lo escribió el kit? El shim CLAUDE.md es `@AGENTS.md`.
+
+    Se compara **sin el comentario de cabecera**: hasta esta versión el shim se copiaba
+    crudo, así que en todo repo instalado con un kit anterior el `CLAUDE.md` trae adentro el
+    comentario de template. Comparando el texto literal, esos repos quedaban clasificados
+    como "escrito a mano" y el instalador los mandaba a migrar su propio shim.
+    """
     txt = path.read_text(encoding="utf-8", errors="replace")
-    return _KIT_ENTRYPOINT_MARK in txt or txt.strip() == "@AGENTS.md"
+    return (_KIT_ENTRYPOINT_MARK in txt
+            or strip_header_comment(txt).strip() == "@AGENTS.md")
+
+
+def _uncommitted(target: Path, rels: list[str]) -> list[str] | None:
+    """Cuáles de `rels` git NO puede devolver. `None` si el destino no es un repo git."""
+    if subprocess.run(["git", "-C", str(target), "rev-parse", "--git-dir"],
+                      capture_output=True).returncode != 0:
+        return None
+    r = subprocess.run(["git", "-C", str(target), "status", "--porcelain", "--", *rels],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        return list(rels)          # ante la duda, tratarlo como no recuperable
+    return sorted({ln[3:].strip().strip('"') for ln in r.stdout.splitlines() if ln.strip()})
 
 
 def _hook_is_ours(target: Path) -> bool:
@@ -389,15 +420,38 @@ def main(argv: list[str]) -> int:
     # reglas, procedimientos, dónde están los secretos— y pisarlo es pérdida de datos
     # irreversible si no estaba commiteado. Para ese repo existe `okf-migrate`, que
     # consolida en vez de reemplazar.
-    if not args.upgrade and not args.force:
+    if not args.upgrade:
         _theirs = [f for f in ("AGENTS.md", "CLAUDE.md")
                    if (target / f).is_file() and not _is_kit_entrypoint(target / f)]
-        if _theirs:
+        # Con --force el reemplazo es deliberado, pero solo es *recuperable* si git lo tiene:
+        # "commiteá antes" es un paso que puede fallar en silencio (un hook que aborta, un
+        # `git add` que no incluyó el archivo) y el usuario se entera cuando ya no está.
+        if _theirs and args.force:
+            _unsaved = _uncommitted(target, _theirs)
+            if _unsaved is None:
+                print(f"okf_install: ojo — '{target}' no es un repo git, así que "
+                      f"{' y '.join(_theirs)} se reemplaza SIN forma de recuperarlo. "
+                      "Copiá el archivo afuera antes si te importa.", file=sys.stderr)
+            elif _unsaved:
+                print(f"okf_install: --force reemplazaría {' y '.join(_unsaved)}, que "
+                      "**no está commiteado**: se perdería sin forma de recuperarlo.\n"
+                      f"  → commitealo primero (verificá que el commit haya entrado: un hook "
+                      f"que falla lo aborta en silencio), o\n"
+                      "  → copiá el archivo afuera del repo y volvé a intentar.",
+                      file=sys.stderr)
+                return 2
+        if _theirs and not args.force:
             print(f"okf_install: '{target}' ya tiene {' y '.join(_theirs)} escrito a mano y "
                   "NO se pisa.\n"
-                  "  → para consolidar ese contexto en un bundle OKF sin perderlo: el skill "
-                  "`okf-migrate`\n"
-                  "  → para instalar igual y REEMPLAZARLO (commiteá antes): --force",
+                  "  → ese repo es el caso de `okf-migrate`: consolida lo que ya tenés en un "
+                  "bundle OKF en vez de reemplazarlo.\n"
+                  "  → si vas por tu cuenta, la secuencia completa es:\n"
+                  f"      1) commiteá (o copiá afuera) {' y '.join(_theirs)} — el paso 2 lo "
+                  "reemplaza\n"
+                  "      2) volvé a correr esto con --force (tu pre-commit NO se pisa ni así)\n"
+                  "      3) re-mergeá lo tuyo: las reglas duras al AGENTS.md nuevo, el resto "
+                  "al bundle\n"
+                  "    Saltear el paso 3 pierde tu contexto aunque el archivo esté commiteado.",
                   file=sys.stderr)
             return 2
 

@@ -4,7 +4,12 @@ description: >
   Migra el contexto disperso de un repo que YA existe (AGENTS.md, CLAUDE.md,
   .cursorrules, /docs, ADRs, notas tribales del README) a un bundle OKF en
   knowledge/, sin duplicar. Usalo cuando el usuario pide "migrá/consolidá el
-  contexto existente a OKF" o "pasá estas docs/ADRs a OKF".
+  contexto existente a OKF" o "pasá estas docs/ADRs a OKF", y también cuando
+  describe el SÍNTOMA sin nombrar OKF: "tengo la documentación toda desparramada",
+  "no sé qué docs siguen vigentes", "mi AGENTS.md/CLAUDE.md es un despelote",
+  "ordená las notas del proyecto", "tengo docs viejos que confunden a la IA".
+  Es también el camino cuando okf_install.py aborta porque el repo ya tiene un
+  AGENTS.md o CLAUDE.md escrito a mano.
 ---
 
 Sos el camino **brownfield** de OKF: el repo ya tiene contexto, pero disperso. Tu
@@ -57,14 +62,37 @@ terminaría ruteando a los agentes hacia la basura).
   borrado por marcadores del `AGENTS.md` que describe `okf-init` §5. Los planes muertos
   → no-autoritativos o borrar (preguntá la disposición, como con cualquier doc stale).
 
-## 4. Mové, no copies
+## 4. Instalá la maquinaria (sin perder el entrypoint del usuario)
+
+Consolidar el contenido no alcanza: un repo migrado necesita lo mismo que uno inicializado
+—linter, hook, CI, procedimientos y el sello `kit_version`— o queda sin forma de mantenerse
+ni de actualizarse después. El instalador **aborta** ante un `AGENTS.md`/`CLAUDE.md` escrito a
+mano (no pisa contenido del usuario), así que la secuencia es:
+
+1. **Poné a salvo lo que ya existe.** Si el repo es git, commiteá el `AGENTS.md`/`CLAUDE.md`
+   actual (o guardá una copia fuera del repo). No sigas sin esto: el paso 3 lo reemplaza.
+2. **Corré el instalador**, que hace todo lo mecánico:
+   `python3 <okf-kit>/scripts/okf_install.py <repo> --profile <perfil> --name "<Proyecto>" --force`
+   (`--force` es lo que le permite reemplazar el entrypoint que acabás de poner a salvo; el
+   `pre-commit` ajeno **no** se pisa ni con `--force`). Si no tenés el kit en disco, seguí
+   `reference/manual-install.md`.
+3. **Re-mergeá lo del usuario en el contrato nuevo**: sus reglas duras van a la sección
+   **"Reglas duras"** del `AGENTS.md` recién instalado (linkeando al concepto que las
+   explica), y todo lo demás —el *por qué*, los procedimientos, los gotchas— va al bundle
+   según el Paso 3. **Nada de lo que había puede desaparecer**: o está en el contrato nuevo,
+   o está en `knowledge/`. Mostrale al usuario dónde quedó cada cosa.
+
+Si el repo ya tenía un bundle OKF y solo hay que subir la maquinaria, esto no es una
+migración: es `--upgrade` (ver `reference/upgrading.md`).
+
+## 5. Mové, no copies
 Por cada pieza: creá el concepto OKF en `knowledge/` (frontmatter `type`+`title`+
 `description`+`timestamp`, `tags` si aplica; cross-links **relativos al archivo**, nunca `/`) y
 **borrá el contenido del original**, dejando un puntero ("esto ahora vive en
-`knowledge/<...>`"). En `AGENTS.md` dejá solo el índice + "el contexto vive en
-`knowledge/`, empezá por `knowledge/index.md`". `CLAUDE.md` queda como shim `@AGENTS.md`.
+`knowledge/<...>`"). El `AGENTS.md` y el `CLAUDE.md` ya los dejó el Paso 4 (contrato +
+shim): acá solo se le suman las reglas duras del usuario, no se reescriben.
 
-## 5. Anti-duplicación + verificá
+## 6. Anti-duplicación + verificá
 **Una verdad, un lugar.** Si algo quedó en dos lados, borralo de uno y linkeá. Generá
 los `index.md` (raíz —subdirectorios **y** los conceptos que vivan en la raíz, como
 `roadmap.md`, agrupados por `# {type}`— y hojas) y una entrada en `log.md` (`## YYYY-MM-DD`, "Migración

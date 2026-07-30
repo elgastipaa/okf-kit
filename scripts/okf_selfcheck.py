@@ -405,6 +405,20 @@ if (KIT / _INSTALLER).is_file():
                   f"la instalación {_mode} no deja andamiaje ni el placeholder de versión",
                   f"quedó: {', '.join(_residue)}" if _residue else "")
 
+            # El chequeo de arriba busca dos tokens LITERALES, así que un tercer tipo de
+            # andamiaje pasaba invisible: el comentario de cabecera de un template. Es el
+            # que le explica al lector cómo instalar el kit — en el repo destino no tiene
+            # ningún sentido, y en el caso del CLAUDE.md se pagaba en cada turno. La regla
+            # general: si un archivo instalado EMPIEZA con un comentario HTML, es andamiaje.
+            _headers = sorted(
+                str(p.relative_to(_dst)) for p in _files
+                if p.suffix == ".md"
+                and p.read_text(encoding="utf-8", errors="replace").lstrip().startswith("<!--")
+            )
+            check(not _headers,
+                  f"la instalación {_mode} no deja comentarios de template en la cabecera",
+                  f"empiezan con un comentario: {', '.join(_headers)}" if _headers else "")
+
             _idx = (_dst / "knowledge" / "index.md")
             _got = re.search(r'^kit_version:\s*"?([^"\s]+)"?', frontmatter(
                 _idx.read_text(encoding="utf-8") if _idx.is_file() else ""), re.M)
@@ -443,12 +457,28 @@ if (KIT / _INSTALLER).is_file():
               "okf_install.py aborta en vez de pisar un AGENTS.md escrito a mano",
               f"exit={_r.returncode}; el contrato del usuario "
               f"{'sobrevivió' if 'legacy' in (_dst / 'AGENTS.md').read_text() else 'SE PERDIÓ'}")
-        # Con --force sí instala, pero el hook ajeno sigue sin pisarse.
+        # --force sobre un archivo que git NO tiene es igual de irreversible que no usarlo:
+        # "commiteá antes" es un paso que falla en silencio (un hook que aborta el commit).
+        _rf = subprocess.run([sys.executable, _INSTALLER, str(_dst), "--name", "X", "--force"],
+                             cwd=KIT, capture_output=True, text=True)
+        check(_rf.returncode == 2 and "No toques legacy/" in (_dst / "AGENTS.md").read_text(),
+              "okf_install.py con --force no borra un entrypoint que git no puede devolver",
+              f"exit={_rf.returncode}; el contrato del usuario "
+              f"{'sobrevivió' if 'legacy' in (_dst / 'AGENTS.md').read_text() else 'SE PERDIÓ'}")
+
+        # Commiteado, --force sí instala — pero el hook ajeno sigue sin pisarse. El commit
+        # va con --no-verify a propósito: el fixture tiene un hook que falla, que es
+        # exactamente el escenario que motivó el assert de arriba.
+        for _cmd in (["git", "-C", str(_dst), "add", "-A"],
+                     ["git", "-C", str(_dst), "-c", "user.email=gate@okf", "-c",
+                      "user.name=gate", "commit", "-qm", "fixture", "--no-verify"]):
+            subprocess.run(_cmd, capture_output=True)
         _r2 = subprocess.run([sys.executable, _INSTALLER, str(_dst), "--name", "X", "--force"],
                              cwd=KIT, capture_output=True, text=True)
-        check("npm test" in _hook.read_text(encoding="utf-8"),
+        check(_r2.returncode == 0 and "npm test" in _hook.read_text(encoding="utf-8"),
               "okf_install.py no pisa un pre-commit que no es del kit (ni con --force)",
-              "le apagó los tests al usuario sin avisar")
+              f"exit={_r2.returncode}; " + ("le apagó los tests al usuario sin avisar"
+                                            if "npm test" not in _hook.read_text() else ""))
 
 # Una verdad, un lugar: si el skill vuelve a describir la plomería en prosa, hay dos
 # fuentes que van a derivar (la regla dura #1 del kit y su causa raíz de bugs).

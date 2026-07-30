@@ -4,16 +4,27 @@
 > the mental model. The rest of the docs are in Spanish; any coding agent will translate or
 > follow them as-is. · Licencia: **Apache-2.0** ([`LICENSE`](LICENSE), [`NOTICE`](NOTICE)).
 
-Esta carpeta es una **guía self-contained + librería de templates** para montar
-un sistema de contexto duradero en cualquier proyecto, usando el **Open Knowledge
-Format (OKF)**.
+**El problema.** Venís hace meses construyendo con una IA. Cada sesión arranca explicándole
+el proyecto de nuevo; las decisiones que tomaron juntos —por qué la base de datos es esa, por
+qué ese hack raro no se toca— viven en chats que ya se borraron. Y el día que el agente rompe
+algo, no hay dónde mirar por qué estaba así.
 
-El objetivo: que **cualquier IA, en cualquier momento, desde cualquier máquina**
-entienda un proyecto sin que se lo expliques de nuevo. El contexto vive en el
-repo, en git, en markdown plano — no en la memoria privada de una herramienta.
+**Qué hace este kit.** Deja en tu repo, en markdown y git, el contexto que la IA necesita:
+el **por qué** de las decisiones (`decisions/`), un mapa del presente que se recorre en
+segundos, y el trabajo en curso. Sin apps, sin servicios, sin `pip install`. Cualquier IA lo
+lee, en cualquier máquina, sin que se lo expliques.
 
-> Esta guía no depende de ningún servicio, SDK ni de la nube. Es markdown.
-> Si podés `cat` un archivo, podés leerla; si podés `git clone`, la podés llevar.
+**Lo que no vas a encontrar en otro lado:** el kit **se mide a sí mismo**. Trae un harness
+([`templates/eval/`](templates/eval/)) que corre preguntas reales contra tu repo, con y sin
+la capa de contexto, y te dice en turnos y tokens si te está sirviendo. Importa: el
+[estudio más grande sobre archivos de contexto](https://arxiv.org/abs/2602.11988) (SRI Lab,
+ETH Zürich, 2026) midió que en general **no mejoran el acierto y cuestan >20% más** — y que
+lo único que sí paga (+4%) es lo que un humano sabe y el código no dice: las decisiones, las
+restricciones que no se ven leyendo, la configuración no obvia. Eso es exactamente lo que OKF
+te ayuda a escribir, y el harness es para que no tengas que creerme.
+
+> Esta guía es **self-contained**: markdown + git, sin depender de ningún servicio, SDK ni
+> nube. Si podés `cat` un archivo, podés leerla; si podés `git clone`, la podés llevar.
 
 **Aplicable a cualquier proyecto.** OKF es agnóstico al dominio. La misma mecánica
 sirve para repos de **código**, proyectos de **datos/analytics** y **wikis / bases
@@ -42,8 +53,11 @@ sin `pip install`**. No hay nada que adoptar para *usar* el bundle.
 /plugin install okf@okf-kit
 ```
 
-Eso te deja `/okf-init` (repo limpio) y `/okf-migrate` (repo con docs/ADRs dispersos), y ya
-podés decirle en tu idioma: *"armá el contexto OKF en este repo"*.
+Eso te deja **`/okf:okf-init`** (repo limpio) y **`/okf:okf-migrate`** (repo con docs/ADRs
+dispersos) — los comandos de un plugin llevan el prefijo del plugin. Igual no hace falta que
+los tipees: alcanza con describir el síntoma en tu idioma (*"cada sesión le tengo que
+explicar el proyecto de nuevo"*, *"tengo la documentación toda desparramada"*) y el skill
+correcto se dispara solo.
 
 **Sin plugin, o con cualquier otra IA** — clonalo y corré el instalador:
 
@@ -58,7 +72,14 @@ con el linter y **te lista lo que falta** — que es la parte que requiere crite
 los conceptos**, el *por qué* que el código no dice. Esa parte la hacés con un agente.
 Flags: `--minimal` (sin capa de futuro) · `--no-claude` (procedimientos a `docs/okf/`) ·
 `--dry-run` · `--upgrade` (subir la maquinaria de un repo que ya tiene OKF, sin tocar su
-bundle). Es stdlib puro y todo lo que escribe se revierte con `git checkout`.
+bundle). Es stdlib puro, te lista todo lo que escribió, y **no pisa nada tuyo**: aborta ante
+un `AGENTS.md`/`CLAUDE.md` escrito a mano (para ese repo está `okf-migrate`) y nunca toca un
+`pre-commit` ajeno.
+
+Para deshacerlo: lo que escribe es **nuevo y untracked**, así que `git checkout` no lo borra
+—`git clean -nd` para ver qué se iría y `git clean -fd` para hacerlo— y el hook, que git no
+versiona, se saca con `rm .git/hooks/pre-commit`. Corré primero el `-n`: `git clean` también
+se lleva otros archivos tuyos sin trackear.
 
 ## Cómo se usa (los "prompts mágicos")
 

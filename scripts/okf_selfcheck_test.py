@@ -245,8 +245,8 @@ def _(d):
 # ---- pérdida de datos: lo que la pasada adversarial encontró destruyendo trabajo ajeno
 @case("el instalador vuelve a pisar el AGENTS.md del usuario", True)
 def _(d):
-    edit(d, "scripts/okf_install.py", "    if not args.upgrade and not args.force:",
-         "    if False:")
+    edit(d, "scripts/okf_install.py", "        if _theirs and not args.force:",
+         "        if False:")
 
 
 @case("el instalador vuelve a pisar el pre-commit del usuario", True)
@@ -338,9 +338,44 @@ def _(d):
 @case("el instalador escribe un archivo extra que no es del bundle", False)
 def _(d):
     edit(d, "scripts/okf_install.py",
-         "    plan.copy(KIT / \"templates\" / \"CLAUDE.md\", target / \"CLAUDE.md\")",
-         "    plan.copy(KIT / \"templates\" / \"CLAUDE.md\", target / \"CLAUDE.md\")\n"
+         "    plan.write(target / \"CLAUDE.md\", build_claude())",
+         "    plan.write(target / \"CLAUDE.md\", build_claude())\n"
          "    plan.write(target / \".editorconfig\", \"root = true\\n\")")
+
+
+@case("--force borra el entrypoint del usuario aunque git no lo tenga", True)
+def _(d):
+    # El escenario que lo motivó: el "commiteá antes" del mensaje de error puede fallar en
+    # silencio (un hook que aborta el commit) y --force ejecuta igual, sin recuperación.
+    edit(d, "scripts/okf_install.py",
+         "        if _theirs and args.force:",
+         "        if False and args.force:")
+
+
+# ---- andamiaje de cabecera en el material instalado
+@case("el shim CLAUDE.md se instala crudo, con su comentario de template", True)
+def _(d):
+    # Fue un bug real: `plan.copy` en vez de `plan.write(build_claude())` mandaba al repo
+    # destino el comentario que explica cómo instalar el kit, y se pagaba en cada turno.
+    edit(d, "scripts/okf_install.py",
+         "    plan.write(target / \"CLAUDE.md\", build_claude())",
+         "    plan.copy(KIT / \"templates\" / \"CLAUDE.md\", target / \"CLAUDE.md\")")
+
+
+@case("un template instalado conserva su comentario de cabecera", True)
+def _(d):
+    # La regla es general, no sobre CLAUDE.md: cualquier archivo instalado que EMPIECE con
+    # un comentario HTML es andamiaje. Acá se rompe por otro archivo distinto.
+    edit(d, "scripts/okf_install.py",
+         "    text = strip_header_comment(read_template(\"AGENTS.md\"))",
+         "    text = read_template(\"AGENTS.md\")")
+
+
+@case("un concepto del bundle usa un comentario HTML en el medio, no en la cabecera", False)
+def _(d):
+    # Redacción legítima: el assert mira solo el ARRANQUE del archivo. Un comentario más
+    # abajo (una nota para el que edita) no es andamiaje de instalación.
+    append(d, "templates/knowledge/log.md", "\n<!-- nota al pie para quien edite esto -->\n")
 
 
 @case("kit_version con un comentario YAML al lado", False)

@@ -10,6 +10,67 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.7.4 — Los primeros cinco minutos dejan de tener paredes
+
+Todo lo de esta entrada sale de la revisión en frío del **vibecoder** (una de las cuatro
+lentes sobre la 0.7.3) y son **bugs**, no decisiones: están en el primer contacto con el kit,
+que es donde se juega la adopción de alguien que no conoce al autor.
+
+### Arreglado — el repo modal del vibecoder quedaba en un callejón sin salida (BLOCKER)
+La 0.7.3 tapó una pérdida de datos haciendo que el instalador **abortara** ante un
+`AGENTS.md`/`CLAUDE.md` escrito a mano, y ruteara a `okf-migrate`. Pero `okf-migrate` **nunca
+mencionaba al instalador**: consolidaba el contenido y listo. El repo que ya viene conversando
+con una IA —el caso más común que el kit dice servir— terminaba **sin linter, sin hook, sin
+CI, sin skills de mantenimiento y sin `kit_version`**, y sin forma de conseguirlos después
+(`--upgrade` no instala lo que no estaba).
+
+- `okf-migrate` gana el paso que **instala la maquinaria preservando el entrypoint del
+  usuario**: poner a salvo → instalar con `--force` → re-mergear las reglas duras al contrato
+  nuevo y el resto al bundle. Nada de lo que había puede desaparecer.
+- El mensaje de error del instalador **cierra el ciclo**: ya no solo nombra `okf-migrate`,
+  dice la secuencia completa.
+
+### Arreglado — `--force` borraba trabajo que git no podía devolver (BLOCKER)
+El mensaje decía "commiteá antes", y ese paso **falla en silencio**: un hook que aborta el
+commit, un `git add` que no incluyó el archivo. Apareció midiendo esto mismo — el commit del
+fixture no entró y el archivo se perdió igual. Ahora `--force` **se niega** si el entrypoint
+que va a reemplazar tiene cambios sin commitear, y avisa fuerte si el destino ni siquiera es
+un repo git. El gate lo cubre con su rotura probada.
+
+### Arreglado — el shim `CLAUDE.md` se instalaba crudo
+`plan.copy` en vez de construirlo: el comentario `<!-- TEMPLATE — copiá esto a la RAÍZ… -->`
+viajaba al repo destino y se pagaba **en cada turno**, diciéndole al agente cómo instalar el
+kit. `GUIDE.md` prometía un shim de una línea y se instalaban nueve (315 → **11 bytes**).
+
+- El gate no lo cazaba porque buscaba dos tokens **literales**. El assert nuevo es **general**:
+  cualquier archivo instalado que empiece con un comentario HTML es andamiaje y falla.
+- De paso: un `CLAUDE.md` instalado por un kit **anterior** (con el comentario) no era
+  reconocido como escrito por el kit, así que el instalador trataba el shim que él mismo había
+  puesto como contenido del usuario y lo mandaba a migrar.
+
+### Arreglado — para disparar el kit había que ya conocer el kit
+Las frases de disparo de `okf-init` y `okf-migrate` contenían "OKF" en todas sus variantes.
+Nadie que necesite el kit sabe que se llama así. Ahora se disparan por **síntoma**: *"cada
+sesión le tengo que explicar el proyecto de nuevo"*, *"tengo la documentación toda
+desparramada"*, *"mi CLAUDE.md es un despelote"*.
+
+### Arreglado — dos cosas que el README afirmaba y eran falsas
+- **`/okf-init` no existe.** Los comandos de un plugin llevan su prefijo: es
+  **`/okf:okf-init`**. Era el primer comando que tipeaba alguien que acababa de instalarlo.
+- **"Todo se revierte con `git checkout`"** — lo que el instalador escribe es *untracked*
+  (`git checkout` no lo toca) y el hook va a `.git/hooks/`, que git no versiona. Ahora dice el
+  procedimiento real (`git clean -nd` para ver, `git clean -fd`, y borrar el hook) con la
+  advertencia de que `git clean` también se lleva otros archivos sin trackear. Los dos estaban
+  también en el README inglés.
+
+### Cambiado — el README abre por el problema, no por la definición del formato
+Y usa por primera vez la evidencia externa: el [estudio de SRI Lab, ETH Zürich](https://arxiv.org/abs/2602.11988)
+midió que los archivos de contexto en general **no mejoran el acierto y cuestan >20% más**, y
+que lo único que sí paga (+4%) es lo que un humano sabe y el código no dice. Es exactamente la
+tesis de OKF, y ahora está en la puerta junto al harness que la mide.
+
+Gate: 108 → **111 asserts**, 52 → **56 roturas**.
+
 ## 0.7.3 — Cuatro lentes en frío: pérdida de datos y veredictos falsos
 
 Corrido el cold-review de 4 lentes sobre las tres releases del día (vibecoder en frío,

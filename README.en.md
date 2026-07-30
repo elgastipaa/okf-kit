@@ -28,8 +28,10 @@ between domains is the folder layout and the `type:` vocabulary — picked with 
 /plugin install okf@okf-kit
 ```
 
-That gives you `/okf-init` (bootstrap a clean repo) and `/okf-migrate` (consolidate a repo
-that already has scattered docs, ADRs and `AGENTS.md` files). Then just say:
+That gives you **`/okf:okf-init`** (bootstrap a clean repo) and **`/okf:okf-migrate`**
+(consolidate a repo that already has scattered docs, ADRs and `AGENTS.md` files) — plugin
+commands carry the plugin's prefix. You don't have to type them, though: describing the
+symptom in your own words is enough to trigger the right skill. Then just say:
 
 ```
 Set up OKF context in this repo.
@@ -51,7 +53,14 @@ layer, `--no-claude` to put the procedures in `docs/okf/` instead of `.claude/sk
 `--dry-run` to see the plan without writing. Already have OKF installed? `--upgrade`
 replaces the kit's machinery without touching your bundle.
 
-Everything the installer writes is Python-stdlib-only and reversible with `git checkout`.
+Everything the installer writes is Python-stdlib-only, and it never overwrites your own work:
+it aborts on a hand-written `AGENTS.md`/`CLAUDE.md` (that repo is what `okf-migrate` is for)
+and never touches someone else's `pre-commit`.
+
+To undo it: what it writes is **new and untracked**, so `git checkout` won't remove it — use
+`git clean -nd` to preview and `git clean -fd` to do it — and the hook, which git doesn't
+version, goes with `rm .git/hooks/pre-commit`. Run the `-n` first: `git clean` also removes
+other untracked files of yours.
 
 ---
 

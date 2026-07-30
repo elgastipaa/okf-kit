@@ -4,7 +4,12 @@ description: >
   Monta el sistema de contexto OKF en un repo desde cero (bootstrap): crea el
   bundle knowledge/ (markdown + frontmatter), el entrypoint AGENTS.md, e instala
   los skills/linter de mantenimiento y testeo. Usalo cuando el usuario pide
-  "armá/inicializá/bootstrapeá este repo con OKF" o "creá el contexto OKF acá".
+  "armá/inicializá/bootstrapeá este repo con OKF" o "creá el contexto OKF acá",
+  y también cuando describe el SÍNTOMA sin nombrar OKF: "cada sesión le tengo
+  que explicar el proyecto de nuevo", "la IA no entiende mi repo", "quiero
+  documentar esto para que la IA lo entienda", "que no se pierda el contexto
+  entre sesiones", "armá un AGENTS.md/CLAUDE.md en serio para este repo".
+  Para un repo que YA tiene docs/ADRs/AGENTS.md propios, usá okf-migrate.
 ---
 
 Montás un sistema de contexto OKF (Open Knowledge Format): conocimiento del
