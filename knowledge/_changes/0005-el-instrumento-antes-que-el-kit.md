@@ -89,9 +89,48 @@ Todo lo demás que encontraron las cuatro lentes. No entra acá, va al
       escribe el que mide, no el harness).
 - [x] Docs del harness al día (`README.md`, `grade.md`) — el comportamiento viejo ya no se
       describe en ningún lado.
-- [ ] Re-medir idlerpg con n≥3 y hand-verify; actualizar `eval/COMPARISON.md` con el número
-      calificado (y corregir la afirmación de `−31%`). **Cuesta plata y tiempo real: es el
-      próximo paso y necesita decisión del usuario.**
+- [x] Re-medir idlerpg con n≥3 y hand-verify; `eval/COMPARISON.md` corregido.
+
+## El resultado (2026-07-30) — el kit no pasa su propio gate
+
+Tres brazos sobre idlerpg, 7 preguntas adversariales, n=3, 63 corridas, ~US$55. La capa la
+aplicó un agente **ciego** (no vio el golden-set) sobre v0.7.4; el `AGENTS.md` de control lo
+escribió otro agente ciego.
+
+| | kit v0.7.4 | sin capa | solo AGENTS.md |
+|---|---:|---:|---:|
+| turnos (sin q2) | 137 | **123** | 139 |
+| no-aciertos, verificados a mano | **4/18** | 0/18 | 0/18 |
+| premisas falsas aceptadas | **1** | 0 | 0 |
+| segundos | **789** | 914 | 878 |
+
+- **En turnos no hay efecto medible en ninguna dirección**: las diferencias son menores al
+  ruido intra-condición (3,14 turnos). Y un `AGENTS.md` convencional tampoco le gana a no
+  tener nada — el resultado de [arXiv:2602.11988](https://arxiv.org/abs/2602.11988) replica
+  acá para los dos formatos.
+- **Lo que sí es distinguible es una regresión de acierto**, y es del kit: inventó una
+  especialización que no existe (q3), respondió una trampa de ambigüedad con seguridad y sin
+  admitirla (q6, dos de tres, una aceptando premisa falsa), y contestó **desde un documento
+  del propio bundle** en vez de verificar (q7) — mientras sin capa el agente contó y acertó,
+  en los mismos turnos.
+- Lo único consistente a favor: **latencia, −14%**.
+
+**Los tres fallos son la misma falla**, y ya tiene ADR: la
+[0009](../decisions/0009-entrypoint-is-a-map-not-an-answer.md) dice que el entrypoint es un mapa y no
+la respuesta. El guardrail existe y **no alcanzó**: la capa sigue ofreciendo una ruta más
+barata que la fuente, y el agente la toma. Es la predicción textual de la
+[0014](../decisions/0014-future-layer-measured.md): *"cualquier capa que parezca autoritativa
+y sea más barata de leer que la fuente invita a saltearse la fuente"*.
+
+**Consecuencia para el roadmap:** el mecanismo 5 (autoridad negativa) **se congela**. Su
+propuesta es licenciar explícitamente que el agente deje de buscar cuando el code-of-record
+no tiene el término — o sea, más permiso para contestar sin verificar, que es exactamente la
+falla que acaba de medirse. Optimizar turnos es la prioridad equivocada: el kit no tiene un
+problema de turnos, tiene un problema de acierto.
+
+**Alcance, sin adornos:** un repo, un golden-set adversarial (el caso más difícil, elegido a
+propósito), n=3, un modelo, una sola aplicación de la capa. No prueba que OKF no sirva. Prueba
+que **hoy no podemos afirmar que sirva**, y que en el eje que importa va para atrás.
 - [x] Gate del propio kit en verde (`okf_selfcheck.py` + las tres suites).
 
 **Probado adversarialmente** (regla dura del repo) con un `claude` falso, 9 escenarios:
