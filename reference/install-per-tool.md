@@ -55,6 +55,9 @@ hagan falta (el contrato los nombra).
 ### Claude Code
 - `CLAUDE.md` = una línea: `@AGENTS.md` (shim, no dupliques).
 - Procedimientos → `.claude/skills/okf-*/` (auto-disparo por `description`).
+- Revisor → `.claude/agents/okf-reviewer.md`: audita el bundle con **contexto fresco**, para que
+  los niveles que revisan trabajo propio no se auto-aprueben. Sin subagentes, el mismo archivo
+  se sigue como procedimiento en un proceso/CLI nuevo (es markdown vendor-neutral).
 - Enforcement → el **git hook** universal (recomendado), o un hook en `.claude/settings.json`.
 - **Bootstrap**: el kit se distribuye como plugin —
   `/plugin marketplace add elgastipaa/okf-kit` + `/plugin install okf@okf-kit` — que shippea

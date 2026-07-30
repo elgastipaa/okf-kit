@@ -108,6 +108,7 @@ Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 | `templates/skills/okf-update/` | Skill que se instala en el repo destino para mantener el bundle fresco. |
 | `templates/skills/okf-plan/` | Skill que se instala en el repo destino para gestionar la **capa de futuro**: el rumbo (`roadmap.md`) y los cambios en curso (`_changes/`, spec-driven liviano con harvest al cerrar). |
 | `templates/skills/okf-verify/` | Skill que se instala en el repo destino para **testear** el bundle y emitir un reporte PASS/FAIL. |
+| `templates/agents/okf-reviewer.md` | Subagente que audita el bundle con **contexto fresco** (Niveles 2 y 4): quien escribió un concepto no puede auditarlo. Se instala en el repo destino. |
 | `templates/scripts/okf_lint.py` | Linter determinista (solo stdlib, sin `pip install`) que valida conformidad OKF. Ideal para CI; lo usa el skill `okf-verify`. |
 | `templates/scripts/okf_coldtest.py` | Arma un entorno aislado (solo el bundle, sin código ni `.git`) para correr el test en frío del Nivel 3. Stdlib, sin install. |
 | `templates/scripts/okf_stale.py` | Rankea **dónde buscar drift** entre el bundle y el código usando `resource:` + `timestamp` + git — sin leer código ni gastar tokens. No es un gate: es el paso 1 del Nivel 2 de verificación. |

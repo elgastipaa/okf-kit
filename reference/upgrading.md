@@ -5,7 +5,7 @@ Un repo con OKF tiene **dos cosas que envejecen distinto**, y confundirlas es el
 | | Qué es | Cómo se mantiene |
 |---|---|---|
 | **Contenido del bundle** | Los conceptos, decisiones y el log: el conocimiento **del proyecto**. | `okf-update` en cada cambio, y `okf-verify` cada tanto. Es tuyo, nunca se pisa. |
-| **Material instalado** | El `AGENTS.md`, los skills y los scripts: la maquinaria **del kit**. | Este documento. Se **reemplaza** por la revisión nueva. |
+| **Material instalado** | El `AGENTS.md`, los skills, el revisor y los scripts: la maquinaria **del kit**. | Este documento. Se **reemplaza** por la revisión nueva. |
 
 `okf-update` mantiene lo primero y **no puede** tocar lo segundo: corre dentro del repo
 destino, sin el kit en disco. Por eso el material instalado se fosiliza en la revisión con la
@@ -43,7 +43,7 @@ que te estás perdiendo — y de lo que hay que re-copiar.
 3. **Los scripts y los skills se reemplazan enteros** (esto lo hace `--upgrade`). No tienen
    estado del proyecto: `templates/scripts/*.py` → `<repo>/scripts/`,
    `templates/skills/{okf-update,okf-verify}` (+ `okf-plan` si va la capa de futuro) →
-   `<repo>/.claude/skills/`, `templates/ci/okf.yml` y `templates/hooks/pre-commit` si estaban
+   `<repo>/.claude/skills/`, `templates/agents/okf-reviewer.md` → `<repo>/.claude/agents/`, `templates/ci/okf.yml` y `templates/hooks/pre-commit` si estaban
    instalados. Un `pre-commit` que **no** es del kit no se pisa: puede ser del usuario.
 4. **El `AGENTS.md` NO se reemplaza entero** — es el único que lleva contenido del proyecto
    mezclado con el del kit. Lo que es del proyecto y **se conserva**: el título y la

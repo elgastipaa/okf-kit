@@ -79,6 +79,10 @@ Si se usa Claude Code, copiá **tres** skills a `<repo>/.claude/skills/`:
 - `templates/skills/okf-plan/` → para gestionar el rumbo y los cambios en curso
   (abrir/retomar/cerrar con harvest). Si omitiste la capa de futuro, saltealo.
 
+Y el **revisor** a `<repo>/.claude/agents/`: `templates/agents/okf-reviewer.md` — audita el
+bundle con contexto fresco, para que los Niveles 2 y 4 no los corra quien hizo el trabajo. Sin
+Claude Code va a `docs/okf/okf-reviewer.md`, junto a los procedimientos.
+
 Copiá también los scripts a `<repo>/scripts/`: **`okf_lint.py`** (chequeador de conformidad
 determinista, solo stdlib, sin `pip install`, ideal para CI), **`okf_coldtest.py`** (arma el
 entorno aislado para el test en frío del Nivel 3) y **`okf_stale.py`** (rankea dónde buscar

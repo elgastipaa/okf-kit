@@ -80,6 +80,15 @@ desfasados, etc.). Con `--strict`, los warnings también hacen FAIL.
 
 No es pass/fail; son **smells** que bajan el valor del bundle. Reportá los que veas.
 
+> **Quién lo corre importa tanto como el método.** Este nivel y el 4 son los únicos que auditan
+> *trabajo que el propio agente pudo haber hecho*, y son los dos donde el sesgo pesa más: quien
+> redactó un concepto lo lee sabiendo lo que quiso decir, y quien escribió el código racionaliza
+> por qué no viola ninguna decisión. Si la sesión que audita es la que hizo el trabajo, estos dos
+> niveles se **delegan a contexto fresco**: el agente `okf-reviewer` que el kit instala, o un
+> proceso/CLI nuevo con el prompt (igual que el Nivel 3). Es la misma práctica que el kit usa
+> para desarrollarse — el cold-review de `DEVELOPING.md`, al que su propio historial le acredita
+> 2 blockers y ~12 majors en una sola pasada.
+
 ### Cómo buscar el drift descriptivo (el smell que importa)
 
 El resto de los smells se ven leyendo. Este no: un concepto que contradice el código se ve
@@ -242,6 +251,7 @@ Resultado: PASS | PASS-WITH-WARNINGS | FAIL
 [x]/[!]/[ ] por ítem (el output del script tal cual, o el checklist de 9 ítems)
 
 ## Nivel 2 — Calidad
+- Quién lo corrió: yo | revisor con contexto fresco (`okf-reviewer`)
 - smells encontrados (o "ninguno")
 
 ## Nivel 3 — Outcome
@@ -249,6 +259,7 @@ Resultado: PASS | PASS-WITH-WARNINGS | FAIL
 - Cómo correrlo (prompt de CLI en frío) — o resultados si ya se corrió
 
 ## Nivel 4 — Cumplimiento (si se corrió)
+- Quién lo corrió: yo | revisor con contexto fresco (`okf-reviewer`)
 - Decisiones/convenciones auditadas y violaciones encontradas (o "ninguna")
 
 ## Issues

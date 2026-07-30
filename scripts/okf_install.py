@@ -61,6 +61,9 @@ PROFILES = {
 
 SKILLS_ALWAYS = ["okf-update", "okf-verify"]
 SKILL_FUTURE = "okf-plan"
+# Subagentes. Van al repo destino y NO los shippea el plugin, por lo mismo que los skills de
+# mantenimiento: un clone sin el plugin tiene que seguir teniéndolos (decisión 0013).
+AGENTS = ["okf-reviewer"]
 SCRIPTS = ["okf_lint.py", "okf_coldtest.py", "okf_stale.py"]
 
 # Un comentario HTML termina en el PRIMER `-->`. El `.*?` ingenuo se trunca cuando el
@@ -195,6 +198,13 @@ def build_roadmap(name: str | None) -> str:
     return text
 
 
+def agent_target(target: Path, no_claude: bool, agent: str) -> Path:
+    """Sin subagentes, el revisor sigue sirviendo como procedimiento legible a mano."""
+    if no_claude:
+        return target / "docs" / "okf" / f"{agent}.md"
+    return target / ".claude" / "agents" / f"{agent}.md"
+
+
 def skill_target(target: Path, no_claude: bool, skill: str) -> Path:
     """Los tres SKILL.md se llaman igual: fuera de `.claude/skills/` hay que RENOMBRARLOS,
     y dejarlos fuera de `knowledge/` (traen frontmatter sin `type` y el linter los rechaza).
@@ -212,6 +222,9 @@ def install_machinery(plan: Plan, target: Path, *, minimal: bool, no_claude: boo
     for skill in skills:
         plan.copy(KIT / "templates" / "skills" / skill / "SKILL.md",
                   skill_target(target, no_claude, skill))
+    for agent in AGENTS:
+        plan.copy(KIT / "templates" / "agents" / f"{agent}.md",
+                  agent_target(target, no_claude, agent))
     for script in SCRIPTS:
         plan.copy(KIT / "templates" / "scripts" / script, target / "scripts" / script)
     if want_ci:

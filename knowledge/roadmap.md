@@ -3,7 +3,7 @@ type: Roadmap
 title: Rumbo del kit OKF
 description: "Hacia dónde va el kit hoy: ingeniería de contexto completa (pasado, presente y futuro) aplicable a cualquier repo sin tooling."
 tags: [roadmap]
-timestamp: 2026-07-29T00:00:00Z
+timestamp: 2026-07-30T00:00:00Z
 ---
 
 # Visión
@@ -31,14 +31,13 @@ git, sin apps externas.
   **Es el diferencial que ningún competidor tiene** —el kit es el único que se mide a sí
   mismo— y hoy `/eval/` está gitignoreado. Requiere decidir qué se publica y qué no.
 
-**De la comparación con `harness-sdd` (lo que ese repo tiene y el kit no):**
+**De la comparación con `harness-sdd`** (el revisor con contexto fresco ya se cerró en la
+[0021](decisions/0021-la-auditoria-no-se-auto-aprueba.md); los otros tres roles son no-goal):
 
 - **Estado de sesión en vivo**: un `_changes/` captura el *cambio*, no *dónde quedó la sesión*
   si el contexto se corta a mitad de una tarea. Medir si hace falta antes de agregar archivos.
 - **Estado WIP machine-readable**: el roadmap es prosa, así que "≤1 cosa en curso" no lo puede
   enforcear ni el linter ni el hook. Convertirlo en invariante chequeable, sin ceremonia.
-- Roles/subagentes (leader/spec_author/implementer/reviewer): el kit no tiene capa de
-  orquestación. **Probable no-goal** — habría que medir que paga antes de sumar una cuarta capa.
 
 **Cerrar lo que quedó escrito y sin medir.**
 
@@ -59,6 +58,12 @@ git, sin apps externas.
   pasa seguido.
 
 # No-goals (por ahora)
+
+- **Los otros tres roles de `harness-sdd`** (leader / spec_author / implementer): ceremonia de
+  equipo grande, sin evidencia de que paguen para un usuario solo. El único que pagaba era el
+  revisor, y ya está ([0021](decisions/0021-la-auditoria-no-se-auto-aprueba.md)).
+- **Un harvester con contexto fresco:** el harvest necesita recordar qué pasó, y eso lo tiene la
+  sesión que hizo el trabajo. Contexto fresco sirve para auditar, no para recordar.
 
 - Reimplementar spec-driven development completo (specs vivas por capability,
   estilo OpenSpec): el kit cubre el ciclo cambio→harvest; para más que eso, se

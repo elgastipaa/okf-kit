@@ -50,6 +50,7 @@ INSTALLED = sorted(
         *(KIT / "templates" / "knowledge").glob("*.md"),
         *(KIT / "templates" / "skills" / s / "SKILL.md"
           for s in ("okf-update", "okf-verify", "okf-plan")),
+        KIT / "templates" / "agents" / "okf-reviewer.md",
     ]
     if p.is_file()
 )
@@ -449,6 +450,35 @@ _mk_sources = [p.get("source") for p in (_mk.get("plugins") or [])]
 check(_mk_sources and all(isinstance(s, str) and (KIT / s).is_dir() for s in _mk_sources),
       f"{_MARKET} apunta a un directorio de plugin que existe",
       f"sources: {_mk_sources}")
+
+# --------------------------- 3m. La auditoría no se auto-aprueba (revisión con contexto fresco)
+# Los Niveles 2 y 4 son los únicos que auditan trabajo que el propio agente pudo haber hecho, y
+# los dos donde el sesgo pesa más. Si `okf-verify` deja de delegarlos, el nivel sigue "corriendo"
+# y deja de encontrar: un gate que se autoaprueba es peor que no tenerlo.
+_REVIEWER = "templates/agents/okf-reviewer.md"
+_rev = read_required(_REVIEWER)
+check(_rev is not None, f"{_REVIEWER} existe (el revisor con contexto fresco se instala)")
+_rev_body = strip_comments(_rev or "").lower()
+check(near(_rev_body, "contradicción", "refutar", window=900),
+      f"{_REVIEWER} le da la consigna refutatoria, no confirmatoria",
+      "sin eso es un lector, no un auditor")
+# Un revisor que arregla lo que encuentra vuelve a ser el autor: la asimetría ES el mecanismo.
+check("disallowedtools" in (_rev or "").lower() and near(_rev_body, "no podés editar"),
+      f"{_REVIEWER} no puede editar (declarado en frontmatter y en el cuerpo)",
+      "si arregla lo que encuentra, vuelve a ser el autor")
+
+_verify = strip_comments(read_required("templates/skills/okf-verify/SKILL.md") or "").lower()
+# Se mide la INSTRUCCIÓN, no la coocurrencia: el bloque del reporte también nombra al
+# revisor, así que un assert laxo se satisfacía desde ahí con la delegación ya borrada
+# (lo cazó la inyección, no la lectura).
+check(near(_verify, "delegalos", "okf-reviewer", "2 y 4", window=500),
+      "okf-verify manda a DELEGAR los niveles 2 y 4 al revisor con contexto fresco",
+      "la instrucción de delegar no nombra al revisor y los niveles: el auto-review volvió "
+      "a ser el default")
+# Vendor-neutral: sin subagentes tiene que haber salida equivalente (la misma del Nivel 3).
+check(near(_verify, "subagentes", "prompt", window=400),
+      "okf-verify ofrece la salida sin subagentes (prompt para una CLI nueva)",
+      "quedaría atado a una herramienta con subagentes")
 
 # ---------------------------------------------------------------- 3f. Autosuficiencia
 # El material instalado no puede citar rutas que solo existen en el kit: el repo destino

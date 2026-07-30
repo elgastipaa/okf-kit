@@ -242,6 +242,39 @@ def _(d):
            "\nAcordate de hacer `chmod +x` en el hook.\n")
 
 
+# ---- la auditoría no se auto-aprueba
+@case("el revisor con contexto fresco no existe", True)
+def _(d): (d / "templates/agents/okf-reviewer.md").unlink()
+
+
+@case("el revisor pierde la consigna refutatoria", True)
+def _(d):
+    edit(d, "templates/agents/okf-reviewer.md",
+         "**Buscá la contradicción, no la confirmación.**", "**Revisá que todo esté bien.**")
+
+
+@case("el revisor puede editar lo que audita", True)
+def _(d):
+    edit(d, "templates/agents/okf-reviewer.md", "disallowedTools: Write, Edit, NotebookEdit", "model: sonnet")
+
+
+@case("okf-verify deja de delegar los niveles que auditan trabajo propio", True)
+def _(d):
+    edit(d, "templates/skills/okf-verify/SKILL.md", "`okf-reviewer`, o, si tu herramienta",
+         "vos mismo, o, si tu herramienta")
+
+
+@case("okf-verify pierde la salida sin subagentes", True)
+def _(d):
+    edit(d, "templates/skills/okf-verify/SKILL.md",
+         "si tu herramienta no tiene subagentes, entregale al usuario el prompt para\n> pegarlo en una CLI nueva",
+         "usá el subagente y listo")
+
+
+@case("el revisor cita una ruta que solo existe en el kit", True)
+def _(d): append(d, "templates/agents/okf-reviewer.md", "\nVer reference/verification.md.\n")
+
+
 # ---- distribución como plugin
 @case("la versión del plugin deriva de VERSION", True)
 def _(d): edit(d, ".claude-plugin/plugin.json", '"version": "', '"version": "9.9.9", "_v": "')

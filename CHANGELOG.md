@@ -10,6 +10,51 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.7.2 — La auditoría del bundle deja de auto-aprobarse
+
+### Agregado — `okf-reviewer`: el revisor con contexto fresco
+`okf-verify` tiene cuatro niveles. El **Nivel 3** ya exigía contexto fresco y lo decía. Pero los
+**Niveles 2** (drift descriptivo) y **4** (cumplimiento) los corría **la misma sesión que escribió
+los conceptos y el código** — los dos donde el sesgo pesa más: el método del Nivel 2 es *"buscá la
+contradicción"*, y quien redactó el concepto lo lee sabiendo lo que quiso decir; el Nivel 4 audita
+si el código viola lo normativo, y quien lo escribió racionaliza.
+
+**No es una apuesta nueva: es la práctica que el kit ya usaba para desarrollarse y no le daba a
+sus usuarios.** El cold-review de 4 lentes de `DEVELOPING.md` tiene acreditados 2 blockers y ~12
+majors en una sola pasada, y era kit-only.
+
+Tres propiedades hacen el mecanismo, y ninguna es opcional:
+1. **Contexto fresco** — y prohibido pedir la intención del autor: si le falta info para juzgar,
+   *ese* es el hallazgo.
+2. **No puede editar** (`disallowedTools` + el cuerpo). Un revisor que arregla lo que encuentra
+   vuelve a ser el autor: la asimetría **es** el mecanismo.
+3. **Consigna refutatoria**, con una sección obligatoria *"lo que intenté refutar y no pude"*:
+   sin eso, un reporte vacío no se distingue de una auditoría que no se hizo.
+
+Vendor-neutral: sin subagentes, el mismo archivo se sigue en un proceso/CLI nuevo (la salida que
+el Nivel 3 ya usaba). Se instala **en el repo destino**, no lo shippea el plugin
+([0013](knowledge/decisions/0013-installed-material-is-self-sufficient.md) +
+[0018](knowledge/decisions/0018-plugin-shippea-solo-el-bootstrap.md)).
+Decisión [0021](knowledge/decisions/0021-la-auditoria-no-se-auto-aprueba.md).
+
+**El contrato `AGENTS.md` no creció ni un carácter** — está al 95% de su presupuesto, y esto es un
+detalle de implementación de `okf-verify`. El modelo sigue siendo de tres capas: no se agregó una
+de orquestación, se agregó un *ejecutor* para dos niveles de un procedimiento que ya existía.
+
+### Arreglado — un skill pedía a mano algo que el script ya hace
+El Nivel 1 de `okf-verify` decía *"la raíz lista todos los subdirs (el script todavía no lo
+valida — chequealo acá)"*. En 0.7.1 el linter empezó a validarlo: el skill instalado quedó
+pidiendo trabajo pagado dos veces.
+
+### No-goals nuevos (decididos, no pendientes)
+- **Los otros tres roles de `harness-sdd`** (leader / spec_author / implementer): ceremonia de
+  equipo grande, sin evidencia de que paguen para un usuario solo.
+- **Un harvester con contexto fresco:** el harvest necesita *recordar* qué pasó, y eso lo tiene la
+  sesión que hizo el trabajo (para eso existe el staging del doc de `_changes/`). Contexto fresco
+  sirve para auditar, no para recordar — lo pensamos y da peor.
+
+Gate: 97 → **104 asserts**, 41 → **47 roturas probadas**.
+
 ## 0.7.1 — Pasada de optimización, hecha con las propias herramientas del kit
 
 Se corrió `okf_stale.py` sobre el dogfood, se midió el bloat en vez de estimarlo y se cerraron

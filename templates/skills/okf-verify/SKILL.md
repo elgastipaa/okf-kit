@@ -18,6 +18,14 @@ correrlo y para emitir el reporte está acá, sin depender de que `okf-kit` siga
 **No arregles nada sin avisar.** Emití el reporte primero; ofrecé aplicar los fixes
 con el skill `okf-update` si el usuario quiere.
 
+> **Si en esta sesión escribiste o modificaste el bundle (o el código que audita), los Niveles
+> 2 y 4 NO los corrés vos: delegalos a un revisor con contexto fresco** — el subagente
+> `okf-reviewer`, o, si tu herramienta no tiene subagentes, entregale al usuario el prompt para
+> pegarlo en una CLI nueva (igual que el Nivel 3). Su método es *buscá la contradicción*: quien
+> redactó un concepto lo lee sabiendo lo que quiso decir, y quien escribió el código racionaliza
+> por qué no viola nada. **Decí en el reporte quién corrió cada nivel.** Si no hiciste el
+> trabajo que se audita, corrélos vos normalmente.
+
 # Nivel 1 — Conformidad (objetivo, PASS/FAIL)
 
 **Corré el script** (determinista, solo stdlib, sin instalar nada) y parseá su
@@ -45,10 +53,10 @@ sin Python — el Nivel 1 no depende de ejecutar nada:
 5. **Links relativos:** ningún cross-link empieza con `/`. Listá los que sí.
 6. **Links resuelven:** cada link relativo apunta a un archivo existente. *(Roto =
    warning; listalos.)*
-7. **Índices:** cada carpeta con conceptos tiene `index.md` y sus entradas coinciden
-   con los archivos reales (sin entradas viejas ni faltantes). La raíz lista **todos** los
-   subdirs (el script todavía no lo valida — chequealo acá) y los conceptos que vivan en la
-   raíz (`roadmap.md`, `glossary.md`), agrupados por `type`.
+7. **Índices:** cada carpeta con conceptos tiene `index.md`, sus entradas coinciden con los
+   archivos reales (sin entradas viejas ni faltantes) y **el texto de cada entrada es la
+   `description` del concepto**. Cada carpeta lista sus subcarpetas, y la raíz además los
+   conceptos que vivan en ella (`roadmap.md`, `glossary.md`), agrupados por `type`.
 8. **Entrypoint:** `AGENTS.md` apunta a `knowledge/index.md`, o el `README` apunta a
    `knowledge/`.
 9. **Sin carpetas vacías.**
@@ -148,6 +156,7 @@ Resultado: PASS | PASS-WITH-WARNINGS | FAIL
 [x]/[!]/[ ] por ítem (el output del script tal cual, o el checklist de 9 ítems)
 
 ## Nivel 2 — Calidad
+- Quién lo corrió: yo | revisor con contexto fresco (`okf-reviewer`)
 - smells encontrados (o "ninguno")
 
 ## Nivel 3 — Outcome
@@ -155,6 +164,7 @@ Resultado: PASS | PASS-WITH-WARNINGS | FAIL
 - Cómo correrlo (prompt de CLI en frío) — o resultados si ya se corrió
 
 ## Nivel 4 — Cumplimiento (si se corrió)
+- Quién lo corrió: yo | revisor con contexto fresco (`okf-reviewer`)
 - Decisiones/convenciones auditadas y violaciones encontradas (o "ninguna")
 
 ## Issues
