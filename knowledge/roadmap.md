@@ -16,16 +16,24 @@ git, sin apps externas.
 
 # Ahora (en curso)
 
-- **[La capa deja de invitar a contestar sin verificar](_changes/0007-el-bundle-tambien-es-un-mapa.md)**
-  — la primera medición defendible dio **4 fallos de acierto contra 0** de no tener capa, con
-  contenido correcto en el bundle: el agente se detiene en una página que contesta *otra*
-  pregunta. La [0022](decisions/0022-el-bundle-tambien-es-un-mapa.md) extiende el guardrail al
-  bundle; falta la re-medición que la confirma o la revierte.
+- **La regresión de acierto sigue abierta.** La medición dio **4 fallos contra 0** de no tener
+  capa. El primer intento de fix (la 0022: obligar a verificar en la fuente) **se midió y se
+  revirtió** — +28% de turnos sin alcanzar el acierto que su propio gate exigía
+  ([0023](decisions/0023-verificar-siempre-no-paga.md)). Lo único con evidencia a favor es la
+  **cláusula de ambigüedad** (premisas falsas 1→0), que es barata y hay que probar sola.
+  Aprendido por la vía dura: **agregar prosa al contrato no mueve el acierto**.
 - **[El instrumento puede arbitrar mejoras del kit](_changes/0005-el-instrumento-antes-que-el-kit.md)**
   — el harness corre n=1 contra un ruido medido de 3,3 turnos/pregunta, con un juez que corre
   ciego y un brazo `nokit` que nunca se ejecutó. Hasta que mida, ninguna mejora del kit se
   puede aceptar ni descartar. Sale de las cuatro revisiones en frío sobre v0.7.3 (anexos en
   `_changes/`).
+
+- **El kit no puede actualizar el contrato de una instalación existente.** `okf_install
+  --upgrade` **no toca `AGENTS.md`** a propósito, porque tiene contenido del usuario — y hace
+  bien, pisarlo sería la pérdida de datos que arregló la 0.7.4. Pero la consecuencia es que
+  **ninguna mejora del contrato llega a un repo ya instalado**: se queda con el texto del día
+  que se instaló, para siempre. Se descubrió teniendo que portar la 0022 a mano. Es el
+  problema de producto más grande que quedó abierto hoy.
 
 # Después (próximo, en orden)
 
@@ -51,7 +59,7 @@ git, sin apps externas.
   [0013](decisions/0013-installed-material-is-self-sufficient.md): si se recorta, se supersede
   o se acota, no se edita en silencio.
 - **Mecanismo 5: "el code-of-record cierra la búsqueda"** — **CONGELADO (2026-08-02)** por la
-  [0022](decisions/0022-el-bundle-tambien-es-un-mapa.md). Proponía licenciar que el agente
+  [0023](decisions/0023-verificar-siempre-no-paga.md). Proponía licenciar que el agente
   **deje de buscar** cuando el code-of-record no tiene el término, o sea más permiso para
   contestar sin verificar: exactamente el modo de falla que la medición encontró. Se revisa
   cuando el acierto vuelva a 0/18. Su evidencia original sigue en pie y por eso no se tira:

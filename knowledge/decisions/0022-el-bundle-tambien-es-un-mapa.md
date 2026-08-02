@@ -1,6 +1,6 @@
 ---
 type: Decision
-status: accepted
+status: "superseded by 0023"
 supersedes: 0009-entrypoint-is-a-map-not-an-answer
 title: El bundle también es un mapa — la obligación de verificar es previa, no reactiva
 description: El guardrail contra respuestas rápidas y equivocadas se extiende del contrato a las páginas del bundle, y pasa de resolver conflictos a exigir la fuente antes de contestar.
@@ -9,6 +9,10 @@ timestamp: 2026-08-02T00:00:00Z
 ---
 
 # Contexto
+
+> **Superseded por la [0023](0023-verificar-siempre-no-paga.md)** (2026-08-02): se midió
+> con el gate que esta misma decisión se puso, **no lo pasó** (+28% de turnos, acierto sin
+> llegar a 0/18) y se revirtió. Lo que sobrevive es la cláusula de ambigüedad.
 
 La [0009](0009-entrypoint-is-a-map-not-an-answer.md) puso el guardrail *"es un MAPA, no la
 respuesta"* después de que un agente contestara mal citando una sección del **contrato**. La

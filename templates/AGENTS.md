@@ -50,11 +50,6 @@ seguí el mapa hasta el concepto en `knowledge/` o hasta el código. Si una secc
 *parece* contestarla, es coincidencia — verificá en la fuente. **¿Pregunta a nivel
 término/sigla?** Si el bundle tiene un `glossary.md`, abrilo **antes de grepear código**.
 
-**El bundle también es un mapa.** Para "¿qué existe / cuántos hay / cuál es el vigente HOY?"
-el concepto es el **puntero** y la respuesta sale del **código**: abrí la fuente aunque el
-concepto ya parezca contestar y no veas ninguna contradicción. Y si la pregunta admite más de
-una lectura, **decilo** en vez de elegir una y darla por única.
-
 **Si el documento y el código no coinciden, quién gana depende del documento:**
 
 - **Descriptivo** (arquitectura, schema, dominio, runbooks, references, glosario — casi todo
