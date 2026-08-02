@@ -50,6 +50,11 @@ seguí el mapa hasta el concepto en `knowledge/` o hasta el código. Si una secc
 *parece* contestarla, es coincidencia — verificá en la fuente. **¿Pregunta a nivel
 término/sigla?** Si el bundle tiene un `glossary.md`, abrilo **antes de grepear código**.
 
+**El bundle también es un mapa.** Para "¿qué existe / cuántos hay / cuál es el vigente HOY?"
+el concepto es el **puntero** y la respuesta sale del **código**: abrí la fuente aunque el
+concepto ya parezca contestar y no veas ninguna contradicción. Y si la pregunta admite más de
+una lectura, **decilo** en vez de elegir una y darla por única.
+
 **Si el documento y el código no coinciden, quién gana depende del documento:**
 
 - **Descriptivo** (arquitectura, schema, dominio, runbooks, references, glosario — casi todo
@@ -123,18 +128,18 @@ de la herramienta).
 
 **Guardrails:** capturá el **por qué**, no el qué; **no dupliques** (una verdad, un archivo);
 **cross-links relativos** (`../dir/x.md`, nunca con `/`); **un concepto por archivo**.
-Edge-cases y más detalle: `okf-update`.
+Edge-cases: `okf-update`.
 
 ## 3. Antes de cerrar la tarea — verificá
 
-Corré **`python3 scripts/okf_lint.py knowledge`** (o, si no hay Python, seguí el checklist de
-verificación) y actualizá `knowledge/` si tu cambio lo amerita.
+Corré **`python3 scripts/okf_lint.py knowledge`** (sin Python: el checklist de `okf-verify`) y
+actualizá `knowledge/` si tu cambio lo amerita.
 <!-- OKF:future-layer:start -->
 Si terminaste un cambio de `_changes/`, hacé su **harvest** antes de cerrar (la sección
 `# Harvest` del propio doc, vía `okf-plan`): decisiones al bundle, roadmap al día, y el doc
 se borra.
 <!-- OKF:future-layer:end -->
-El **pre-commit hook**, si está instalado, lo chequea igual en cualquier herramienta.
+El **pre-commit hook**, si está instalado, lo chequea igual.
 
 ## Procedimientos
 
@@ -144,5 +149,5 @@ El **pre-commit hook**, si está instalado, lo chequea igual en cualquier herram
 - **Planificar** trabajo futuro y cerrar cambios: `okf-plan`
 <!-- OKF:future-layer:end -->
 
-Son **vendor-neutral**: corren como skills de Claude Code *o* los sigue cualquier agente
-leyendo su procedimiento (si no se usa Claude Code, están en `docs/okf/<nombre>.md`).
+Corren como skills de Claude Code, o los sigue cualquier agente leyendo su procedimiento
+(sin Claude Code: `docs/okf/<nombre>.md`).

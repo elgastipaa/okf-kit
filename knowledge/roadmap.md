@@ -16,6 +16,11 @@ git, sin apps externas.
 
 # Ahora (en curso)
 
+- **[La capa deja de invitar a contestar sin verificar](_changes/0007-el-bundle-tambien-es-un-mapa.md)**
+  — la primera medición defendible dio **4 fallos de acierto contra 0** de no tener capa, con
+  contenido correcto en el bundle: el agente se detiene en una página que contesta *otra*
+  pregunta. La [0022](decisions/0022-el-bundle-tambien-es-un-mapa.md) extiende el guardrail al
+  bundle; falta la re-medición que la confirma o la revierte.
 - **[El instrumento puede arbitrar mejoras del kit](_changes/0005-el-instrumento-antes-que-el-kit.md)**
   — el harness corre n=1 contra un ruido medido de 3,3 turnos/pregunta, con un juez que corre
   ciego y un brazo `nokit` que nunca se ejecutó. Hasta que mida, ninguna mejora del kit se
@@ -45,12 +50,14 @@ git, sin apps externas.
   —mantenimiento— es el 24% y no paga nada en turnos de lectura. Tensiona con la
   [0013](decisions/0013-installed-material-is-self-sufficient.md): si se recorta, se supersede
   o se acota, no se edita en silencio.
-- **Mecanismo 5: "el code-of-record cierra la búsqueda"** (autoridad negativa acotada +
-  ancla de símbolo greppable). `trap` es la categoría más cara medida (6,4 turnos, n=19) y es
-  el 31% de las preguntas; es la mitad que falta de la
-  [0008](decisions/0008-declare-non-authoritative-layers.md), que dice dónde mirar pero no cuándo
-  parar. **Riesgo medio-alto** —misma forma que el falso positivo de q5— - gate obligatorio
-  con n≥3 y hand-verify; un `incorrecta` nuevo lo mata.
+- **Mecanismo 5: "el code-of-record cierra la búsqueda"** — **CONGELADO (2026-08-02)** por la
+  [0022](decisions/0022-el-bundle-tambien-es-un-mapa.md). Proponía licenciar que el agente
+  **deje de buscar** cuando el code-of-record no tiene el término, o sea más permiso para
+  contestar sin verificar: exactamente el modo de falla que la medición encontró. Se revisa
+  cuando el acierto vuelva a 0/18. Su evidencia original sigue en pie y por eso no se tira:
+  `trap` es la categoría más cara medida (6,4 turnos, n=19) y es el 31% de las preguntas; es
+  la mitad que falta de la [0008](decisions/0008-declare-non-authoritative-layers.md), que dice
+  dónde mirar pero no cuándo parar.
 - **`log.md` es peso muerto**: 0 citas en 61 corridas contra 13 ediciones. El contrato ya lo
   trata como opcional pero el instalador lo pone siempre y el keep-alive lo exige. El log real
   es `git log` + `decisions/`.

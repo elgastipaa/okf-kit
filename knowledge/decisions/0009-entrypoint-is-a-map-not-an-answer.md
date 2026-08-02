@@ -1,6 +1,6 @@
 ---
 type: Decision
-status: accepted
+status: "superseded by 0022"
 title: El entrypoint es un mapa, no una respuesta — guardrail contra falsos positivos
 description: El template AGENTS.md instruye explícitamente no responder preguntas de dominio citando el propio contrato, porque una capa de contexto puede fabricar respuestas rápidas y equivocadas.
 tags: [okf, entrypoint, correctness, false-positive, eval]
@@ -8,6 +8,11 @@ timestamp: 2026-06-18T00:00:00Z
 ---
 
 # Contexto
+
+> **Superseded por la [0022](0022-el-bundle-tambien-es-un-mapa.md)** (2026-08-02): lo que
+> decidió acá sigue vigente, pero su alcance quedaba limitado al **contrato** y la medición
+> mostró que los fallos venían de las **páginas del bundle**. La 0022 lo extiende y lo vuelve
+> una obligación previa de verificar, no una regla de desempate.
 En una validación **blind** (un agente aplicó el kit a un repo sin conocer las preguntas, y
 después se midió con `templates/eval/`), aparecieron −31% de turnos reales — pero **una
 pregunta se volvió rápida y MAL**: "¿cuál es la regla anti-waste?" (una mecánica de combate)
