@@ -1,4 +1,4 @@
-# OKF — Guía para implementar ingeniería de contexto en cualquier repo
+# okf-kit — que la IA deje de olvidarse tu proyecto
 
 > 🇬🇧 **English speaker?** Start at [`README.en.md`](README.en.md) — install instructions and
 > the mental model. The rest of the docs are in Spanish; any coding agent will translate or
@@ -33,14 +33,11 @@ vocabulario de `type:` — eso se elige con un *perfil* (ver `reference/profiles
 
 **Sin apps externas ni instalaciones.** No hace falta Obsidian, Notion, MkDocs, un
 visor de grafos ni ningún servicio: es markdown + git. Un humano lo lee en GitHub o
-con `cat`; un agente lo lee como archivos. El kit incluye un linter de Python
-opcional (`okf_lint.py`) para validar conformidad y correr en CI — **solo stdlib,
-sin `pip install`**. No hay nada que adoptar para *usar* el bundle.
+con `cat`; un agente lo lee como archivos. **No hay nada que adoptar para *usar* el bundle.**
 
-> **¿La máquina no tiene Python?** El linter necesita un intérprete Python 3 (sin
-> librerías, solo el intérprete). Si no lo tenés: instalá Python 3, **o** dejá que
-> el agente haga ese chequeo leyendo los archivos vía el skill `okf-verify`. El
-> resto del sistema no usa Python en absoluto.
+El kit trae además herramientas opcionales para que el contexto no se pudra solo —un linter,
+un ranker de drift, un revisor con contexto fresco—, pero eso es plomería: **no es el motivo
+por el que esto sirve**, y funciona sin ellas. Están en la tabla de abajo si te interesan.
 
 ---
 
@@ -117,7 +114,7 @@ Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 | Archivo | Para qué |
 |---|---|
 | **`GUIDE.md`** | **El procedimiento ejecutable.** Lo que un agente sigue para montar OKF en un repo. Empezá acá si sos un agente. |
-| **`OKF-SPEC.md`** | La especificación del formato (reglas normativas), condensada y self-contained. |
+| `OKF-SPEC.md` | La especificación del formato, para quien quiera implementarlo o escribir tooling. **Como usuario no la necesitás**: lo que recibís es una carpeta de markdown con frontmatter. |
 | `reference/profiles.md` | Cómo organizar carpetas y `type:` por dominio (código / datos / wiki / mixto). El núcleo de la universalidad. |
 | `reference/examples.md` | Mini-bundles de ejemplo completos, en los tres dominios, para copiar el estilo. |
 | `reference/verification.md` | Cómo **testear** un bundle: conformidad (PASS/FAIL), calidad, el test de comportamiento en frío, y la auditoría de cumplimiento (¿el código respeta lo normativo?). |
@@ -126,7 +123,7 @@ Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 | `reference/manual-install.md` | El camino **manual** de los pasos mecánicos del init. Solo si la máquina no tiene Python — con Python, `scripts/okf_install.py` los hace sellados y verificados. |
 | `reference/install-per-tool.md` | Cómo conectar OKF a **cualquier IA** (Claude/Cursor/Copilot/Gemini…) — punteros a `AGENTS.md`, sin lock-in. |
 | `reference/special-cases.md` | Monorepos, migración desde contexto existente, escala (cuándo partir), e idioma. |
-| `reference/optional-tools.md` | Aceleradores externos **opcionales** (Repomix): entender el repo al bootstrapear y medir el tamaño del bundle en tokens. |
+| `reference/optional-tools.md` | Aceleradores externos **opcionales** (Repomix) para empaquetar el *código* del repo. Para el bundle no hace falta: `okf_lint.py --pack` lo hace sin dependencias. |
 | `reference/spec-driven-interop.md` | En qué difiere OKF de las herramientas spec-driven (OpenSpec, Spec Kit, Kiro), qué se tomó de su filosofía y cómo convivir con ellas en el mismo repo. |
 | `templates/AGENTS.md` | Template del entrypoint universal. |
 | `templates/CLAUDE.md` | Shim que apunta a AGENTS.md (evita duplicar). |
@@ -200,7 +197,9 @@ vive en `knowledge/`").
 
 ## Crédito
 
-OKF (Open Knowledge Format) es un formato abierto publicado por Google Cloud en
+El formato que usa por debajo se llama **OKF (Open Knowledge Format)**, y no necesitás
+aprender la sigla para usar el kit: lo que te queda en el repo es markdown con frontmatter,
+legible con `cat` y en GitHub. Es un formato abierto publicado por Google Cloud en
 [GoogleCloudPlatform/knowledge-catalog](https://github.com/GoogleCloudPlatform/knowledge-catalog)
 (`okf/SPEC.md`). Allá está pensado para catálogos de datos; acá lo generalizamos a
 **contexto de cualquier proyecto — código, datos o wikis**, que el formato permite

@@ -170,12 +170,12 @@ pone siempre y el keep-alive lo exige. El log real es `git log` + `decisions/`.
 **Hecho cuando:** el instalador no lo siembra salvo `--with-log`, sale de `KEEPALIVE_TOKENS`,
 y el gate se ajusta con su rotura.
 
-## [ ] 3.3 · El linter y los 4 niveles dejan de ser pitch
+## [x] 3.3 · El linter y los 4 niveles dejan de ser pitch
 **Evidencia:** 0 hits de demanda de "linter" o "conformidad" en 131 entradas, y ocupan tres
 filas del README. **Se mantiene el mecanismo, se deja de vender.** Es edición de README y
 GUIDE, no borrado de código.
 
-## [ ] 3.4 · `OKF-SPEC.md` deja de ser puerta de entrada
+## [x] 3.4 · `OKF-SPEC.md` deja de ser puerta de entrada
 **Decidido:** se queda como base del formato —es el linaje de Google Cloud, la base de la
 licencia Apache y el contrato del linter—, pero **el usuario nunca necesita aprender la
 palabra "OKF"**: recibe una carpeta de markdown con frontmatter. La spec pasa a referencia
