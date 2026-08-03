@@ -60,10 +60,13 @@ primero que hay que traducir.
       también difiere.
 - [x] Sello de versión por archivo instalado, leyendo **todos** los archivos (OpenSpec lee el
       primero y extrapola; ese es su bug, no lo copiamos).
-- [ ] **Pendiente** — Inventario de archivos retirados, para que un archivo que el kit dejó de shippear no
-      quede huérfano.
+- [~] **Inventario de archivos retirados: NO se hace todavía, a propósito.** Hoy el kit no
+      retiró ningún archivo instalado, así que la constante quedaría **vacía** — y un
+      inventario vacío es decoración: no se puede probar rompiéndolo, que es la regla del
+      repo. Se agrega el día que se retire el primero, con su rotura.
 - [x] Disparadores de `okf-init` y `okf-migrate` **en inglés además de castellano**.
-- [ ] **Pendiente** — Ids estables de regla en el linter + `--skip`.
+- [x] Ids estables de regla en el linter + `--skip` (22 reglas con id; el id sale
+      entre corchetes en cada hallazgo para poder copiarlo).
 - [x] Gate y las tres suites (115/115, 59/59, 22/22, 9/9) en verde, con rotura por cada assert nuevo.
 
 # Decisiones y descubrimientos en el camino

@@ -26,13 +26,15 @@ from pathlib import Path
 
 KIT = Path(__file__).resolve().parents[1]
 LINT = KIT / "templates" / "scripts" / "okf_lint.py"
-CASES: list[tuple[str, str | None, object]] = []
+CASES: list[tuple[str, str | None, object, tuple[str, ...]]] = []
 
 
-def case(name: str, expect: str | None):
-    """expect = substring que el reporte DEBE contener; None = no debe reportar nada."""
+def case(name: str, expect: str | None, extra: list[str] | None = None):
+    """expect = substring que el reporte DEBE contener; None = no debe reportar nada.
+
+    `extra` = flags adicionales del linter para ese caso (p.ej. `--skip`)."""
     def deco(fn):
-        CASES.append((name, expect, fn))
+        CASES.append((name, expect, fn, tuple(extra or ())))
         return fn
     return deco
 
@@ -180,6 +182,26 @@ def _(d):
          "# Contexto\n\nVer [alcanzable](0099-alcanzable-por-cross-link.md).")
 
 
+# ---- ids estables de regla y --skip
+@case("cada hallazgo trae su id de regla entre corchetes", "[link-absolute]")
+def _(d):
+    edit(d, "index.md", "](decisions/index.md)", "](/decisions/index.md)")
+
+
+@case("--skip calla la regla por id", None, extra=["--skip", "dir-empty"])
+def _(d):
+    # Rotura de efecto AISLADO: una carpeta vacía dispara `dir-empty` y nada más. Un link
+    # absoluto habría servido igual de mal: además de `link-absolute`, deja el subárbol
+    # entero inalcanzable, así que el caso no probaría el skip sino la suma de reglas.
+    (d / "carpeta-vacia").mkdir()
+
+
+@case("--skip de otra regla NO tapa la que importa", "[link-absolute]",
+      extra=["--skip", "dir-empty,log-date-iso"])
+def _(d):
+    edit(d, "index.md", "](decisions/index.md)", "](/decisions/index.md)")
+
+
 def main() -> int:
     if not LINT.is_file():
         print(f"okf_lint_test: no encontré {LINT}", file=sys.stderr)
@@ -188,7 +210,7 @@ def main() -> int:
     print(f"{'caso':<62} {'espera':<8} {'real':<8} veredicto")
     bad = 0
     try:
-        for name, expect, fn in CASES:
+        for name, expect, fn, extra in CASES:
             # Se copia el KIT entero, no solo `knowledge/`: el dogfood linkea archivos de
             # afuera del bundle (`../../OKF-SPEC.md`) y en una copia aislada serían links
             # rotos — un falso positivo del harness que enmascararía los casos limpios.
@@ -201,7 +223,7 @@ def main() -> int:
                 print(f"{name:<62} {'—':<8} {'—':<8} SETUP ROTO: {e}")
                 bad += 1
                 continue
-            r = subprocess.run([sys.executable, str(LINT), str(d), "--strict"],
+            r = subprocess.run([sys.executable, str(LINT), str(d), "--strict", *extra],
                                capture_output=True, text=True)
             out = r.stdout + r.stderr
             if expect is None:

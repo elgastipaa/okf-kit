@@ -91,16 +91,27 @@ def is_concept(p: Path) -> bool:
 
 
 class Linter:
-    def __init__(self, bundle: Path, strict: bool = False) -> None:
+    def __init__(self, bundle: Path, strict: bool = False,
+                 skip: tuple[str, ...] = ()) -> None:
         self.bundle = bundle
         self.strict = strict
-        self.issues: list[tuple[str, str, int, str]] = []
+        self.skip = set(skip)
+        self.issues: list[tuple[str, str, int, str, str]] = []
         # description de cada concepto, para cruzarla contra el texto de su entrada de index
         self.descriptions: dict[Path, str] = {}
 
-    def add(self, sev: str, path: Path, line: int, msg: str) -> None:
+    def add(self, sev: str, path: Path, line: int, msg: str, rid: str = "misc") -> None:
+        """`rid` es el **id estable** de la regla: lo que se puede silenciar con `--skip`.
+
+        El mensaje es prosa, cambia y está en castellano; el id no. Sin él, callar una regla
+        obliga a forkear el kit. Los ids viven en el código y NO en un YAML paralelo a
+        propósito: speccy externalizó sus reglas a datos y mantiene además una copia para
+        documentarlas, que ya divergió — externalizar no salva de la deriva, duplicar sí la causa.
+        """
+        if rid in self.skip:
+            return
         rel = "." if path == self.bundle else str(path.relative_to(self.bundle))
-        self.issues.append((sev, rel, line, msg))
+        self.issues.append((sev, rel, line, msg, rid))
 
     def _ignored(self, p: Path) -> bool:
         """True si p está dentro de (o es) algo con prefijo '_': plantillas/borradores
@@ -176,40 +187,40 @@ class Linter:
         try:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
-            self.add("ERROR", path, 1, "el archivo no es UTF-8")
+            self.add("ERROR", path, 1, "el archivo no es UTF-8", rid="encoding")
             return
         fm, body, body_start = self.split_fm(text)
         if fm is None:
-            self.add("ERROR", path, 1, "falta frontmatter (debe empezar con '---')")
+            self.add("ERROR", path, 1, "falta frontmatter (debe empezar con '---')", rid="frontmatter-missing")
             return
         if fm == "UNTERMINATED":
-            self.add("ERROR", path, 1, "frontmatter sin cerrar (falta el '---' de cierre)")
+            self.add("ERROR", path, 1, "frontmatter sin cerrar (falta el '---' de cierre)", rid="frontmatter-unclosed")
             return
         fm_errs = self.validate_frontmatter(fm)
         if fm_errs:
             for msg in fm_errs:
-                self.add("ERROR", path, 1, msg)
+                self.add("ERROR", path, 1, msg, rid="frontmatter-yaml")
             return  # frontmatter inválido → la extracción de claves no es confiable
         keys = self.top_keys(fm)
         if not keys.get("type", "").strip():
-            self.add("ERROR", path, 1, "falta `type` (o está vacío) — único requisito duro de OKF")
+            self.add("ERROR", path, 1, "falta `type` (o está vacío) — único requisito duro de OKF", rid="type-required")
         for k in AUTHORING_DEFAULTS:
             if not keys.get(k, "").strip():
-                self.add("WARN", path, 1, f"falta `{k}` (recomendado al escribir)")
+                self.add("WARN", path, 1, f"falta `{k}` (recomendado al escribir)", rid="field-recommended")
         ts = keys.get("timestamp", "").strip().strip('"').strip("'")
         if ts and not ISO_DT_RE.match(ts):
-            self.add("WARN", path, 1, f"`timestamp` no parece ISO 8601: '{ts}'")
+            self.add("WARN", path, 1, f"`timestamp` no parece ISO 8601: '{ts}'", rid="timestamp-iso")
         auth = keys.get("authority", "").split(" #", 1)[0].strip().strip('"').strip("'").lower()
         if auth and auth not in AUTHORITY_VALUES:
             self.add("WARN", path, 1,
                      f"`authority: {auth}` no está en el vocabulario "
-                     f"({' | '.join(AUTHORITY_VALUES)}) — no declara nada")
+                     f"({' | '.join(AUTHORITY_VALUES)}) — no declara nada", rid="authority-vocab")
         desc = keys.get("description", "")
         self.descriptions[path.resolve()] = desc.strip().strip('"').strip("'")
         if desc and len(desc) > 200:
-            self.add("WARN", path, 1, "`description` muy larga (>200 chars) — acortala a una frase")
+            self.add("WARN", path, 1, "`description` muy larga (>200 chars) — acortala a una frase", rid="description-long")
         elif desc and re.search(r"[.!?]\s+[A-ZÁÉÍÓÚ¿¡]", desc):
-            self.add("WARN", path, 1, "`description` parece tener más de una frase")
+            self.add("WARN", path, 1, "`description` parece tener más de una frase", rid="description-multi")
         self.check_conflict_markers(path, body, body_start)
         self.check_links(path, body, body_start)
 
@@ -217,7 +228,7 @@ class Linter:
         text = path.read_text(encoding="utf-8", errors="replace")
         fm, _body, _ = self.split_fm(text)
         if fm not in (None, "UNTERMINATED") and not is_root:
-            self.add("WARN", path, 1, "index.md no debería llevar frontmatter (salvo okf_version en la raíz)")
+            self.add("WARN", path, 1, "index.md no debería llevar frontmatter (salvo okf_version en la raíz)", rid="index-frontmatter")
         self.check_conflict_markers(path, text.splitlines(), 1)
         self.check_links(path, text.splitlines(), 1)
 
@@ -230,7 +241,7 @@ class Linter:
         for i, ln in enumerate(lines):
             if re.match(r"^(<{7}[ \t]|={7}$|>{7}[ \t])", ln.rstrip("\n")):
                 self.add("ERROR", path, start + i,
-                         "marcador de conflicto de merge sin resolver")
+                         "marcador de conflicto de merge sin resolver", rid="merge-conflict")
                 return
 
     def check_log(self, path: Path) -> None:
@@ -240,7 +251,7 @@ class Linter:
             if s.startswith("## "):
                 date = s[3:].strip()
                 if not ISO_DATE_RE.fullmatch(date):
-                    self.add("WARN", path, i, f"heading de fecha no ISO (## YYYY-MM-DD): '{date}'")
+                    self.add("WARN", path, i, f"heading de fecha no ISO (## YYYY-MM-DD): '{date}'", rid="log-date-iso")
 
     def check_links(self, path: Path, lines: list[str], start_line: int) -> None:
         in_fence = False
@@ -283,13 +294,13 @@ class Linter:
                     continue
                 if target.startswith("/"):
                     self.add("ERROR", path, lineno,
-                             f"link absoluto '{target}': empieza con '/', rompe en GitHub; usá relativo al archivo")
+                             f"link absoluto '{target}': empieza con '/', rompe en GitHub; usá relativo al archivo", rid="link-absolute")
                     continue
                 rel = target.split("#", 1)[0]
                 if not rel:
                     continue
                 if not (path.parent / rel).exists():
-                    self.add("WARN", path, lineno, f"link roto: '{target}' no existe")
+                    self.add("WARN", path, lineno, f"link roto: '{target}' no existe", rid="link-broken")
 
     # ---- directory-level ----
     def check_dirs(self) -> None:
@@ -301,12 +312,12 @@ class Linter:
             if self._ignored(d):
                 continue  # carpeta con prefijo '_' (derivada/efímera): fuera del bundle conforme
             if not any(True for _ in d.rglob("*.md")):
-                self.add("WARN", d, 0, "carpeta vacía (sin conceptos)")
+                self.add("WARN", d, 0, "carpeta vacía (sin conceptos)", rid="dir-empty")
                 continue
             concepts = [c for c in d.iterdir() if c.is_file() and is_concept(c)]
             index = d / "index.md"
             if concepts and not index.exists():
-                self.add("WARN", d, 0, "carpeta con conceptos sin index.md")
+                self.add("WARN", d, 0, "carpeta con conceptos sin index.md", rid="dir-no-index")
             if index.exists():
                 itext = index.read_text(encoding="utf-8", errors="replace")
                 linked = set()
@@ -316,7 +327,7 @@ class Linter:
                         linked.add((index.parent / tgt).resolve())
                 for c in concepts:
                     if c.resolve() not in linked:
-                        self.add("WARN", index, 0, f"el concepto '{c.name}' no está linkeado en el index")
+                        self.add("WARN", index, 0, f"el concepto '{c.name}' no está linkeado en el index", rid="concept-unlinked")
                 # Una subcarpeta que el index del padre no lista es un subárbol INVISIBLE
                 # para quien navega desde el entrypoint: el contenido existe y nadie llega.
                 for sub in sorted(p for p in d.iterdir() if p.is_dir()):
@@ -325,7 +336,7 @@ class Linter:
                     if (sub / "index.md").resolve() not in linked and sub.resolve() not in linked:
                         self.add("WARN", index, 0,
                                  f"la subcarpeta '{sub.name}/' no está listada en este index "
-                                 "(invisible al navegar desde la raíz)")
+                                 "(invisible al navegar desde la raíz)", rid="subdir-unlisted")
                 self.check_index_descriptions(index, itext)
 
     @staticmethod
@@ -352,7 +363,7 @@ class Linter:
             if self._norm(text) != self._norm(desc):
                 self.add("WARN", index, 0,
                          f"la entrada de '{target}' no coincide con su `description` "
-                         f"(index: {text[:60]!r} · concepto: {desc[:60]!r})")
+                         f"(index: {text[:60]!r} · concepto: {desc[:60]!r})", rid="index-desc-drift")
 
     def check_navigable(self) -> None:
         # El linter valida que el bundle sea navegable (index.md raíz). El wiring
@@ -361,7 +372,7 @@ class Linter:
         root = self.bundle / "index.md"
         if not root.exists():
             self.add("WARN", self.bundle, 0,
-                     "el bundle no tiene index.md raíz (hace falta para navegación/entrypoint)")
+                     "el bundle no tiene index.md raíz (hace falta para navegación/entrypoint)", rid="root-index-missing")
             return
         self.check_reachable(root)
 
@@ -404,7 +415,7 @@ class Linter:
             if p.resolve() not in seen:
                 self.add("WARN", p, 0,
                          "no se llega a este concepto navegando desde el index.md raíz "
-                         "(subárbol invisible: existe y nadie lo encuentra)")
+                         "(subárbol invisible: existe y nadie lo encuentra)", rid="unreachable")
 
     # ---- run / report ----
     def run(self) -> int:
@@ -432,9 +443,10 @@ class Linter:
     def report(self) -> int:
         errors = [i for i in self.issues if i[0] == "ERROR"]
         warns = [i for i in self.issues if i[0] == "WARN"]
-        for sev, rel, line, msg in sorted(self.issues, key=lambda x: (x[1], x[2])):
+        for sev, rel, line, msg, rid in sorted(self.issues, key=lambda x: (x[1], x[2])):
             loc = f"{rel}:{line}" if line else rel
-            print(f"  {sev:5} {loc} — {msg}")
+            # El id va en la salida para que se pueda copiar a `--skip` sin adivinarlo.
+            print(f"  {sev:5} {loc} — {msg} [{rid}]")
         if not self.issues:
             print("  (sin problemas)")
         print(f"\nokf_lint: {len(errors)} error(es), {len(warns)} warning(s) en '{self.bundle}'")
@@ -448,8 +460,23 @@ def main(argv: list[str]) -> int:
     strict = "--strict" in args
     if strict:
         args.remove("--strict")
+    # `--skip id1,id2`: callar una regla por su id estable, sin forkear el kit. Los ids se
+    # imprimen entre corchetes en cada hallazgo, así que se copian de la salida.
+    skip: tuple[str, ...] = ()
+    for a in list(args):
+        if a.startswith("--skip="):
+            skip += tuple(x.strip() for x in a.split("=", 1)[1].split(",") if x.strip())
+            args.remove(a)
+        elif a == "--skip":
+            i = args.index(a)
+            if i + 1 >= len(args):
+                print("okf_lint: --skip necesita una lista de ids (ej: --skip dir-empty,log-date-iso)",
+                      file=sys.stderr)
+                return 2
+            skip += tuple(x.strip() for x in args[i + 1].split(",") if x.strip())
+            del args[i:i + 2]
     bundle = Path(args[0]) if args else Path("knowledge")
-    return Linter(bundle, strict=strict).run()
+    return Linter(bundle, strict=strict, skip=skip).run()
 
 
 if __name__ == "__main__":
