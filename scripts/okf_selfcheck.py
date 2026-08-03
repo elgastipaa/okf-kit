@@ -270,6 +270,35 @@ check(0 < len(_agents_installed) <= BUDGET,
       "templates/AGENTS.md instalado entra en el presupuesto",
       f"{len(_agents_installed)}/{BUDGET} chars ≈ {len(_agents_installed)//4} tokens por turno")
 
+# El presupuesto del contrato mide UN archivo, y el agente paga TRES: el contrato, el shim
+# `CLAUDE.md` y las `description:` de los skills instalados, que el harness inyecta en el
+# system prompt. Medir uno solo dejaba crecer los otros dos sin que nadie los mirara —hoy son
+# 1.400 chars, el 17% del always-on real—. Este techo no es un límite negociado como el de
+# 7000: es un **cable trampa** sobre los canales que nadie estaba observando.
+ALWAYS_ON_BUDGET = 8600
+_desc_re = re.compile(r"^description:\s*(.*(?:\n[ \t]+.*)*)", re.M)
+
+
+def _description_len(rel: str) -> int:
+    txt = read_required(rel) or ""
+    m = re.match(r"---\r?\n(.*?)\r?\n---", txt, re.S)
+    d = _desc_re.search(m.group(1)) if m else None
+    return len(d.group(1)) if d else 0
+
+
+_always_on = {
+    "contrato": len(_agents_installed),
+    "shim CLAUDE.md": len(strip_comments(read_required("templates/CLAUDE.md") or "").strip()) + 1,
+    **{f"description {s}": _description_len(f"templates/skills/{s}/SKILL.md")
+       for s in ("okf-update", "okf-verify", "okf-plan")},
+    "description okf-reviewer": _description_len("templates/agents/okf-reviewer.md"),
+}
+_always_on_total = sum(_always_on.values())
+check(0 < _always_on_total <= ALWAYS_ON_BUDGET,
+      "el always-on REAL (contrato + shim + descripciones) entra en su presupuesto",
+      f"{_always_on_total}/{ALWAYS_ON_BUDGET} chars ≈ {_always_on_total // 4} tokens por turno · "
+      + " · ".join(f"{k} {v}" for k, v in _always_on.items()))
+
 # El techo está escrito también en prosa, en dos archivos: que no derive del valor real.
 for rel in ["templates/AGENTS.md", "templates/skills/okf-verify/SKILL.md"]:
     txt = read_required(rel)

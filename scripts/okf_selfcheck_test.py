@@ -359,6 +359,14 @@ def _(d):
          "**Nota:** existe un archivo de chequeos en")
 
 
+@case("una description de skill se infla y nadie la mide", True)
+def _(d):
+    # El canal que estaba invisible: las `description:` van al system prompt en CADA turno,
+    # y el presupuesto del contrato no las contaba. Inflar una tiene que doler.
+    edit(d, "templates/skills/okf-verify/SKILL.md", "description: >",
+         "description: >\n  " + ("relleno que nadie midio. " * 40))
+
+
 @case("--upgrade pisa la maquinaria que el usuario editó", True)
 def _(d):
     # La forma ingenua: reemplazar siempre. Se lleva puestas las ediciones del usuario

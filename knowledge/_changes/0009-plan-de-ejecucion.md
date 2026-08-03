@@ -131,9 +131,13 @@ turnos de lectura**).
 sin skills pueda mantener el bundle solo con el contrato. Eso se **supersede o se acota**, no
 se edita — y es una decisión de producto, no una optimización.
 
-**Antes de tocar nada:** arreglar que el presupuesto **mide un archivo de tres** (le faltan el
-`CLAUDE.md` y las descripciones de los skills; el always-on real es ~8.400 chars, no 6.900).
-Ese sub-ítem sí es autónomo y va primero.
+**[x] Sub-ítem hecho (autónomo):** el gate ahora mide el always-on **real**. Números: contrato
+6.912 + shim 11 + descripciones de skills 1.406 = **8.329 chars ≈ 2.082 tokens por turno**,
+contra los 6.912 que medía — un punto ciego del 20%, y creciendo sin que nadie lo mirara.
+`ALWAYS_ON_BUDGET = 8600` es un **cable trampa** sobre los canales invisibles, no un límite
+negociado como el 7000 del contrato.
+
+**Lo que sigue bloqueado** es recortar §2, que es la decisión de producto.
 
 ---
 
