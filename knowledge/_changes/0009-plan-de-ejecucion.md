@@ -208,9 +208,12 @@ repos privados.
 El antes/después de un init real con el diff visible. Hoy la única prueba navegable es el
 dogfood, que está enterrado. Es lo que convierte a un desconocido.
 
-## [ ] 4.4 · Mueblería de adopción
-`CONTRIBUTING.md`, badges, topics de GitHub, un asciinema de 30s. Barato, y hoy no hay nada.
-Incluye mandar el PR a `awesome-vibe-coding`, que acepta PRs triviales.
+## [~] 4.4 · Mueblería de adopción
+**Hecha la parte autónoma:** `CONTRIBUTING.md` (con las tres reglas no negociables y el
+método de medición) y los badges del README.
+
+**Falta lo que va hacia afuera y necesita tu OK:** topics de GitHub, el asciinema de 30s del
+init, y el PR a `awesome-vibe-coding` — publicar en el repo de otro no lo decide un agente.
 
 ---
 

@@ -1,5 +1,9 @@
 # okf-kit — que la IA deje de olvidarse tu proyecto
 
+[![selfcheck](https://github.com/elgastipaa/okf-kit/actions/workflows/selfcheck.yml/badge.svg)](https://github.com/elgastipaa/okf-kit/actions/workflows/selfcheck.yml)
+[![Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![sin dependencias](https://img.shields.io/badge/deps-0%20(stdlib)-brightgreen.svg)](#)
+
 > 🇬🇧 **English speaker?** Start at [`README.en.md`](README.en.md) — install instructions and
 > the mental model. The rest of the docs are in Spanish; any coding agent will translate or
 > follow them as-is. · Licencia: **Apache-2.0** ([`LICENSE`](LICENSE), [`NOTICE`](NOTICE)).
@@ -143,6 +147,7 @@ Actualizá el bundle OKF de este repo según GUIDE.md (paso "Mantenimiento").
 | `README.en.md` | Puerta de entrada en **inglés**: qué es, cómo se instala, el modelo mental. |
 | `LICENSE` / `NOTICE` | **Apache-2.0** (la misma que el OKF de Google Cloud, del que deriva `OKF-SPEC.md`) + el aviso de atribución. |
 | `VERSION` | Revisión semver de **este kit** (no del formato). `okf-init` la estampa como `kit_version` en el bundle del repo. |
+| `CONTRIBUTING.md` | Cómo trabajar sobre el kit: las cuatro suites, la regla de que todo assert va con su rotura, y por qué un cambio de comportamiento se mide antes de darlo por bueno. |
 | `CHANGELOG.md` | Historial de revisiones del kit. Aclara `kit_version` (kit) vs `okf_version` (formato OKF). |
 | `DEVELOPING.md` | Proceso interno para **desarrollar el kit**: el gate de release (selfcheck + cold-review de 4 lentes). |
 | `scripts/okf_install.py` | **El instalador** (kit-only, stdlib): ejecuta todo lo mecánico del init/upgrade en un comando y verifica su salida con el linter. Lo que requiere criterio se lo deja al agente. |
