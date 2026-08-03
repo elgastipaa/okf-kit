@@ -344,6 +344,15 @@ def _(d):
 
 
 # ---- el contrato tiene que poder actualizarse sin perder lo del usuario
+@case("--upgrade pisa la maquinaria que el usuario editó", True)
+def _(d):
+    # La forma ingenua: reemplazar siempre. Se lleva puestas las ediciones del usuario
+    # sobre skills, linter o hook, y nunca se entera.
+    edit(d, "scripts/okf_install.py",
+         "        if respect_edits:",
+         "        if False:")
+
+
 @case("--upgrade regenera el contrato entero y borra lo del usuario", True)
 def _(d):
     # La forma ingenua de "actualizar el contrato": pisarlo con el template. Se lleva puestas

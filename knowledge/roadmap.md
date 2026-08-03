@@ -85,10 +85,14 @@ git, sin apps externas.
   `reference/examples.md`. Es lo que convierte a un desconocido.
 - Mueblería de adopción: badges, topics de GitHub, `CONTRIBUTING.md`, un asciinema de 30s del
   init. Barato y hoy no existe nada.
-- Publicar la medición del harness de eval (turnos/tokens/acierto en los tres conejillos).
-  **Es el diferencial que ningún competidor tiene** —verificado: ni Spec Kit (124k★), ni
-  OpenSpec (63k★), ni Conductor, ni cc-sdd miden nada— y hoy `/eval/` está gitignoreado.
-  Depende del cambio 0005: hasta que el instrumento no arbitre, no hay número publicable.
+- Publicar la medición del harness de eval. Ni Spec Kit (124k★), ni OpenSpec (63k★), ni
+  Conductor, ni cc-sdd miden nada — pero **"nadie mide" es falso y hay que dejar de decirlo**:
+  [CCPM](https://github.com/automazeio/ccpm) (8,3k★) publica un badge `eval_score 100%` y una
+  tabla de 100% contra 27,7% de baseline. El terreno narrativo ya está ocupado por un número
+  peor que el nuestro. Lo defendible no es "somos los únicos que medimos" sino **cómo**:
+  n≥3 con dispersión reportada, brazo sin capa que aparta los archivos de verdad, juez que
+  verifica contra el código, veredicto de premisa falsa, y **publicar también cuando da
+  negativo** — que es lo que acabamos de hacer. Hoy `/eval/` está gitignoreado.
 
 **De la comparación con `harness-sdd`** (el revisor con contexto fresco ya se cerró en la
 [0021](decisions/0021-la-auditoria-no-se-auto-aprueba.md); los otros tres roles son no-goal):

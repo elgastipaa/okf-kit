@@ -521,6 +521,26 @@ if (KIT / _INSTALLER).is_file():
               "okf_install.py --upgrade reemplaza la prosa vieja del kit en el contrato",
               "el contrato quedó con el texto de la versión anterior")
 
+        # La maquinaria (skills, linter, hook) también es reemplazable — y también puede
+        # haberla editado el usuario. Pisarla en silencio es la misma pérdida de datos que
+        # el contrato, un nivel más abajo. Se mide sobre la conducta: editar y upgradear.
+        _skill = _dst / ".claude" / "skills" / "okf-update" / "SKILL.md"
+        _skill.write_text(_skill.read_text(encoding="utf-8").rstrip()
+                          + "\n\nREGLA_PROPIA_DEL_USUARIO\n", encoding="utf-8")
+        _victim = _dst / "scripts" / "okf_lint.py"
+        _before = _victim.read_text(encoding="utf-8")
+        for _c in (["git", "-C", str(_dst), "add", "-A"],
+                   ["git", "-C", str(_dst), "commit", "-qm", "edits", "--no-verify"]):
+            subprocess.run(_c, capture_output=True)
+        subprocess.run([sys.executable, _INSTALLER, str(_dst), "--upgrade"],
+                       cwd=KIT, capture_output=True, text=True)
+        check("REGLA_PROPIA_DEL_USUARIO" in _skill.read_text(encoding="utf-8"),
+              "okf_install.py --upgrade no pisa material instalado que el usuario editó",
+              "le borró su edición sin avisar")
+        check(_victim.read_text(encoding="utf-8") == _before,
+              "okf_install.py --upgrade deja intacto lo que no cambió",
+              "reescribió un archivo que no hacía falta tocar")
+
 # Una verdad, un lugar: si el skill vuelve a describir la plomería en prosa, hay dos
 # fuentes que van a derivar (la regla dura #1 del kit y su causa raíz de bugs).
 _init_txt = read_required("templates/skills/okf-init/SKILL.md") or ""

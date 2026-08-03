@@ -10,6 +10,11 @@ description: >
   documentar esto para que la IA lo entienda", "que no se pierda el contexto
   entre sesiones", "armá un AGENTS.md/CLAUDE.md en serio para este repo".
   Para un repo que YA tiene docs/ADRs/AGENTS.md propios, usá okf-migrate.
+  ALSO IN ENGLISH — trigger on the symptom, not the acronym: "I have to explain
+  my project to the AI every session", "the AI keeps forgetting my project",
+  "Claude/Cursor doesn't understand my repo", "set up context/memory for this repo",
+  "write a proper AGENTS.md / CLAUDE.md for this project", "document this codebase
+  so the AI gets it", "stop losing context between sessions".
 ---
 
 Montás un sistema de contexto OKF (Open Knowledge Format): conocimiento del

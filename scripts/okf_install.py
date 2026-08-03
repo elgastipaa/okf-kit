@@ -41,6 +41,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import hashlib
 import re
 import shutil
 import subprocess
@@ -307,21 +308,70 @@ def skill_target(target: Path, no_claude: bool, skill: str) -> Path:
 
 
 # ------------------------------------------------------------------ pasos de instalación
+# El sello que llevan los archivos de maquinaria instalados. Guarda la versión **y el hash
+# de lo que escribimos**: con la versión sola no se puede distinguir "es mi copia vieja" de
+# "lo editaste vos", y ahí es donde OpenSpec pisa trabajo del usuario en silencio.
+STAMP_MARK = "okf-kit:managed"
+_STAMP_RE = re.compile(rf"^.*{re.escape(STAMP_MARK)} v(\S+) sha1:([0-9a-f]{{40}}).*$\n?",
+                       re.M)
+_COMMENT = {".md": "<!-- {} -->", ".py": "# {}", ".yml": "# {}", ".yaml": "# {}"}
+
+
+def _stamped(path: Path, body: str, version: str) -> str:
+    """El contenido con su sello al final, comentado según el tipo de archivo."""
+    digest = hashlib.sha1(body.encode("utf-8")).hexdigest()
+    tpl = _COMMENT.get(path.suffix, "# {}")
+    sep = "" if body.endswith("\n") else "\n"
+    return body + sep + tpl.format(
+        f"{STAMP_MARK} v{version} sha1:{digest} — lo reemplaza `okf_install.py --upgrade`; "
+        "si lo editás, deja de actualizarse solo") + "\n"
+
+
+def classify_managed(dst: Path) -> str:
+    """`ausente` | `intacto` | `editado` | `sin-sello`.
+
+    Tres desenlaces y no dos: sin esto, un upgrade o pisa lo que el usuario tocó, o no
+    actualiza nunca por miedo. `sin-sello` es material de un kit anterior al sellado — no se
+    puede afirmar que lo editaron, así que se trata con la misma prudencia.
+    """
+    if not dst.is_file():
+        return "ausente"
+    txt = dst.read_text(encoding="utf-8", errors="replace")
+    m = _STAMP_RE.search(txt)
+    if not m:
+        return "sin-sello"
+    body = _STAMP_RE.sub("", txt)
+    return "intacto" if hashlib.sha1(body.encode("utf-8")).hexdigest() == m.group(2) else "editado"
+
+
 def install_machinery(plan: Plan, target: Path, *, minimal: bool, no_claude: bool,
-                      want_ci: bool, want_hook: bool) -> None:
-    """Skills + scripts + CI + hook. Es idéntico en instalación y en --upgrade."""
+                      want_ci: bool, want_hook: bool, version: str = "",
+                      respect_edits: bool = False) -> None:
+    """Skills + scripts + CI + hook. Es idéntico en instalación y en --upgrade.
+
+    Con `respect_edits` (el camino de `--upgrade`) no pisa un archivo que el usuario editó:
+    lo reporta y sigue. En una instalación fresca no aplica — no hay nada que respetar.
+    """
+    def put(src: Path, dst: Path, executable: bool = False) -> None:
+        body = src.read_text(encoding="utf-8")
+        if respect_edits:
+            state = classify_managed(dst)
+            if state in ("editado", "sin-sello"):
+                plan.skip(f"{dst.relative_to(target)} ({'lo editaste' if state == 'editado' else 'sin sello del kit'}: NO se pisa)")
+                return
+        plan.write(dst, _stamped(dst, body, version) if version else body, executable=executable)
     skills = list(SKILLS_ALWAYS) + ([] if minimal else [SKILL_FUTURE])
     for skill in skills:
-        plan.copy(KIT / "templates" / "skills" / skill / "SKILL.md",
-                  skill_target(target, no_claude, skill))
+        put(KIT / "templates" / "skills" / skill / "SKILL.md",
+            skill_target(target, no_claude, skill))
     for agent in AGENTS:
-        plan.copy(KIT / "templates" / "agents" / f"{agent}.md",
-                  agent_target(target, no_claude, agent))
+        put(KIT / "templates" / "agents" / f"{agent}.md",
+            agent_target(target, no_claude, agent))
     for script in SCRIPTS:
-        plan.copy(KIT / "templates" / "scripts" / script, target / "scripts" / script)
+        put(KIT / "templates" / "scripts" / script, target / "scripts" / script)
     if want_ci:
-        plan.copy(KIT / "templates" / "ci" / "okf.yml",
-                  target / ".github" / "workflows" / "okf.yml")
+        put(KIT / "templates" / "ci" / "okf.yml",
+            target / ".github" / "workflows" / "okf.yml")
     else:
         plan.skip(".github/workflows/okf.yml (--no-ci)")
     if not want_hook:
@@ -333,8 +383,8 @@ def install_machinery(plan: Plan, target: Path, *, minimal: bool, no_claude: boo
         # hasta que mergea algo roto. La guarda existía y solo se consultaba en --upgrade.
         plan.skip("git hook (ya hay un pre-commit que NO es del kit: no se pisa — ver abajo)")
     else:
-        plan.copy(KIT / "templates" / "hooks" / "pre-commit",
-                  target / ".git" / "hooks" / "pre-commit", executable=True)
+        put(KIT / "templates" / "hooks" / "pre-commit",
+            target / ".git" / "hooks" / "pre-commit", executable=True)
 
 
 def install_fresh(plan: Plan, target: Path, args, version: str) -> None:
@@ -350,7 +400,7 @@ def install_fresh(plan: Plan, target: Path, args, version: str) -> None:
         plan.write(target / "knowledge" / "roadmap.md", roadmap)
         # `_changes/` la ignora el linter; el `.gitkeep` la hace sobrevivir un clone.
         plan.write(target / "knowledge" / "_changes" / ".gitkeep", "")
-    install_machinery(plan, target, minimal=args.minimal, no_claude=args.no_claude,
+    install_machinery(plan, target, version=version, minimal=args.minimal, no_claude=args.no_claude,
                       want_ci=not args.no_ci, want_hook=not args.no_hook)
 
 
@@ -392,7 +442,11 @@ def install_upgrade(plan: Plan, target: Path, args, version: str) -> str | None:
     minimal = args.minimal or not (target / "knowledge" / "roadmap.md").is_file()
     no_claude = args.no_claude or (target / "docs" / "okf").is_dir()
     install_machinery(
-        plan, target, minimal=minimal, no_claude=no_claude,
+        plan, target, version=version, minimal=minimal, no_claude=no_claude,
+        # En upgrade sí se respeta lo que el usuario haya editado: la maquinaria es del kit,
+        # pero si alguien la tocó, pisarla en silencio es la misma pérdida de datos que la
+        # 0.7.4 arregló para el entrypoint, un nivel más abajo.
+        respect_edits=True,
         want_ci=not args.no_ci and (target / ".github" / "workflows" / "okf.yml").is_file(),
         # Un pre-commit que no es nuestro no se pisa: puede ser del usuario.
         want_hook=not args.no_hook and _hook_is_ours(target),

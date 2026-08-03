@@ -10,6 +10,10 @@ description: >
   "ordená las notas del proyecto", "tengo docs viejos que confunden a la IA".
   Es también el camino cuando okf_install.py aborta porque el repo ya tiene un
   AGENTS.md o CLAUDE.md escrito a mano.
+  ALSO IN ENGLISH — trigger on the symptom: "my AGENTS.md is a mess", "my CLAUDE.md
+  got out of hand", "my docs are all over the place", "I don't know which docs are
+  still true", "clean up / consolidate my project notes", "I have old docs confusing
+  the AI", "migrate my existing docs and ADRs".
 ---
 
 Sos el camino **brownfield** de OKF: el repo ya tiene contexto, pero disperso. Tu

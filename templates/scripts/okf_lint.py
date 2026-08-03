@@ -73,6 +73,18 @@ ISO_DT_RE = re.compile(r"^\d{4}-\d{2}-\d{2}([T ]\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[
 URL_PREFIXES = ("http://", "https://", "mailto:", "tel:", "data:")
 
 
+def strip_code(text: str) -> str:
+    """El texto sin bloques cercados ni inline-code: ahí los `[x](y)` son ejemplos, no links."""
+    out, fenced = [], False
+    for ln in text.splitlines():
+        s = ln.lstrip()
+        if s.startswith("```") or s.startswith("~~~"):
+            fenced = not fenced
+            continue
+        out.append("" if fenced else re.sub(r"`[^`]*`", "", ln))
+    return "\n".join(out)
+
+
 def is_concept(p: Path) -> bool:
     """Un .md es concepto si no es reservado ni una plantilla/borrador (prefijo '_')."""
     return p.suffix == ".md" and p.name not in RESERVED and not p.name.startswith("_")
@@ -346,9 +358,53 @@ class Linter:
         # El linter valida que el bundle sea navegable (index.md raíz). El wiring
         # de entrypoint a nivel repo (AGENTS.md / puntero en README) lo verifica el
         # skill okf-verify, que tiene el contexto para saber si es un repo de código.
-        if not (self.bundle / "index.md").exists():
+        root = self.bundle / "index.md"
+        if not root.exists():
             self.add("WARN", self.bundle, 0,
                      "el bundle no tiene index.md raíz (hace falta para navegación/entrypoint)")
+            return
+        self.check_reachable(root)
+
+    def check_reachable(self, root: Path) -> None:
+        """¿Se llega a cada concepto navegando DESDE la raíz?
+
+        Los demás chequeos de índice son **locales**: verifican que cada carpeta liste lo
+        suyo. Eso deja pasar un subárbol entero invisible — basta una carpeta intermedia sin
+        `index.md` para cortar la cadena, y abajo todo puede estar perfectamente indexado
+        contra un índice al que nadie llega. El contenido existe, el gate da verde y el agente
+        nunca lo encuentra, que es la única forma de fallar que importa en una capa de
+        contexto.
+        """
+        seen: set[Path] = set()
+        queue = [root.resolve()]
+        while queue:                                   # BFS con visited-set: los cross-links
+            cur = queue.pop()                          # entre conceptos hacen ciclos.
+            if cur in seen or not cur.is_file():
+                continue
+            seen.add(cur)
+            try:
+                text = cur.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            for m in LINK_RE.finditer(strip_code(text)):
+                tgt = m.group(1).strip().split("#", 1)[0]
+                if not tgt or tgt.startswith(URL_PREFIXES) or tgt.startswith("/"):
+                    continue
+                dest = (cur.parent / tgt).resolve()
+                if dest.is_dir():                      # link a carpeta ⇒ entra por su índice
+                    dest = dest / "index.md"
+                try:                                   # nunca salir del bundle
+                    dest.relative_to(self.bundle.resolve())
+                except ValueError:
+                    continue
+                queue.append(dest)
+        for p in sorted(self.bundle.rglob("*.md")):
+            if self._ignored(p) or p.name in RESERVED or not is_concept(p):
+                continue
+            if p.resolve() not in seen:
+                self.add("WARN", p, 0,
+                         "no se llega a este concepto navegando desde el index.md raíz "
+                         "(subárbol invisible: existe y nadie lo encuentra)")
 
     # ---- run / report ----
     def run(self) -> int:

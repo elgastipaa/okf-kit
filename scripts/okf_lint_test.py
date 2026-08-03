@@ -154,6 +154,32 @@ def _(d):
     edit(d, "index.md", "# Subdirectories\n", "# Subdirectories\n\n* [domain](domain/index.md) - vacía aún.\n")
 
 
+# ---- alcanzabilidad desde la raíz (subárboles invisibles)
+@case("un concepto al que no se llega navegando desde la raíz", "subárbol invisible")
+def _(d):
+    # El índice de la carpeta lo lista bien, pero el índice RAÍZ deja de listar la carpeta:
+    # los chequeos locales siguen contentos y el subárbol entero queda inalcanzable.
+    edit(d, "index.md", "](decisions/index.md)", "](decisions/index.md-roto)")
+
+
+@case("un concepto linkeado desde otro concepto, no desde un índice", None)
+def _(d):
+    # Redacción legítima: se llega igual, por un cross-link. El chequeo es de
+    # ALCANZABILIDAD, no de "todo tiene que colgar de un índice".
+    p = d / "decisions" / "0099-alcanzable-por-cross-link.md"
+    p.write_text(
+        "---\ntype: Decision\nstatus: accepted\ntitle: Alcanzable por cross-link\n"
+        "description: Concepto al que se llega desde otro concepto y no desde un índice.\n"
+        "timestamp: 2026-08-03T00:00:00Z\n---\n\n# Contexto\n\ncuerpo\n",
+        encoding="utf-8")
+    # Se lista en su índice (chequeo local, ya existente) y además se cross-linkea: el
+    # chequeo nuevo no tiene que agregar ruido sobre contenido perfectamente normal.
+    edit(d, "decisions/index.md", "\n* [", 
+         "\n* [Alcanzable por cross-link](0099-alcanzable-por-cross-link.md) - Concepto al que se llega desde otro concepto y no desde un índice.\n* [")
+    edit(d, "decisions/0001-relative-links-over-absolute.md", "# Contexto",
+         "# Contexto\n\nVer [alcanzable](0099-alcanzable-por-cross-link.md).")
+
+
 def main() -> int:
     if not LINT.is_file():
         print(f"okf_lint_test: no encontré {LINT}", file=sys.stderr)
