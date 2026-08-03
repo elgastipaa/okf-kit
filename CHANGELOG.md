@@ -10,6 +10,43 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.7.5 — El contrato deja de estar congelado en la versión que lo instaló
+
+### Arreglado — ninguna mejora del contrato llegaba a un repo ya instalado (BLOCKER)
+`--upgrade` reemplazaba scripts, skills, CI, hook y el sello de versión, pero **no tocaba el
+`AGENTS.md`** — a propósito, porque tiene contenido del usuario y pisarlo es la pérdida de
+datos que arregló la 0.7.4. La consecuencia no la había mirado nadie: **cada instalación
+quedaba clavada en el texto del día que nació, para siempre.**
+
+Apareció al tener que portar a mano un cambio del contrato a un repo de prueba. El que lo
+portó sabía qué había cambiado porque lo había escrito una hora antes; un usuario con OKF
+instalado hace meses no tiene cómo.
+
+### La causa no era una función faltante: el contrato era inactualizable por su forma
+Las capas no autoritativas vivían **dentro de §1**, con el texto del usuario y el del kit
+**entrelazados en el mismo párrafo** — en un repo real el usuario había escrito antes de la
+frase fija del kit *y también después*. No hay forma mecánica de reemplazar uno sin pisar el
+otro.
+
+- **`## Capas NO autoritativas` pasa a ser su propia sección.** Ahora el contrato se divide
+  por dueño: del kit son `## 1.`, `## 2.`, `## 3.` y `## Procedimientos`; del usuario son el
+  título, el stack, `## Reglas duras`, las capas no autoritativas **y cualquier sección que
+  haya agregado él**, que se conservan palabra por palabra.
+- El apareo entre versiones es por **prefijo** (`## 2.`), no por título completo: los títulos
+  cambian entre revisiones y aparear por texto exacto abortaría sin motivo.
+- Regla de forma para siempre ([0024](knowledge/decisions/0024-el-contrato-se-actualiza-por-secciones.md)):
+  ninguna sección del contrato puede mezclar prosa del kit con contenido del usuario en el
+  mismo párrafo.
+
+### Se planta y delega en vez de adivinar
+Tres casos donde no puede garantizar que no destruye nada, y en los tres avisa qué hacer:
+`AGENTS.md` con cambios sin commitear o repo sin git (no hay red para devolverlo), contrato en
+el formato viejo con las capas embebidas en §1 (migración one-time, a mano), y una sección del
+kit que ya no existe en la revisión nueva.
+
+Gate: 111 → **113 asserts**, 56 → **58 roturas** — las dos mitades pueden fallar solas (no
+actualizar, o actualizar de más) y la segunda es destructiva, así que cada una tiene la suya.
+
 ## 0.7.4 — Los primeros cinco minutos dejan de tener paredes
 
 Todo lo de esta entrada sale de la revisión en frío del **vibecoder** (una de las cuatro

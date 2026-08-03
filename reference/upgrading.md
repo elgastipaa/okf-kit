@@ -26,11 +26,12 @@ que te estás perdiendo — y de lo que hay que re-copiar.
 
 ## Procedimiento
 
-> **Los pasos 3 y 5 son mecánicos y los hace el instalador:**
+> **Los pasos 3, 4 y 5 son mecánicos y los hace el instalador:**
 > `python3 scripts/okf_install.py <repo> --upgrade`. Reemplaza scripts, skills, CI y hook
-> (detecta solo el nivel de instalación y si el hook es del kit), re-estampa `kit_version`,
-> deja la línea en `log.md`, corre el linter sobre el resultado y **no toca el `AGENTS.md`
-> ni el contenido del bundle**. Los pasos 1, 2, 4 y 6 siguen siendo tuyos: son criterio.
+> (detecta solo el nivel de instalación y si el hook es del kit), **actualiza las secciones
+> del kit dentro del `AGENTS.md` conservando las tuyas**, re-estampa `kit_version`, deja la
+> línea en `log.md`, corre el linter sobre el resultado y **no toca el contenido del bundle**.
+> Los pasos 1, 2 y 6 siguen siendo tuyos: son criterio.
 
 1. **Leé el `CHANGELOG` desde la versión del repo hasta la actual.** No es ceremonia: te dice
    qué archivos cambiaron y si alguna regla cambió de forma (p.ej. de 0.5.0 a 0.6.x el
@@ -45,12 +46,21 @@ que te estás perdiendo — y de lo que hay que re-copiar.
    `templates/skills/{okf-update,okf-verify}` (+ `okf-plan` si va la capa de futuro) →
    `<repo>/.claude/skills/`, `templates/agents/okf-reviewer.md` → `<repo>/.claude/agents/`, `templates/ci/okf.yml` y `templates/hooks/pre-commit` si estaban
    instalados. Un `pre-commit` que **no** es del kit no se pisa: puede ser del usuario.
-4. **El `AGENTS.md` NO se reemplaza entero** — es el único que lleva contenido del proyecto
-   mezclado con el del kit. Lo que es del proyecto y **se conserva**: el título y la
-   descripción del stack, las **reglas duras** propias, y los `{{placeholders}}` completados
-   (capas no-autoritativas, etc.). Lo que es del kit y **se reemplaza**: las secciones 1, 2, 3
-   y Procedimientos. Mostrale al usuario qué conservaste y qué reemplazaste **antes** de
-   escribir: acá es donde se pierde conocimiento si se hace en silencio.
+4. **El `AGENTS.md` se actualiza por secciones** (esto lo hace `--upgrade`). Es el único
+   archivo que mezcla contenido del proyecto con contenido del kit, así que **no se reemplaza
+   entero**: el instalador cambia solo `## 1.`, `## 2.`, `## 3.` y `## Procedimientos`, y deja
+   palabra por palabra el título, la descripción del stack, `## Reglas duras`, `## Capas NO
+   autoritativas` **y cualquier sección que hayas agregado vos**. Al terminar te dice qué
+   secciones tocó.
+
+   **Cuándo se planta y te lo deja a vos** (siempre avisando, nunca en silencio):
+   - Si el `AGENTS.md` tiene **cambios sin commitear**, o el repo no es git: sin red para
+     devolvértelo, no lo toca.
+   - Si el contrato viene de **antes de la 0.7.5**, donde las capas no autoritativas vivían
+     *dentro* de §1 entrelazadas con el texto del kit. Ahí no hay forma mecánica de separar lo
+     tuyo de lo mío: movelas a una sección propia `## Capas NO autoritativas` y volvé a correrlo.
+   - Si encuentra una sección del kit que ya no existe en la revisión nueva: puede tener
+     contenido tuyo adentro, así que la migración es tuya.
 5. **Re-estampá `kit_version`** en `knowledge/index.md` con el `VERSION` nuevo, y dejá una
    línea en `log.md` (`## YYYY-MM-DD` · qué revisión, desde cuál). Esto también lo hace
    `--upgrade`; si el repo no mantiene `log.md`, lo omite.

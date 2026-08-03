@@ -343,6 +343,25 @@ def _(d):
          "    plan.write(target / \".editorconfig\", \"root = true\\n\")")
 
 
+# ---- el contrato tiene que poder actualizarse sin perder lo del usuario
+@case("--upgrade regenera el contrato entero y borra lo del usuario", True)
+def _(d):
+    # La forma ingenua de "actualizar el contrato": pisarlo con el template. Se lleva puestas
+    # las reglas duras, las capas no autoritativas y cualquier sección propia del usuario.
+    edit(d, "scripts/okf_install.py",
+         "            new, replaced, abort = upgrade_contract(installed, version, minimal)",
+         "            new, replaced, abort = build_agents(version, minimal, None), ['todo'], None")
+
+
+@case("--upgrade no toca el contrato, así que la mejora nunca llega", True)
+def _(d):
+    # El bug que motivó todo esto: --upgrade actualizaba la maquinaria y dejaba el contrato
+    # congelado en el texto del día que se instaló.
+    edit(d, "scripts/okf_install.py",
+         "    if agents.is_file() and _is_kit_entrypoint(agents):",
+         "    if False:")
+
+
 @case("--force borra el entrypoint del usuario aunque git no lo tenga", True)
 def _(d):
     # El escenario que lo motivó: el "commiteá antes" del mensaje de error puede fallar en

@@ -10,6 +10,11 @@ resource: ../../scripts/okf_install.py
 
 # Contexto
 
+> **Actualizada por la [0024](0024-el-contrato-se-actualiza-por-secciones.md)** (2026-08-03):
+> el merge del `AGENTS.md`, que acá figura como criterio del agente, pasó a ser plomería —
+> se separaron las secciones por dueño y el instalador ya puede hacerlo solo. El corte que
+> define esta decisión no cambia; se movió un ejemplo de un lado al otro.
+
 El kit resolvía bien el problema difícil (qué contexto capturar y por qué) y mal el fácil
 (copiar archivos). `okf-init` le pedía a una IA ~40 operaciones de archivo y **una sola de
 ellas requiere inteligencia**: sembrar los conceptos. El resto eran `mkdir`, `cp`, `chmod`,

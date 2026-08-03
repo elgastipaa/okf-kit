@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-08-03
+* **Update**: v0.7.5 — **el contrato deja de estar congelado en la versión que lo instaló** ([0024](decisions/0024-el-contrato-se-actualiza-por-secciones.md)). `--upgrade` actualizaba scripts, skills, CI y sello pero NO el `AGENTS.md`, así que ninguna mejora del contrato llegaba jamás a un repo instalado. Al automatizarlo apareció la causa real: el contrato era inactualizable **por su forma** — las capas no autoritativas vivían dentro de §1, con el texto del usuario y el del kit entrelazados en el mismo párrafo. Ahora cada uno tiene sus secciones y el instalador reemplaza solo las suyas; ante cualquier forma inesperada se planta y avisa en vez de adivinar.
+
 ## 2026-08-02
 * **Update**: primer cambio del kit **revertido por su propia medición**. La [0022](decisions/0022-el-bundle-tambien-es-un-mapa.md) —obligar a abrir la fuente en toda pregunta de estado actual— se aceptó con un gate escrito ANTES de medir, se midió (n=3, única variable cambiada: el texto del contrato) y **no lo pasó**: +28% de turnos y el acierto sin llegar a 0/18. Revertida en la [0023](decisions/0023-verificar-siempre-no-paga.md), que conserva lo que sí sirvió (la cláusula de ambigüedad bajó las premisas falsas de 1 a 0) y el hallazgo de fondo: **agregar prosa al contrato no mueve el acierto**, y verificar en la fuente no impide alucinar sobre la fuente.
 

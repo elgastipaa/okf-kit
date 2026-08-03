@@ -28,13 +28,6 @@ git, sin apps externas.
   puede aceptar ni descartar. Sale de las cuatro revisiones en frío sobre v0.7.3 (anexos en
   `_changes/`).
 
-- **El kit no puede actualizar el contrato de una instalación existente.** `okf_install
-  --upgrade` **no toca `AGENTS.md`** a propósito, porque tiene contenido del usuario — y hace
-  bien, pisarlo sería la pérdida de datos que arregló la 0.7.4. Pero la consecuencia es que
-  **ninguna mejora del contrato llega a un repo ya instalado**: se queda con el texto del día
-  que se instaló, para siempre. Se descubrió teniendo que portar la 0022 a mano. Es el
-  problema de producto más grande que quedó abierto hoy.
-
 # Después (próximo, en orden)
 
 **Lo que dejaron las cuatro lentes sobre v0.7.3, gateado por el instrumento.**

@@ -480,6 +480,47 @@ if (KIT / _INSTALLER).is_file():
               f"exit={_r2.returncode}; " + ("le apagó los tests al usuario sin avisar"
                                             if "npm test" not in _hook.read_text() else ""))
 
+# El contrato tiene que poder ACTUALIZARSE sin perder lo del usuario: si no, cada repo se
+# queda con el texto del día que se instaló y ninguna mejora del kit le llega nunca. Se mide
+# sobre la conducta real —instalar, escribir contenido propio, envejecer el kit, upgradear—
+# porque las dos mitades pueden fallar solas: no reemplazar, o reemplazar de más.
+if (KIT / _INSTALLER).is_file():
+    with tempfile.TemporaryDirectory() as _tmp:
+        _dst = Path(_tmp) / "repo"
+        _dst.mkdir()
+        for _c in (["git", "init", "-q", str(_dst)],
+                   ["git", "-C", str(_dst), "config", "user.email", "gate@okf"],
+                   ["git", "-C", str(_dst), "config", "user.name", "gate"]):
+            subprocess.run(_c, capture_output=True)
+        subprocess.run([sys.executable, _INSTALLER, str(_dst), "--name", "X"],
+                       cwd=KIT, capture_output=True, text=True)
+        _ag = _dst / "AGENTS.md"
+        _txt = _ag.read_text(encoding="utf-8")
+        # Contenido del usuario en sus tres formas: una sección que el kit siembra vacía,
+        # y una sección entera que el kit no conoce.
+        _txt = re.sub(r"(## Reglas duras\n\n).*?(\n\n## Capas)", r"\1- SECRETO_DEL_USUARIO\2",
+                      _txt, flags=re.S)
+        _txt = re.sub(r"(## Capas NO autoritativas\n\n).*?(\n\n## 1\.)", r"\1- BASURA_DEL_USUARIO\2",
+                      _txt, flags=re.S)
+        _txt += "\n## Seccion propia\n\nSECCION_DEL_USUARIO\n"
+        # Envejecemos el kit: prosa que la versión actual ya no tiene.
+        _txt = _txt.replace("**Guardrails:**", "PROSA_VIEJA_DEL_KIT\n\n**Guardrails:**", 1)
+        _ag.write_text(_txt, encoding="utf-8")
+        for _c in (["git", "-C", str(_dst), "add", "-A"],
+                   ["git", "-C", str(_dst), "commit", "-qm", "fixture"]):
+            subprocess.run(_c, capture_output=True)
+        subprocess.run([sys.executable, _INSTALLER, str(_dst), "--upgrade"],
+                       cwd=KIT, capture_output=True, text=True)
+        _got = _ag.read_text(encoding="utf-8")
+        _kept = [m for m in ("SECRETO_DEL_USUARIO", "BASURA_DEL_USUARIO", "SECCION_DEL_USUARIO")
+                 if m not in _got]
+        check(not _kept,
+              "okf_install.py --upgrade conserva el contenido del usuario en el contrato",
+              f"se perdió: {', '.join(_kept)}" if _kept else "")
+        check("PROSA_VIEJA_DEL_KIT" not in _got,
+              "okf_install.py --upgrade reemplaza la prosa vieja del kit en el contrato",
+              "el contrato quedó con el texto de la versión anterior")
+
 # Una verdad, un lugar: si el skill vuelve a describir la plomería en prosa, hay dos
 # fuentes que van a derivar (la regla dura #1 del kit y su causa raíz de bugs).
 _init_txt = read_required("templates/skills/okf-init/SKILL.md") or ""

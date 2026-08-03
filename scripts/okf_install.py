@@ -144,6 +144,86 @@ def build_agents(version: str, minimal: bool, name: str | None) -> str:
     return text
 
 
+# Las secciones que escribe (y por lo tanto puede reemplazar) el kit. Todo lo demás
+# —el título, las reglas duras, las capas no autoritativas y cualquier sección que haya
+# agregado el usuario— es contenido suyo y se conserva palabra por palabra.
+KIT_SECTIONS = ("## 1.", "## 2.", "## 3.", "## Procedimientos")
+
+
+def split_contract(text: str) -> list[tuple[str | None, str]]:
+    """El contrato como [(heading, bloque)], preservando orden y texto exacto.
+
+    El primer bloque lleva `heading=None`: es el título + la descripción del proyecto.
+    """
+    out: list[tuple[str | None, str]] = []
+    cur_head: str | None = None
+    cur: list[str] = []
+    for line in text.splitlines(keepends=True):
+        if line.startswith("## "):
+            out.append((cur_head, "".join(cur)))
+            cur_head, cur = line.rstrip("\n"), [line]
+        else:
+            cur.append(line)
+    out.append((cur_head, "".join(cur)))
+    return out
+
+
+def _is_kit_section(head: str | None) -> bool:
+    return head is not None and head.startswith(KIT_SECTIONS)
+
+
+def upgrade_contract(installed: str, version: str, minimal: bool) -> tuple[str, list[str], str | None]:
+    """Reemplaza SOLO las secciones del kit; devuelve (texto, reemplazadas, motivo_de_aborto).
+
+    Un `AGENTS.md` no se puede regenerar de cero: mezcla el texto del kit con contenido del
+    usuario que no está en ningún lado más (sus reglas duras, dónde están los secretos). Por
+    eso se hace por secciones y **ante cualquier forma inesperada se aborta**: perder eso es
+    irreversible, y una actualización que borra trabajo es peor que no actualizar.
+    """
+    fresh = split_contract(build_agents(version, minimal, None))
+    fresh_kit = {h: b for h, b in fresh if _is_kit_section(h)}
+    old = split_contract(installed)
+
+    # Migración one-time: hasta la 0.7.4 las capas no autoritativas vivían DENTRO de §1,
+    # entrelazadas con la prosa del kit en el mismo párrafo. No hay forma mecánica de
+    # separarlas (el usuario escribe antes y después de la frase fija), así que se pide el
+    # movimiento a mano en vez de adivinar y borrar.
+    heads = [h for h, _ in old if h]
+    if not any(h.startswith("## Capas NO autoritativas") for h in heads):
+        if "Capas NO autoritativas" in installed:
+            return "", [], (
+                "el contrato tiene las capas no autoritativas DENTRO de §1 (formato viejo), "
+                "entrelazadas con el texto del kit.\n"
+                "  → movelas a una sección propia `## Capas NO autoritativas` (después de "
+                "`## Reglas duras`) y volvé a correr esto.\n"
+                "  No lo hago yo: ahí hay texto tuyo mezclado con el mío y separarlo a ciegas "
+                "puede borrarte contenido.")
+
+    replaced, out = [], []
+    for head, block in old:
+        if _is_kit_section(head):
+            # Se aparea por el PREFIJO (`## 2.`), no por el título completo: el título de una
+            # sección cambia entre versiones y aparear por texto exacto abortaría de gusto.
+            pref = next(p for p in KIT_SECTIONS if head.startswith(p))
+            key = next((k for k in fresh_kit if k.startswith(pref)), None)
+            if key is None:                     # sección del kit que ya no existe
+                return "", [], (f"la sección {head!r} no existe en el kit v{version}. "
+                                "Migrala a mano: puede tener contenido tuyo adentro.")
+            new_block = fresh_kit.pop(key)
+            out.append(new_block)
+            # Se compara ANTES de sacar la clave: mirar el dict ya vaciado daba siempre
+            # "cambió" y el upgrade no era idempotente (reportaba trabajo que no hizo).
+            if new_block != block:
+                replaced.append(head)
+        else:
+            out.append(block)
+    # Secciones que el kit agregó en una versión posterior a la instalada.
+    for head, block in fresh:
+        if _is_kit_section(head) and head in fresh_kit:
+            out.append(block); replaced.append(f"{head} (nueva)")
+    return "".join(out), replaced, None
+
+
 def build_claude() -> str:
     """El shim instalado: `@AGENTS.md` y nada más.
 
@@ -317,6 +397,28 @@ def install_upgrade(plan: Plan, target: Path, args, version: str) -> str | None:
         # Un pre-commit que no es nuestro no se pisa: puede ser del usuario.
         want_hook=not args.no_hook and _hook_is_ours(target),
     )
+    # El contrato TAMBIÉN se actualiza: si no, cada repo se queda para siempre con el texto
+    # del día que se instaló y ninguna mejora del kit le llega nunca.
+    agents = target / "AGENTS.md"
+    if agents.is_file() and _is_kit_entrypoint(agents):
+        installed = agents.read_text(encoding="utf-8")
+        unsaved = _uncommitted(target, ["AGENTS.md"])
+        if unsaved:
+            print("okf_install: AGENTS.md tiene cambios sin commitear, así que NO lo toco "
+                  "(commitealo y volvé a correr esto para actualizarlo).", file=sys.stderr)
+        elif unsaved is None:
+            print("okf_install: el destino no es un repo git, así que NO toco el AGENTS.md "
+                  "(sin git no hay forma de devolvértelo si algo sale mal).", file=sys.stderr)
+        else:
+            new, replaced, abort = upgrade_contract(installed, version, minimal)
+            if abort:
+                print(f"okf_install: no actualizo el AGENTS.md — {abort}", file=sys.stderr)
+            elif replaced:
+                plan.write(agents, new)
+                print(f"  contrato: actualizadas {len(replaced)} sección(es) del kit "
+                      f"({', '.join(s.replace('## ','') for s in replaced)}); "
+                      "tus reglas duras y capas no autoritativas quedaron intactas")
+
     old = restamp_kit_version(plan, index, version)
     append_log_line(
         plan, target / "knowledge" / "log.md",

@@ -37,6 +37,12 @@ explica. Ejemplos:}}
 - {{El trabajo de DB corre localmente, no desde la nube — ver knowledge/decisions/0002-db-work-runs-locally.md}}
 - {{Antes de tocar el modelo de datos, leé knowledge/schema/}}
 
+## Capas NO autoritativas
+
+{{Listá los dirs/archivos scratch, legacy, planes viejos o exploración que **NO reflejan el
+estado actual** — ej. `notes/`, mockups, docs de refactors pasados. Si el repo no tiene
+ninguna, borrá esta sección. La regla de qué hacer con ellas está en §1.}}
+
 ## 1. Antes de actuar — leé el contexto
 
 El "qué" y el "por qué" de este proyecto viven en **`knowledge/`** (formato OKF: markdown +
@@ -93,11 +99,10 @@ metodologías — preguntale *qué tiene que pasar para que esté listo* y escri
 falta. Si te pide ir directo al código, **respetalo**: hacé el trabajo y registrá al menos la
 decisión que haya quedado.
 
-**Capas NO autoritativas — no reconcilies basura.** {{Listá los dirs/archivos scratch,
-legacy, planes viejos o exploración que **NO reflejan el estado actual** — ej. `notes/`,
-mockups, docs de refactors pasados. Si el repo no tiene ninguna, borrá esta sección.}} Para "¿qué existe / cuántos / a qué nivel HOY?" la
-respuesta sale **del código**; si difieren, gana el código y estas capas se ignoran (no
-gastes turnos reconciliándolas).
+**No reconcilies basura.** Las capas scratch/legacy de este repo están listadas abajo, en
+`## Capas NO autoritativas`. Para "¿qué existe / cuántos / a qué nivel HOY?" la respuesta sale
+**del código**; si difieren, gana el código y esas capas se ignoran (no gastes turnos
+reconciliándolas).
 
 ## 2. Mientras trabajás — mantené el contexto vivo (el trato)
 

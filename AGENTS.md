@@ -20,7 +20,8 @@ ingeniería de contexto (OKF) en *otros* repos. Es el **toolsmith**, no un repo 
 - **La plomería del init/upgrade vive en `scripts/okf_install.py`, no en prosa.** Es la fuente
   única del procedimiento **mecánico**; `okf-init` y `reference/upgrading.md` **delegan** y no
   lo re-statean (el gate lo verifica). Lo que requiere **criterio** —sembrar conceptos,
-  completar `{{placeholders}}`, mergear el `AGENTS.md` al actualizar— se queda en el agente.
+  completar `{{placeholders}}`— se queda en el agente. (El merge del `AGENTS.md` al
+  actualizar ya es mecánico: [0024](knowledge/decisions/0024-el-contrato-se-actualiza-por-secciones.md).)
 - **`VERSION` es la fuente de verdad de la versión.** Los templates usan `{{KIT_VERSION}}`; el
   dogfood `knowledge/index.md` debe estampar el mismo valor (el selfcheck lo exige).
 - **Cada fix se testea adversarialmente antes de darlo por hecho** — la lección de esta historia:
