@@ -189,7 +189,7 @@ si decimos explícitamente que condensamos 0.1.
 
 # Fase 4 — que exista para alguien que no nos conoce
 
-## [ ] 4.1 · Paridad del `README.en.md`
+## [x] 4.1 · Paridad del `README.en.md`
 **Evidencia:** el 100% de ese mercado escribe en inglés y el README inglés es **42% más
 corto** que el castellano: al anglohablante le damos la versión degradada. Los disparadores
 ya son bilingües (fase 0); falta la puerta.

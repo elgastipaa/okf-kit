@@ -1,21 +1,42 @@
-# OKF kit — durable context engineering for any repo
+# okf-kit — so the AI stops forgetting your project
 
-> **Note on language.** The full documentation of this kit is in **Spanish**
-> (`README.md`, `GUIDE.md`, `OKF-SPEC.md`, `reference/`, `templates/`). This page is the
-> English entry point: what the kit is, how to install it, and where to look next. Any
-> coding agent can translate the rest on demand — and if you point one at `GUIDE.md`, it
-> will follow the procedure regardless of the prose language.
+> **Note on language.** The kit's full documentation is in **Spanish** (`GUIDE.md`,
+> `OKF-SPEC.md`, `reference/`, `templates/`). This page is the English entry point and
+> covers everything you need to decide and to install. Point any coding agent at `GUIDE.md`
+> and it will follow the procedure regardless of the prose language.
 
-**The problem.** You build a project by talking to AI. The reasoning lives in a chat that
-expires. Next session — new machine, new tool, new model — you explain everything again.
+**The problem.** You've been building with an AI for months. Every session starts by
+explaining the project again; the decisions you made together — why that database, why that
+weird hack must not be touched — live in chats that are long gone. And the day the agent
+breaks something, there's nowhere to look up why it was that way.
 
-**The kit.** A **guide + template library + tooling** that installs a durable context
-system into *any* repo, using the **Open Knowledge Format (OKF)**: plain markdown with YAML
-frontmatter, versioned in git. No external service, no SDK, no cloud, no `pip install`.
-If you can `cat` a file you can read it; if you can `git clone`, you can take it with you.
+**What this kit does.** It leaves the context the AI needs in your repo, in markdown and
+git: the **why** behind decisions (`decisions/`), a map of the present you can walk in
+seconds, and the work in flight. No apps, no services, no `pip install`. Any AI reads it, on
+any machine, without you explaining it.
 
-Works for **code**, **data/analytics** and **wiki/knowledge-base** repos. What changes
-between domains is the folder layout and the `type:` vocabulary — picked with a *profile*.
+**What you won't find elsewhere: the kit measures itself.** It ships a harness
+([`templates/eval/`](templates/eval/)) that runs real questions against your repo, with and
+without the context layer, and tells you in turns and tokens whether it's actually helping.
+This matters: the [largest study on context files](https://arxiv.org/abs/2602.11988)
+(SRI Lab, ETH Zürich, 2026) measured that in general they **don't improve accuracy and cost
+>20% more** — and that the only thing that did pay off (+4%) is what a human knows and the
+code cannot say: decisions, constraints you can't see by reading, non-obvious test
+configuration. That's exactly what this kit helps you write, and the harness is there so you
+don't have to take my word for it.
+
+**We publish the measurement even when it's bad.** The first defensible run on a real repo
+found the layer cost accuracy, and it's written down in the repo. A kit that only publishes
+its wins isn't measuring — it's advertising.
+
+> **Self-contained**: markdown + git, no service, SDK or cloud. If you can `cat` a file you
+> can read it; if you can `git clone`, you can take it with you.
+
+**No external apps.** No Obsidian, Notion, MkDocs or graph viewer: it's markdown + git. A
+human reads it on GitHub; an agent reads it as files. **There's nothing to adopt in order to
+*use* the bundle.** The kit also ships optional tooling so the context doesn't rot on its own
+— a linter, a drift ranker, a fresh-context reviewer — but that's plumbing: it's not the
+reason this works, and it works without them.
 
 ---
 
@@ -88,7 +109,7 @@ Useful, but not portable and not in the repo. The source of truth must be the bu
 
 ## Why this design holds up
 
-- **Never lost** → it's in git: versioned, diffable, with a `log.md` history.
+- **Never lost** → it's in git: versioned, diffable, with the history git already gives you.
 - **Any time** → it's state on disk, with no backend or session behind it.
 - **Any AI** → markdown + `AGENTS.md` is as close to a cross-vendor standard as exists.
 - **Anywhere** → `git clone` and the whole context follows you.
@@ -104,7 +125,7 @@ Useful, but not portable and not in the repo. The source of truth must be the bu
 | File | What for |
 |---|---|
 | **`GUIDE.md`** | The executable procedure an agent follows to install OKF in a repo. |
-| **`OKF-SPEC.md`** | The format specification (normative rules), condensed and self-contained. |
+| `OKF-SPEC.md` | The format spec, for anyone implementing it or writing tooling. **As a user you don't need it**: what you get is a folder of markdown with frontmatter. |
 | `reference/profiles.md` | Folder layout and `type:` per domain — the core of the universality. |
 | `reference/verification.md` | How to **test** a bundle: conformance, quality, the cold-behavior test, and the compliance audit. |
 | `reference/upgrading.md` | Moving a repo that already has OKF to the current kit revision. |
