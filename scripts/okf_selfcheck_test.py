@@ -83,10 +83,13 @@ def _(d):
 
 
 # ---- procedimientos: un paso borrado tiene que notarse aunque el token viva en otra sección
-@case("el keep-alive pierde el paso de log.md", True)
+@case("el keep-alive pierde el paso de indexar el concepto", True)
 def _(d):
+    # Antes este caso apuntaba al paso de `log.md`; desde la 0.7.6 log.md es opt-in y salió
+    # del keep-alive, así que el caso se reapuntó a un paso que SIGUE siendo obligatorio.
+    # Un caso que prueba algo que ya no es regla no prueba nada.
     edit(d, "templates/skills/okf-update/SKILL.md",
-         "5. **Si mantenés `log.md`**", "5. **Paso removido**")
+         "4. **Actualizá el `index.md`**", "4. **Paso removido**")
 
 
 # ---- la rama normativa: presencia de tokens ≠ afirmar la regla
@@ -357,6 +360,11 @@ def _(d):
     # lente C con un archivo más, no con un archivo menos.
     edit(d, "templates/AGENTS.md", "**Si tocaste código:** corré los chequeos de",
          "**Nota:** existe un archivo de chequeos en")
+
+
+@case("log.md vuelve a sembrarse siempre", True)
+def _(d):
+    edit(d, "scripts/okf_install.py", "    if args.with_log:", "    if True:")
 
 
 @case("una description de skill se infla y nadie la mide", True)

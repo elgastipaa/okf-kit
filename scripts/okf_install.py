@@ -415,7 +415,11 @@ def install_fresh(plan: Plan, target: Path, args, version: str) -> None:
     plan.write(target / "knowledge" / "index.md",
                build_index(version, args.minimal, args.name,
                            (_m.group(1).strip().strip('"') if _m else "")))
-    plan.write(target / "knowledge" / "log.md", build_log(version))
+    # `log.md` es opt-in desde la 0.7.6: 0 citas en 61 corridas medidas contra 13 ediciones
+    # en la historia del propio kit. El log real es `git log` + `decisions/`, y el contrato ya
+    # lo trataba como opcional mientras el instalador lo ponía siempre.
+    if args.with_log:
+        plan.write(target / "knowledge" / "log.md", build_log(version))
     if not args.minimal:
         plan.write(target / "knowledge" / "roadmap.md", roadmap)
         # `_changes/` la ignora el linter; el `.gitkeep` la hace sobrevivir un clone.
@@ -553,7 +557,8 @@ def lint(target: Path) -> tuple[int, str]:
 def pending_placeholders(target: Path) -> list[str]:
     """Los `{{...}}` que quedaron: es exactamente el trabajo de criterio que falta."""
     out = []
-    for rel in ("AGENTS.md", "knowledge/index.md", "knowledge/log.md", "knowledge/roadmap.md"):
+    for rel in ("AGENTS.md", "knowledge/index.md", "knowledge/checks.md",
+                "knowledge/log.md", "knowledge/roadmap.md"):
         p = target / rel
         if p.is_file() and "{{" in p.read_text(encoding="utf-8", errors="replace"):
             out.append(rel)
@@ -579,6 +584,8 @@ def main(argv: list[str]) -> int:
                     help="reemplazar solo la maquinaria (no toca AGENTS.md ni el bundle)")
     ap.add_argument("--force", action="store_true",
                     help="reemplazar un AGENTS.md/CLAUDE.md escrito a mano (commiteá antes)")
+    ap.add_argument("--with-log", action="store_true",
+                    help="sembrar knowledge/log.md (opt-in: 0 citas medidas en 61 corridas)")
     ap.add_argument("--dry-run", action="store_true", help="mostrar el plan, no escribir nada")
     args = ap.parse_args(argv[1:])
 

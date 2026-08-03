@@ -223,7 +223,9 @@ check(_stamped == ver and bool(ver),
 # Los tokens tienen que estar en los PASOS del procedimiento, no sueltos en cualquier
 # párrafo (borrar el paso de `log.md` pasaba desapercibido porque `log.md` aparecía en
 # otra sección del mismo archivo).
-KEEPALIVE_TOKENS = ["index.md", "log.md", "{type}", "frontmatter"]
+# `log.md` sale de acá en la 0.7.6: pasó a opt-in (0 citas en 61 corridas medidas). El
+# keep-alive obligatorio es sembrar el concepto, indexarlo y que tenga frontmatter.
+KEEPALIVE_TOKENS = ["index.md", "{type}", "frontmatter"]
 for rel in ["templates/AGENTS.md", "templates/skills/okf-update/SKILL.md"]:
     txt = read_required(rel)
     steps = numbered_steps(strip_comments(txt)) if txt is not None else ""
@@ -453,6 +455,13 @@ if (KIT / _INSTALLER).is_file():
             # SIEMPRE — incluida la instalación mínima, que es la del perfil "andá directo
             # al código". Que exista en completa y falte en mínima sería el bug de la lente C
             # otra vez, así que se mide en las dos.
+            # `log.md` es opt-in desde la 0.7.6 (0 citas en 61 corridas medidas). Que no se
+            # siembre por default es la mitad; que `--with-log` lo siga sembrando es la otra,
+            # y sin ella "opt-in" sería "borrado".
+            check(not (_dst / "knowledge" / "log.md").is_file(),
+                  f"la instalación {_mode} NO siembra log.md (es opt-in)",
+                  "vuelve a costarle una escritura por concepto a alguien que nunca lo lee")
+
             _chk = _dst / "knowledge" / "checks.md"
             check(_chk.is_file(),
                   f"la instalación {_mode} siembra knowledge/checks.md",
