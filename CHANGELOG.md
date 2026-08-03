@@ -10,6 +10,65 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.7.6 — El kit adelgaza, se mide de verdad y deja de venderse por lo que no importa
+
+Ejecución de las fases 0 a 4 del plan que salió de analizar seis herramientas del ecosistema
+(OpenSpec, rulebook-ai, context-engineering-intro, mattpocock/skills, speccy,
+awesome-vibe-coding). Detalle en [`knowledge/references/ecosistema-2026.md`](knowledge/references/ecosistema-2026.md).
+
+### Agregado — `knowledge/checks.md`: el bundle contesta "¿cómo sé que esto anda?"
+El kit gobernaba todo el ciclo de un cambio **excepto el código**: "verificar" significaba
+pasar el linter del bundle, y la única línea que pedía probar el código vivía en la capa
+opcional — o sea que `--minimal` la borraba, justo para el perfil que dice *"andá directo al
+código"*. Ahora se siembra **siempre**, el contrato manda a correrlo y el harvest exige **el
+comando con su salida**. Acepta *"este repo no tiene chequeos automáticos"* como respuesta
+válida: un archivo que obliga a inventar comandos es peor que no tenerlo.
+
+### Arreglado — subárboles invisibles y maquinaria pisada sin mirar
+- **El linter no veía subárboles inalcanzables.** Los chequeos eran *locales* (cada carpeta
+  contra su índice) y nunca transitivos: una sola carpeta intermedia sin `index.md` cortaba la
+  cadena y todo lo de abajo quedaba fuera del alcance del agente, con el gate en verde.
+- **`install_machinery` reemplazaba skills, linter y hook incondicionalmente.** Ahora cada
+  archivo instalado lleva un sello con **versión + hash** y se clasifica en cuatro desenlaces
+  ([0025](knowledge/decisions/0025-el-material-instalado-se-sella-con-hash.md)). El hash es lo
+  que distingue *"mi copia vieja"* de *"lo editaste vos"* — OpenSpec sella solo con la versión
+  y por eso pisa en silencio.
+
+### Agregado — `--pack`, y una dependencia de npm menos
+`okf_lint.py --pack` emite el bundle como un solo markdown, **cada archivo una vez** y los
+links entre conceptos como punteros (de `resolve.js` de speccy). Un pack que inline por link
+produce N copias del mismo concepto: fabrica la deriva que el kit combate, adentro del archivo
+que se le da al agente. Repomix queda acotado a empaquetar el *código*.
+
+### Agregado — ids estables de regla y `--skip`
+Las 22 reglas del linter tienen id (`link-absolute`, `unreachable`…), sale entre corchetes en
+cada hallazgo, y se callan con `--skip` sin forkear el kit. Viven en el código y **no** en un
+YAML paralelo: speccy externalizó las suyas y mantiene además una copia para documentarlas,
+que ya divergió. La deriva la causa duplicar, no el formato.
+
+### Cambiado — el kit adelgaza
+- **`log.md` pasa a opt-in** (`--with-log`): **0 citas en 61 corridas medidas** contra 13
+  ediciones en la historia del propio kit. El log real es `git log` + `decisions/`.
+- **`okf-migrate` pasa al frente.** Sobre 131 entradas del mercado analizado ninguna hace lo
+  que hace OKF, y el mercado ya eligió AGENTS.md por default. La ventana real no es "montá
+  contexto de cero" sino *"mi AGENTS.md se convirtió en un despelote"*: **migrate es el
+  producto, init el accesorio**.
+- **El linter, los 4 niveles y `OKF-SPEC.md` dejan de ser argumento de venta.** Se mantiene el
+  mecanismo; el usuario no necesita aprender la sigla "OKF" para usar el kit.
+
+### Arreglado — el gate medía el 80% de lo que el agente paga
+El presupuesto contaba **solo** `templates/AGENTS.md`, y el always-on real son tres cosas:
+contrato 6.912 + shim 11 + descripciones de los skills 1.406 = **8.329 chars ≈ 2.082 tokens
+por turno**. Las descripciones son el 17% y crecían sin que nadie las mirara porque no
+estaban en ningún assert.
+
+### Otros
+Disparadores de los skills **en inglés** (el 100% de ese mercado escribe en inglés y nadie que
+tipeara *"the AI keeps forgetting my project"* disparaba nada), paridad del `README.en.md`, y
+`CONTRIBUTING.md`.
+
+Gate: 113 → **124 asserts**, 58 → **63 roturas** del gate, 20 → **26** del linter.
+
 ## 0.7.5 — El contrato deja de estar congelado en la versión que lo instaló
 
 ### Arreglado — ninguna mejora del contrato llegaba a un repo ya instalado (BLOCKER)
