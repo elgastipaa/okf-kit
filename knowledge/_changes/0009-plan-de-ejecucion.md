@@ -66,7 +66,7 @@ cambios de comportamiento en el instalador — es posicionamiento.
 
 **Riesgo:** bajo. **Gate:** el de siempre; `reference/*` sigue resolviendo.
 
-## [ ] 1.2 · `--pack`: empaquetar el bundle sin depender de Repomix
+## [x] 1.2 · `--pack`: empaquetar el bundle sin depender de Repomix
 **De dónde sale:** `resolve.js` de speccy. La decisión clave que copiamos es **externos se
 inlinean, internos quedan como punteros**: un pack que inline todo copia el mismo concepto N
 veces y fabrica la deriva que el kit combate.

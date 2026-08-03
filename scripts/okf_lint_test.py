@@ -26,15 +26,16 @@ from pathlib import Path
 
 KIT = Path(__file__).resolve().parents[1]
 LINT = KIT / "templates" / "scripts" / "okf_lint.py"
-CASES: list[tuple[str, str | None, object, tuple[str, ...]]] = []
+CASES: list[tuple[str, str | None, object, tuple[str, ...], bool]] = []
 
 
-def case(name: str, expect: str | None, extra: list[str] | None = None):
+def case(name: str, expect: str | None, extra: list[str] | None = None,
+         pack_unique: bool = False):
     """expect = substring que el reporte DEBE contener; None = no debe reportar nada.
 
     `extra` = flags adicionales del linter para ese caso (p.ej. `--skip`)."""
     def deco(fn):
-        CASES.append((name, expect, fn, tuple(extra or ())))
+        CASES.append((name, expect, fn, tuple(extra or ()), pack_unique))
         return fn
     return deco
 
@@ -202,6 +203,15 @@ def _(d):
     edit(d, "index.md", "](decisions/index.md)", "](/decisions/index.md)")
 
 
+# ---- --pack: empaquetar el bundle sin duplicar
+@case("--pack no repite un archivo aunque lo linkeen dos veces", None, pack_unique=True)
+def _(d):
+    # El cross-link extra hace que el concepto sea alcanzable por dos caminos. Un pack que
+    # inline por link lo copiaria dos veces — la deriva adentro del propio pack.
+    edit(d, "index.md", "# Subdirectories",
+         "Ver tambien [una decision](decisions/0001-relative-links-over-absolute.md).\n\n# Subdirectories")
+
+
 def main() -> int:
     if not LINT.is_file():
         print(f"okf_lint_test: no encontré {LINT}", file=sys.stderr)
@@ -210,7 +220,7 @@ def main() -> int:
     print(f"{'caso':<62} {'espera':<8} {'real':<8} veredicto")
     bad = 0
     try:
-        for name, expect, fn, extra in CASES:
+        for name, expect, fn, extra, pack_unique in CASES:
             # Se copia el KIT entero, no solo `knowledge/`: el dogfood linkea archivos de
             # afuera del bundle (`../../OKF-SPEC.md`) y en una copia aislada serían links
             # rotos — un falso positivo del harness que enmascararía los casos limpios.
@@ -222,6 +232,15 @@ def main() -> int:
             except AssertionError as e:
                 print(f"{name:<62} {'—':<8} {'—':<8} SETUP ROTO: {e}")
                 bad += 1
+                continue
+            if pack_unique:
+                rp = subprocess.run([sys.executable, str(LINT), str(d), "--pack"],
+                                    capture_output=True, text=True)
+                heads = [l for l in rp.stdout.splitlines() if l.startswith("## `")]
+                ok = len(heads) == len(set(heads))
+                print(f"{name:<62} {'limpio':<8} {'limpio' if ok else 'duplica':<8} "
+                      f"{'ok' if ok else '<<< MAL'}")
+                bad += not ok
                 continue
             r = subprocess.run([sys.executable, str(LINT), str(d), "--strict", *extra],
                                capture_output=True, text=True)

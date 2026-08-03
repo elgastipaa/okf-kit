@@ -6,7 +6,11 @@ funciona 100% sin ellas (caminando archivos a mano y con el linter para lo estru
 
 ---
 
-## Repomix — empaquetar un repo para LLMs
+## Repomix — empaquetar un repo de código para LLMs
+
+> **Para empaquetar o medir el BUNDLE ya no hace falta**: eso lo hace
+> `okf_lint.py --pack`, que viene con el kit y no necesita Node (ver Uso 2). Repomix sigue
+> siendo útil para lo que el kit no puede hacer: empaquetar **el código** del repo.
 
 [Repomix](https://github.com/yamadashy/repomix) empaqueta un repo (o una carpeta) en
 **un solo archivo AI-friendly**, con **conteo de tokens** y compresión opcional. Corre
@@ -31,27 +35,26 @@ mantiene incremental con `okf-update`, sin volver a empaquetar. Respeta `.gitign
 excluye secretos automáticamente. Útil también para `okf-migrate` (inventariar contexto
 disperso rápido).
 
-### Uso 2 — Medir el tamaño del bundle (token-sizer)
+### Uso 2 — Medir o empaquetar el BUNDLE: ya no hace falta Repomix
 
-El linter valida estructura, no tamaño. Para detectar objetivamente un `index.md` o un
-concepto **demasiado grande** (smell de Nivel 2 en `verification.md`) o decidir **cuándo
-partir** un bundle (`special-cases.md`), medí los tokens:
+**Esto lo hace el propio kit**, sin dependencias de npm:
 
 ```
-npx repomix@latest knowledge/ --style markdown
+python3 scripts/okf_lint.py knowledge --pack
 ```
 
-Repomix imprime un **resumen** (archivos, caracteres, **tokens totales** y los archivos
-más pesados por tokens). Para sizing, el agente solo necesita ese resumen impreso, no el
-archivo empaquetado entero → barato. Para medir solo los índices (la preocupación central
-del progressive disclosure):
+Emite el bundle entero como **un solo markdown** (a stdout) y reporta por stderr cuántos
+archivos, caracteres y tokens aproximados tiene. Sirve para las dos cosas: dárselo a una IA
+de una sentada, y medir si un `index.md` o un concepto se está yendo de tamaño (smell de
+Nivel 2 en `verification.md`, o decidir cuándo partir un bundle según `special-cases.md`).
 
-```
-npx repomix@latest knowledge/ --include "**/index.md"
-```
+Dos propiedades que un `cat *.md` no te da:
 
-Señal práctica: si un `index.md` pesa desproporcionadamente respecto al resto, agrupá en
-subcarpetas; si un concepto domina el conteo, partilo en conceptos enlazados.
+- **Cada archivo aparece UNA sola vez** y los links entre conceptos quedan como punteros. Un
+  pack que inline cada link produce N copias del mismo concepto: fabrica la deriva que el kit
+  existe para evitar, adentro del archivo que le das al agente.
+- **El orden es el de navegación** desde `index.md`, y lo que no se alcanza desde la raíz sale
+  al final y **señalado**. Si lo mezclara, taparía el problema que el linter reporta.
 
 ### Notas
 

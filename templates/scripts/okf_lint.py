@@ -455,6 +455,76 @@ class Linter:
         return 0
 
 
+def pack(bundle: Path) -> int:
+    """Emite el bundle entero como UN markdown, cada archivo una sola vez.
+
+    Sirve para dárselo a una IA de una sentada (o para medir su tamaño) sin depender de una
+    herramienta externa de npm.
+
+    La decisión que hace que esto no sea un `cat *.md` es de `resolve.js` de speccy:
+    **cada archivo se inlinea UNA vez y los links entre ellos quedan como punteros**. Un pack
+    que inline cada link produce N copias del mismo concepto — o sea, fabrica la deriva que
+    el kit existe para evitar, dentro del propio archivo que se le da al agente.
+
+    El recorrido es el mismo BFS de alcanzabilidad, así que el orden del pack es el orden en
+    que se navega desde la raíz, y lo inalcanzable queda al final y **señalado**: si el pack
+    lo mostrara mezclado, taparía el problema que el linter reporta.
+    """
+    # Todo resuelto desde el arranque: el BFS compara rutas absolutas y `_ignored` hace
+    # `relative_to`, así que mezclar relativas con absolutas revienta.
+    bundle = bundle.resolve()
+    root = bundle / "index.md"
+    if not root.is_file():
+        print(f"okf_lint: {bundle}/index.md no existe — sin raíz no hay orden de navegación",
+              file=sys.stderr)
+        return 2
+    lint = Linter(bundle)
+    order: list[Path] = []
+    seen: set[Path] = set()
+    queue = [root.resolve()]
+    while queue:
+        cur = queue.pop(0)                       # FIFO: el orden de lectura, no el de pila
+        if cur in seen or not cur.is_file() or cur.suffix != ".md":
+            continue
+        try:
+            cur.relative_to(bundle)
+        except ValueError:
+            continue                             # nunca sale del bundle
+        if lint._ignored(cur):
+            continue
+        seen.add(cur); order.append(cur)
+        for m in LINK_RE.finditer(strip_code(cur.read_text(encoding="utf-8", errors="replace"))):
+            tgt = m.group(1).strip().split("#", 1)[0]
+            if not tgt or tgt.startswith(URL_PREFIXES) or tgt.startswith("/"):
+                continue
+            dest = (cur.parent / tgt).resolve()
+            queue.append(dest / "index.md" if dest.is_dir() else dest)
+
+    rest = [p for p in sorted(bundle.rglob("*.md"))
+            if not lint._ignored(p) and p.resolve() not in seen]
+    # `log.md` y compañía NO se linkean desde el índice por diseño: marcarlos como
+    # inalcanzables sería una falsa alarma que hace creer que el bundle está roto.
+    extra = [p for p in rest if p.name in RESERVED]
+    unreachable = [p for p in rest if p.name not in RESERVED]
+    out = [f"# Bundle empaquetado: {bundle.name}\n",
+           f"_{len(order)} archivos alcanzables desde index.md" +
+           (f", {len(unreachable)} INALCANZABLES" if unreachable else "") + "._\n"]
+    for group, files in (("", order), ("Archivos reservados (no se linkean por diseño)", extra),
+                         ("INALCANZABLES desde index.md — el agente no llega a esto", unreachable)):
+        if not files:
+            continue
+        if group:
+            out.append(f"\n---\n\n# {group}\n")
+        for f in files:
+            out.append(f"\n---\n\n## `{f.relative_to(bundle).as_posix()}`\n")
+            out.append(f.read_text(encoding="utf-8", errors="replace").rstrip() + "\n")
+    text = "".join(out)
+    print(text)
+    print(f"okf_lint --pack: {len(order) + len(rest)} archivos, {len(text)} chars "
+          f"(~{len(text) // 4} tokens)", file=sys.stderr)
+    return 0
+
+
 def main(argv: list[str]) -> int:
     args = [a for a in argv[1:]]
     strict = "--strict" in args
@@ -475,7 +545,12 @@ def main(argv: list[str]) -> int:
                 return 2
             skip += tuple(x.strip() for x in args[i + 1].split(",") if x.strip())
             del args[i:i + 2]
+    do_pack = "--pack" in args
+    if do_pack:
+        args.remove("--pack")
     bundle = Path(args[0]) if args else Path("knowledge")
+    if do_pack:
+        return pack(bundle)
     return Linter(bundle, strict=strict, skip=skip).run()
 
 
