@@ -52,7 +52,7 @@ Está terminado salvo el inventario de retirados, que se saltó a propósito. Co
 decisiones al bundle, `log.md`, roadmap, y borrar `0008-*.md`. **Hacelo primero**: el repo
 tiene la regla de ≤1 cambio activo y ahora hay dos.
 
-## [ ] 1.1 · `okf-migrate` pasa al frente
+## [x] 1.1 · `okf-migrate` pasa al frente
 **De dónde sale:** el análisis de mercado. Sobre 131 entradas de `awesome-vibe-coding`,
 ninguna hace lo que hace OKF, y el mercado ya eligió AGENTS.md por default (60k repos, Linux
 Foundation, *"usá los títulos que quieras"*). La ventana real no es "montá contexto de cero"

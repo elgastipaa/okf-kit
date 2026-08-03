@@ -53,13 +53,20 @@ sin `pip install`**. No hay nada que adoptar para *usar* el bundle.
 /plugin install okf@okf-kit
 ```
 
-Eso te deja **`/okf:okf-init`** (repo limpio) y **`/okf:okf-migrate`** (repo con docs/ADRs
-dispersos) — los comandos de un plugin llevan el prefijo del plugin. Igual no hace falta que
-los tipees: alcanza con describir el síntoma en tu idioma (*"cada sesión le tengo que
-explicar el proyecto de nuevo"*, *"tengo la documentación toda desparramada"*) y el skill
-correcto se dispara solo.
+Eso te deja dos caminos, y **el que probablemente necesitás es el segundo**:
 
-**Sin plugin, o con cualquier otra IA** — clonalo y corré el instalador:
+- **`/okf:okf-migrate`** — *"mi `AGENTS.md` es un despelote"*, *"tengo docs por todos lados y
+  no sé cuáles siguen vigentes"*. **Este es el caso normal**: un repo que ya viene
+  conversando con una IA y acumuló contexto disperso. Consolida lo que ya tenés —separando lo
+  vigente de lo que el código dejó atrás— en vez de agregar una capa más encima.
+- **`/okf:okf-init`** — un repo **sin** contexto previo. Es el caso menos común.
+
+Los comandos de un plugin llevan su prefijo. Igual no hace falta que los tipees: alcanza con
+describir el síntoma en tu idioma y el skill correcto se dispara solo.
+
+**Sin plugin, o con cualquier otra IA** — clonalo y usalo desde ahí. Si el repo ya tiene
+contexto disperso, el camino es `okf-migrate` (el instalador **aborta** ante un `AGENTS.md`
+escrito a mano, justamente para no pisártelo). Si está limpio:
 
 ```bash
 git clone https://github.com/elgastipaa/okf-kit

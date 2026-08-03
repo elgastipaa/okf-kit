@@ -28,10 +28,17 @@ between domains is the folder layout and the `type:` vocabulary — picked with 
 /plugin install okf@okf-kit
 ```
 
-That gives you **`/okf:okf-init`** (bootstrap a clean repo) and **`/okf:okf-migrate`**
-(consolidate a repo that already has scattered docs, ADRs and `AGENTS.md` files) — plugin
-commands carry the plugin's prefix. You don't have to type them, though: describing the
-symptom in your own words is enough to trigger the right skill. Then just say:
+That gives you two paths, and **the one you probably need is the second**:
+
+- **`/okf:okf-migrate`** — *"my `AGENTS.md` is a mess"*, *"I have docs everywhere and I don't
+  know which ones are still true"*. **This is the normal case**: a repo that's been built
+  with an AI and accumulated scattered context. It consolidates what you already have —
+  separating what's still true from what the code left behind — instead of piling one more
+  layer on top.
+- **`/okf:okf-init`** — a repo with **no** prior context. The less common case.
+
+Plugin commands carry the plugin's prefix. You don't have to type them, though: describing
+the symptom in your own words is enough to trigger the right skill. Then just say:
 
 ```
 Set up OKF context in this repo.

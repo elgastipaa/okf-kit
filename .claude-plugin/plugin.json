@@ -17,7 +17,7 @@
     "spec-driven"
   ],
   "skills": [
-    "./templates/skills/okf-init",
-    "./templates/skills/okf-migrate"
+    "./templates/skills/okf-migrate",
+    "./templates/skills/okf-init"
   ]
 }
