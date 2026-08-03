@@ -37,20 +37,6 @@ git, sin apps externas.
 
 **Lo que dejaron las cuatro lentes sobre v0.7.3, gateado por el instrumento.**
 
-- **Los bugs del camino libre** (no necesitan medición, son bugs): `okf-migrate` es un
-  callejón sin salida —el repo con `AGENTS.md`/`CLAUDE.md` propio es ruteado ahí y queda sin
-  linter, hook, CI ni ruta de upgrade—; los disparadores de `okf-init`/`okf-migrate` exigen
-  conocer el kit ("OKF" en las dos frases) en vez de nombrar el síntoma; el README promete
-  `/okf-init` cuando el plugin expone `/okf:okf-init`; "todo se revierte con `git checkout`"
-  es falso (lo que instala es untracked, y el hook va a `.git/hooks/`); y `okf_install.py:250`
-  copia el `CLAUDE.md` crudo, con su comentario `<!-- TEMPLATE … -->` adentro.
-- **Nada verifica que el código ande.** "Verificar", en el contrato instalado, es pasar el
-  linter del bundle: hook, CI y los cuatro niveles apuntan todos ahí. Y la única línea que
-  pide probar el código vive en la capa opcional, así que `--minimal` la borra — justo para
-  el perfil que dice "andá directo al código". Propuesta de la lente C: sembrar siempre
-  `knowledge/runbooks/checks.md` ("este repo no tiene chequeos" también es información) y una
-  frase en el contrato. Converge con el paper de ETH: las *non-obvious test configurations*
-  son de lo poco que mide como ganancia real.
 - **La dieta del contrato.** El always-on real son 8.382 chars y el presupuesto mide 6.684
   (un archivo de tres: falta el `CLAUDE.md` y las descripciones de los skills). §2
   —mantenimiento— es el 24% y no paga nada en turnos de lectura. Tensiona con la

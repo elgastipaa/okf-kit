@@ -1,6 +1,7 @@
 # Update Log
 
 ## 2026-08-03
+* **Update**: cosechado el cambio 0008 (fase 0 del plan del ecosistema). Decisión [0025](decisions/0025-el-material-instalado-se-sella-con-hash.md) — el material instalado se sella con **versión + hash**, que es lo único que distingue "mi copia vieja" de "lo editaste vos"; OpenSpec sella solo con versión y por eso pisa en silencio. Y [references/ecosistema-2026.md](references/ecosistema-2026.md), para no volver a investigar los seis repos ni reintroducir por intuición lo que ya vimos fallar (marcadores en el archivo del usuario: OpenSpec los abandonó).
 * **Update**: v0.7.5 — **el contrato deja de estar congelado en la versión que lo instaló** ([0024](decisions/0024-el-contrato-se-actualiza-por-secciones.md)). `--upgrade` actualizaba scripts, skills, CI y sello pero NO el `AGENTS.md`, así que ninguna mejora del contrato llegaba jamás a un repo instalado. Al automatizarlo apareció la causa real: el contrato era inactualizable **por su forma** — las capas no autoritativas vivían dentro de §1, con el texto del usuario y el del kit entrelazados en el mismo párrafo. Ahora cada uno tiene sus secciones y el instalador reemplaza solo las suyas; ante cualquier forma inesperada se planta y avisa en vez de adivinar.
 
 ## 2026-08-02

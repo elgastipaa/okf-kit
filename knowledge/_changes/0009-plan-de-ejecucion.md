@@ -47,7 +47,7 @@ nueva volvería a discutir el orden.
 
 # Fase 1 — el producto (lo que el mercado pide)
 
-## [ ] 1.0 · Cosechar el cambio 0008 (fase 0)
+## [x] 1.0 · Cosechar el cambio 0008 (fase 0)
 Está terminado salvo el inventario de retirados, que se saltó a propósito. Cosechalo:
 decisiones al bundle, `log.md`, roadmap, y borrar `0008-*.md`. **Hacelo primero**: el repo
 tiene la regla de ≤1 cambio activo y ahora hay dos.
