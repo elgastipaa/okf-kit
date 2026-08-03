@@ -16,6 +16,11 @@ git, sin apps externas.
 
 # Ahora (en curso)
 
+- **[Cola de ejecución de las fases 1 a 4](_changes/0009-plan-de-ejecucion.md)** — el plan que
+  salió del análisis de seis herramientas del ecosistema, escrito para ejecutarse de a un ítem
+  por iteración. Marca qué puede hacerse solo, qué cuesta plata (💰) y qué necesita una
+  decisión del usuario (🙋).
+
 - **La regresión de acierto sigue abierta.** La medición dio **4 fallos contra 0** de no tener
   capa. El primer intento de fix (la 0022: obligar a verificar en la fuente) **se midió y se
   revirtió** — +28% de turnos sin alcanzar el acierto que su propio gate exigía
