@@ -116,6 +116,10 @@ Su reporte final lista los archivos con `{{placeholders}}`. Los que importan:
 - **`AGENTS.md`**: el nombre y el stack en una o dos frases, las **reglas duras** del proyecto
   (linkeando al concepto que explica cada una) y las **capas NO autoritativas** (dirs scratch,
   legacy, planes viejos que NO son estado; si el repo no tiene ninguna, borrá esa sección).
+- **`knowledge/checks.md`**: los comandos que prueban que el código anda, sacados del
+  `package.json`/`Makefile`/CI — **no los inventes**. Si el repo no tiene ninguno,
+  escribí eso tal cual: "este repo no tiene chequeos automáticos" es información y hoy
+  es invisible. Es el único concepto que contesta *"¿cómo sé que esto anda?"*.
 - **`knowledge/index.md`**: la `description` del roadmap y una línea por carpeta sembrada.
 - **`knowledge/log.md`**: qué conceptos sembraste en este primer pase.
 

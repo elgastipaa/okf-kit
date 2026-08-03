@@ -79,6 +79,19 @@ primero que hay que traducir.
   sus reglas para documentarlas y ya divergió. Por eso los ids van en el código, no en un YAML
   paralelo.
 
+## Fase 1 arrancada: `knowledge/checks.md`
+
+Sembrado **siempre** (también en `--minimal`, que era el agujero exacto de la lente C: el
+perfil "andá directo al código" es el que más lo necesita y era el único que se quedaba sin
+la línea que pide probar). El contrato manda a correrlo y el harvest exige **el comando con
+su salida**, no la palabra "probado". Es lo único que
+[arXiv:2602.11988](https://arxiv.org/abs/2602.11988) mide como ganancia real —*non-obvious
+test configurations*— y lo que el kit no hacía.
+
+Detalle de diseño: `checks.md` acepta explícitamente **"este repo no tiene chequeos
+automáticos"** como respuesta válida. Un archivo que obliga a inventar comandos es peor que
+no tenerlo, y saber que no hay red es información que hoy nadie escribe en ningún lado.
+
 # Harvest (al cerrar — NO borres este archivo sin completarlo)
 
 - [ ] Verificado el "Resultado esperado" (probado de verdad, no asumido)

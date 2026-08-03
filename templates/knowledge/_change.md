@@ -57,7 +57,8 @@ y `references/` del bundle — anotalas acá en el momento para no perderlas.}}
 
 # Harvest (al cerrar — NO borres este archivo sin completarlo)
 
-- [ ] Verificado el "Resultado esperado" de arriba (probado de verdad, no asumido)
+- [ ] Verificado el "Resultado esperado" de arriba corriendo los chequeos de
+      `knowledge/checks.md` — **pegá el comando y su salida**, no alcanza con "probado"
 - [ ] Decisiones/descubrimientos de arriba → `knowledge/decisions/` y `references/` (+ sus index)
 - [ ] Conceptos del bundle afectados actualizados (arquitectura / schema / runbooks…)
 - [ ] Si el harvest creó una **carpeta** nueva, sumala al `# Subdirectories` del index raíz

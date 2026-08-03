@@ -344,6 +344,21 @@ def _(d):
 
 
 # ---- el contrato tiene que poder actualizarse sin perder lo del usuario
+# ---- los chequeos del repo: el único concepto que contesta "¿esto anda?"
+@case("la instalación deja de sembrar checks.md", True)
+def _(d):
+    edit(d, "scripts/okf_install.py",
+         '    plan.write(target / "knowledge" / "checks.md", build_checks())', "    pass")
+
+
+@case("el contrato siembra checks.md pero no manda a correrlo", True)
+def _(d):
+    # Un archivo sembrado y no ruteado es un documento que nadie abre: el agujero de la
+    # lente C con un archivo más, no con un archivo menos.
+    edit(d, "templates/AGENTS.md", "**Si tocaste código:** corré los chequeos de",
+         "**Nota:** existe un archivo de chequeos en")
+
+
 @case("--upgrade pisa la maquinaria que el usuario editó", True)
 def _(d):
     # La forma ingenua: reemplazar siempre. Se lleva puestas las ediciones del usuario

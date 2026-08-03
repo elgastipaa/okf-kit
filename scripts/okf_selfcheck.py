@@ -50,8 +50,8 @@ INSTALLED = [
     "templates/CLAUDE.md",
     "templates/agents/okf-reviewer.md",
     *(f"templates/knowledge/{n}.md" for n in (
-        "_change", "_concept", "_decision", "_generated", "_glossary", "_reference",
-        "_roadmap", "_runbook", "index", "log")),
+        "_change", "_checks", "_concept", "_decision", "_generated", "_glossary",
+        "_reference", "_roadmap", "_runbook", "index", "log")),
     *(f"templates/skills/{s}/SKILL.md" for s in ("okf-update", "okf-verify", "okf-plan")),
 ]
 
@@ -139,6 +139,7 @@ _missing = [rel for rel in INSTALLED if not (KIT / rel).is_file()]
 for rel in ("templates/AGENTS.md", "templates/skills/okf-plan/SKILL.md",
             "templates/skills/okf-update/SKILL.md", "templates/skills/okf-verify/SKILL.md",
             "templates/knowledge/_change.md", "templates/knowledge/_roadmap.md",
+            "templates/knowledge/_checks.md",
             "reference/verification.md", "OKF-SPEC.md", "GUIDE.md", "VERSION"):
     if not (KIT / rel).is_file():
         _missing.append(rel)
@@ -419,6 +420,16 @@ if (KIT / _INSTALLER).is_file():
                   f"la instalación {_mode} no deja comentarios de template en la cabecera",
                   f"empiezan con un comentario: {', '.join(_headers)}" if _headers else "")
 
+            # Nada del bundle contesta "¿cómo sé que esto anda?" salvo este archivo, y va
+            # SIEMPRE — incluida la instalación mínima, que es la del perfil "andá directo
+            # al código". Que exista en completa y falte en mínima sería el bug de la lente C
+            # otra vez, así que se mide en las dos.
+            _chk = _dst / "knowledge" / "checks.md"
+            check(_chk.is_file(),
+                  f"la instalación {_mode} siembra knowledge/checks.md",
+                  "sin él, 'verificar' significa pasar el linter del bundle y nada pregunta "
+                  "nunca si el código anda")
+
             _idx = (_dst / "knowledge" / "index.md")
             _got = re.search(r'^kit_version:\s*"?([^"\s]+)"?', frontmatter(
                 _idx.read_text(encoding="utf-8") if _idx.is_file() else ""), re.M)
@@ -540,6 +551,28 @@ if (KIT / _INSTALLER).is_file():
         check(_victim.read_text(encoding="utf-8") == _before,
               "okf_install.py --upgrade deja intacto lo que no cambió",
               "reescribió un archivo que no hacía falta tocar")
+
+# El contrato tiene que MANDAR a correr los chequeos: sembrar el archivo y no rutearlo lo
+# vuelve un documento que nadie abre. Se mide sobre el contrato instalado, no sobre el
+# template, porque el recorte de --minimal podría llevárselo.
+_MARKED_BLOCK = re.compile(
+    r"^[ \t]*<!--\s*OKF:future-layer:start\s*-->[ \t]*\n.*?"
+    r"^[ \t]*<!--\s*OKF:future-layer:end\s*-->[ \t]*\n", re.S | re.M)
+
+
+def _installed_contract(minimal: bool) -> str:
+    """El contrato tal como queda instalado, con o sin la capa de futuro."""
+    txt = _MARKED_BLOCK.sub("", _agents_body) if minimal else _agents_body
+    return re.sub(r"^[ \t]*<!--\s*OKF:.*?-->[ \t]*\n", "", txt, flags=re.M)
+
+
+for _mini in (False, True):
+    _c = _installed_contract(_mini)
+    # Se exige el IMPERATIVO, no las palabras sueltas: "existe un archivo de chequeos"
+    # contiene los mismos términos y no manda a nadie a hacer nada.
+    check("checks.md" in _c and near(_c, "checks.md", "corré", "listo"),
+          f"el contrato {'mínimo' if _mini else 'completo'} manda a correr los chequeos del repo",
+          "el archivo se siembra pero nadie lo abre")
 
 # Una verdad, un lugar: si el skill vuelve a describir la plomería en prosa, hay dos
 # fuentes que van a derivar (la regla dura #1 del kit y su causa raíz de bugs).

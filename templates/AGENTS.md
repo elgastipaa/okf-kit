@@ -139,7 +139,10 @@ Si terminaste un cambio de `_changes/`, hacé su **harvest** antes de cerrar (la
 `# Harvest` del propio doc, vía `okf-plan`): decisiones al bundle, roadmap al día, y el doc
 se borra.
 <!-- OKF:future-layer:end -->
-El **pre-commit hook**, si está instalado, lo chequea igual.
+**Si tocaste código:** corré los chequeos de
+[`knowledge/checks.md`](knowledge/checks.md) y **no declares "listo" sin verlos pasar**. Si
+ese archivo dice que el repo no tiene chequeos, decilo vos también en vez de suplirlo con tu
+criterio.
 
 ## Procedimientos
 

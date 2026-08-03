@@ -265,8 +265,15 @@ def build_index(version: str, minimal: bool, name: str | None,
     )
     # Se reconstruyen los dos bloques enteros en vez de parchear líneas: el template
     # los trae con ejemplos, y un parche por línea derivaría al primer cambio de ejemplo.
+    # `checks.md` va SIEMPRE (también en --minimal): su entrada tiene que coincidir
+    # palabra por palabra con su `description`, que el linter cruza.
+    checks_block = (
+        "# Runbook\n\n"
+        "* [Cómo se comprueba que este repo anda](checks.md) - "
+        "Los comandos que prueban que el código funciona, y qué cubre cada uno.\n"
+    )
     head = text.split("# Roadmap", 1)[0].rstrip() + "\n\n"
-    return head + ("" if minimal else roadmap_block + "\n") + subdirs_block
+    return head + ("" if minimal else roadmap_block + "\n") + checks_block + "\n" + subdirs_block
 
 
 def build_log(version: str) -> str:
@@ -289,6 +296,19 @@ def build_roadmap(name: str | None) -> str:
         "- (nada activo)", text, flags=re.M | re.S,
     )
     return text
+
+
+def build_checks() -> str:
+    """`knowledge/checks.md`: los comandos que prueban que el código anda.
+
+    Se siembra SIEMPRE, incluida la instalación mínima. Es el único concepto que contesta
+    "¿cómo sé que lo que escribí funciona?" — el resto del bundle dice qué hay y por qué.
+    Y es lo único que un estudio independiente sobre archivos de contexto midió como
+    ganancia real: la *configuración de tests no obvia* que el código no revela.
+    """
+    text = strip_header_comment(read_template("knowledge/_checks.md"))
+    now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return text.replace("{{YYYY-MM-DDTHH:MM:SSZ}}", now)
 
 
 def agent_target(target: Path, no_claude: bool, agent: str) -> Path:
@@ -400,6 +420,9 @@ def install_fresh(plan: Plan, target: Path, args, version: str) -> None:
         plan.write(target / "knowledge" / "roadmap.md", roadmap)
         # `_changes/` la ignora el linter; el `.gitkeep` la hace sobrevivir un clone.
         plan.write(target / "knowledge" / "_changes" / ".gitkeep", "")
+    # Va SIEMPRE, también en --minimal: el perfil que dice "andá directo al código" es
+    # justo el que más necesita saber con qué se comprueba que el código anda.
+    plan.write(target / "knowledge" / "checks.md", build_checks())
     install_machinery(plan, target, version=version, minimal=args.minimal, no_claude=args.no_claude,
                       want_ci=not args.no_ci, want_hook=not args.no_hook)
 
