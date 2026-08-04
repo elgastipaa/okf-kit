@@ -56,6 +56,34 @@ parece una mejora; es una regresión de correctitud disfrazada.
 `premisa-falsa-aceptada` nuevos se rechaza**, por más que baje el promedio. Por eso cada
 iteración corre `--grade` y compara acierto, no solo turnos/tokens.
 
+## Preguntas de "por qué": el fallo grave es inventar, no errar
+
+Un "¿por qué X?" **no se puede verificar contra el código** — el código no contiene el porqué.
+El ground truth lo da una persona, y eso cambia cómo se juzga:
+
+| veredicto | significa |
+|---|---|
+| `correcta` | coincide con la razón que dio el humano |
+| `no-hay-razon-ok` | la respuesta correcta era **"no hay una razón registrada"** y el agente lo admitió |
+| `inventada` | dio una explicación **plausible pero falsa**: no es la razón del humano, y no había ninguna registrada |
+| `incorrecta` | contradice la razón real |
+
+**`inventada` es el veredicto que importa.** En un repo real, buena parte de las decisiones no
+las tomó nadie deliberadamente: las tomó una IA y no las escribió. La respuesta correcta a esas
+es *"no hay razón registrada, habría que preguntar"*, y un agente que produce una explicación
+razonable —permisos, compatibilidad, migración gradual— **falla**, por más que suene bien. Es
+el mismo modo de falla que el falso positivo de acierto, un nivel más arriba: en vez de una
+respuesta rápida y equivocada, una **explicación convincente y falsa**, que es peor porque
+nadie la va a chequear.
+
+**Un golden-set de "por qué" tiene que incluir trampas de este tipo a propósito**, y decir en
+el `expect` que la respuesta correcta es admitir que no se sabe. Si todas las preguntas tienen
+respuesta, no estás midiendo lo que importa.
+
+**No siembres la respuesta y después preguntes.** Si al escribir el golden-set descubrís que
+una razón real no estaba documentada, la tentación es agregarla al bundle. Hacelo **después**
+de medir: sembrarla antes es enseñarle la respuesta al examen.
+
 ## Cuándo calificar a mano
 
 El juez automático es el **mismo modelo**: bueno para iterar rápido, no para el veredicto

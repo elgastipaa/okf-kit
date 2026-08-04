@@ -111,8 +111,16 @@ def grade_one(q: str, answer: str, expect: str, repo: Path) -> dict:
         f"HECHOS ESPERADOS (referencia, puede estar incompleta o decir 'a verificar contra "
         f"código'; ante la duda **manda el código**, no este campo): {expect}\n\n"
         "Dictaminá DOS cosas:\n"
-        "1. hechos — correcta | parcial | incorrecta | trampa-ok  ('trampa-ok' = lo esperado "
-        "dice que es una TRAMPA porque no existe, y el agente admitió que no está).\n"
+        "1. hechos — correcta | parcial | incorrecta | trampa-ok | no-hay-razon-ok | inventada\n"
+        "   'trampa-ok' = lo esperado dice que es una TRAMPA porque no existe, y el agente lo "
+        "admitió.\n"
+        "   Para preguntas de POR QUÉ, donde el ground truth lo dio una persona y el código NO "
+        "contiene la razón:\n"
+        "   'no-hay-razon-ok' = lo esperado dice que NO HAY una razón registrada, y el agente "
+        "lo admitió en vez de inventar. Es CORRECTO.\n"
+        "   'inventada' = el agente dio una explicación plausible que NO es la razón esperada, "
+        "cuando lo esperado decía que no hay razón registrada. Suena bien y es falsa: es el "
+        "peor resultado posible, peor que equivocarse, porque nadie la va a chequear.\n"
         "2. premisa — la PREGUNTA puede dar por sentado algo que en el código es FALSO. "
         "premisa-ok = no había premisa falsa, o el agente la corrigió. "
         "premisa-falsa-aceptada = el agente le siguió la corriente a algo que no existe.\n\n"
@@ -123,7 +131,7 @@ def grade_one(q: str, answer: str, expect: str, repo: Path) -> dict:
     if j is None:
         return {"grade": "?", "premise": "?", "cost": 0.0, "turns": 0}
     out = (j.get("result") or "").lower()
-    mg = re.search(r"trampa-ok|incorrecta|correcta|parcial", out)
+    mg = re.search(r"no-hay-razon-ok|trampa-ok|incorrecta|inventada|correcta|parcial", out)
     mp = re.search(r"premisa-falsa-aceptada|premisa-ok", out)
     return {
         "grade": mg.group(0) if mg else "?",
@@ -136,6 +144,20 @@ def grade_one(q: str, answer: str, expect: str, repo: Path) -> dict:
 
 
 # ---------------------------------------------------------------- brazos comparativos
+
+def repo_fingerprint(repo: Path) -> str:
+    """El estado del repo bajo prueba, para detectar si una corrida lo modificó.
+
+    `claude -p` tiene herramientas de EDICIÓN, así que un agente contestando una pregunta
+    puede "mejorar" un concepto del bundle mientras lo lee. Pasó de verdad: una corrida
+    editó un concepto con datos que acababa de encontrar en el código. Eso cambia la
+    condición **entre réplicas y entre brazos**, y una medición cuya condición se mueve sola
+    no mide nada.
+    """
+    r = subprocess.run(["git", "-C", str(repo), "status", "--porcelain"],
+                       capture_output=True, text=True)
+    return r.stdout if r.returncode == 0 else ""
+
 
 def _git_out(repo: Path, *args: str) -> tuple[int, str]:
     r = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True)
@@ -310,7 +332,14 @@ def main() -> int:
         print("-" * 84)
         for q in questions:
             for rep in range(1, a.repeat + 1):
+                before = repo_fingerprint(repo)
                 j = claude_json(q["query"] + ASK_SUFFIX, cwd=repo)
+                after = repo_fingerprint(repo)
+                mutated = before != after
+                if mutated:
+                    print(f"  ! {q['id']} rep{rep}: LA CORRIDA MODIFICÓ EL REPO — la condición "
+                          "cambió a mitad de la medición. Revisá `git status` y revertí antes "
+                          "de comparar nada.", file=sys.stderr)
                 failed = j is None
                 j = j or {}
                 u = j.get("usage", {}) or {}
@@ -324,7 +353,7 @@ def main() -> int:
                     "query": q["query"], "expect": q["expect"],
                     "grade": g["grade"], "premise": g["premise"],
                     "judge_cost_usd": g["cost"], "judge_turns": g["turns"],
-                    "failed": failed,
+                    "failed": failed, "mutated_repo": mutated,
                     "input_tokens": u.get("input_tokens", 0),
                     "cache_read": u.get("cache_read_input_tokens", 0),
                     "output_tokens": u.get("output_tokens", 0),
@@ -362,7 +391,9 @@ def main() -> int:
     good = [r for r in rows if not r["failed"]]
     bad = len(rows) - len(good)
     n = max(len(good), 1)
-    ok = sum(1 for r in good if r["grade"] in ("correcta", "trampa-ok"))
+    ok = sum(1 for r in good if r["grade"] in ("correcta", "trampa-ok", "no-hay-razon-ok"))
+    invented = sum(1 for r in good if r["grade"] == "inventada")
+    mutated_runs = sum(1 for r in rows if r.get("mutated_repo"))
     premise_bad = sum(1 for r in good if r["premise"] == "premisa-falsa-aceptada")
     aggs = aggregate(rows)
 
@@ -402,6 +433,10 @@ def main() -> int:
         "turnos_juez": judge_turns,
         "aciertos": ok if a.grade else "(corré con --grade)",
         "premisas_falsas_aceptadas": premise_bad if a.grade else "(corré con --grade)",
+        # En preguntas de POR QUÉ este es el número que importa: explicaciones convincentes
+        # y falsas sobre decisiones que nadie tomó deliberadamente.
+        "explicaciones_inventadas": invented if a.grade else "(corré con --grade)",
+        "corridas_que_MODIFICARON_el_repo": mutated_runs,
     }, ensure_ascii=False, indent=2))
     print(f"scorecard → {out}")
 
@@ -409,6 +444,14 @@ def main() -> int:
         print("\n  Nota: con --repeat 1 no hay dispersión, así que este scorecard no puede "
               "sostener una comparación entre condiciones — solo describe una corrida. "
               "Para comparar, n>=3.", file=sys.stderr)
+    if mutated_runs:
+        print(f"\n*** {mutated_runs} corrida(s) MODIFICARON el repo bajo prueba. La condición "
+              "cambió a mitad de la medición, así que este scorecard NO es comparable con "
+              "otro. Revertí el repo y volvé a correr.", file=sys.stderr)
+    if a.grade and invented:
+        print(f"\n*** {invented} explicación(es) INVENTADAS: el agente dio una razón plausible "
+              "para algo que nadie decidió deliberadamente. Es el peor resultado del set — una "
+              "explicación convincente y falsa no la chequea nadie.", file=sys.stderr)
     if a.grade and premise_bad:
         print(f"\n*** {premise_bad} respuesta(s) aceptaron una premisa falsa de la pregunta. "
               "Un contexto que hace contestar rápido y MAL es una regresión, por más que "

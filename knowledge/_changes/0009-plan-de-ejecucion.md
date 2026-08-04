@@ -85,7 +85,7 @@ ciclos termine.
 > Todos estos ítems dependen del instrumento, que ya está arreglado (cambio 0005). Ninguno se
 > da por bueno sin correr la medición, y **la medición cuesta plata**.
 
-## [ ] 2.1 🙋 · El golden-set de "por qué"
+## [x] 2.1 · El golden-set de "por qué" (ground truth dictado por Gasti, 2026-08-04)
 **El hallazgo que lo motiva:** las 7 preguntas con las que medimos todo son de **recuperación
 de hechos** ("¿cuántos?", "¿a qué nivel?", "¿cuál es el último?"). Ninguna pregunta *por qué*.
 Y [arXiv:2602.11988](https://arxiv.org/abs/2602.11988) dice exactamente eso: los overviews no
