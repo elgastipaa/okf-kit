@@ -78,7 +78,7 @@ decisión informada"*) y con las otras seis reconstruyó en silencio.
       la convención que ya existe en el template de roadmap en vez de inventar un artefacto.
 - [x] **`okf-init` y `okf-migrate` terminan mostrando las preguntas abiertas** al usuario, con
       su assert en el gate.
-- [ ] **Decisión** que registre todo esto y su evidencia.
+- [x] **Decisión** que registre todo esto y su evidencia.
 - [ ] **Arreglar el bundle de idlerpg**: las dos reconstrucciones pasan a preguntas abiertas.
       Es la demostración del cambio sobre el caso que lo originó.
 - [ ] 💰 **Re-medir** el golden-set de "por qué" (~US$25, dos brazos) y comparar contra la
