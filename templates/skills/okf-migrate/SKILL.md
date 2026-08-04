@@ -113,3 +113,21 @@ de contexto existente a OKF"). Corré `python3 scripts/okf_lint.py knowledge` (o
   actualizar / descartar); no inventes el *por qué* de una decisión vieja ni asumas que un doc
   viejo sigue vigente.
 - **No borres el original hasta haber movido** su contenido al bundle.
+
+# 7. Entregá las preguntas abiertas — no es opcional
+
+```
+python3 scripts/okf_lint.py knowledge --questions
+```
+
+Migrar es peor que inicializar para esto: estás leyendo docs que escribió **otra persona u
+otra IA hace meses**, y el porqué de la mitad de las cosas no está en ningún lado. La
+tentación de reconstruirlo del código es enorme y el resultado suena perfecto.
+
+**No reconstruyas.** Dejá `> Pendiente de confirmar: …` y traéselas al usuario: es el único
+que puede contestarlas, y cada una que conteste es conocimiento que **no existía en ninguna
+parte** hasta ese momento. Eso es lo que la migración produce de verdad; el markdown ordenado
+es el subproducto.
+
+Si una decisión la dedujiste del código, marcala `origen: reconstruido` y dejala en
+`status: proposed` — el linter rechaza que una reconstrucción sea normativa.

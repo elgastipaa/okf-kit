@@ -362,6 +362,17 @@ def _(d):
          "**Nota:** existe un archivo de chequeos en")
 
 
+@case("okf-init deja de entregarle las preguntas abiertas al usuario", True)
+def _(d):
+    # El paso que el kit NO hizo cuando se aplico a un repo real. Sin el, lo que el agente
+    # no pudo averiguar se reconstruye en silencio y queda escrito como un hecho.
+    # La regresion realista no es cambiarle el titulo: es que el paso desaparezca en una
+    # reescritura del skill. Cambiar solo el heading deja el cuerpo y el assert lo ve igual.
+    f = d / "templates/skills/okf-init/SKILL.md"
+    txt = f.read_text(encoding="utf-8")
+    f.write_text(txt[:txt.index("## 6. Entregá las PREGUNTAS ABIERTAS")], encoding="utf-8")
+
+
 @case("el rename de perfil se hace sin alias (rompe el CLI de quien ya lo usó)", True)
 def _(d):
     edit(d, "scripts/okf_install.py", 'PROFILE_ALIASES = {"wiki": "concepto"}',

@@ -474,6 +474,41 @@ class Linter:
         return 0
 
 
+# Una pregunta abierta: lo que el agente NO pudo deducir y nadie le contestó. La convención
+# ya existía en el template de roadmap; acá se vuelve visible en todo el bundle.
+QUESTION_RE = re.compile(r"^\s*>\s*Pendiente de confirmar:\s*(.+)$", re.M)
+
+
+def questions(bundle: Path) -> int:
+    """Lista las preguntas abiertas del bundle.
+
+    Existe porque el silencio es indistinguible de la certeza: un bundle sin preguntas
+    abiertas puede significar "está todo averiguado" o "el agente reconstruyó lo que no
+    sabía y no avisó". Sacarlas a la superficie es lo que hace que la segunda opción se note.
+    """
+    bundle = bundle.resolve()
+    if not bundle.is_dir():
+        print(f"okf_lint: no existe el directorio '{bundle}'", file=sys.stderr)
+        return 2
+    found = []
+    for p in sorted(bundle.rglob("*.md")):
+        text = p.read_text(encoding="utf-8", errors="replace")
+        for m in QUESTION_RE.finditer(text):
+            line = text[:m.start()].count("\n") + 1
+            found.append((p.relative_to(bundle).as_posix(), line, m.group(1).strip()))
+    if not found:
+        print("okf_lint --questions: no hay preguntas abiertas en el bundle.")
+        print("  Ojo: eso puede significar que está todo averiguado, o que se reconstruyó\n"
+              "  lo que no se sabía sin dejar constancia. Si el bundle lo escribió un agente\n"
+              "  sin un humano al lado, lo segundo es más probable que lo primero.")
+        return 0
+    for rel, line, q in found:
+        print(f"  {rel}:{line} — {q}")
+    print(f"\nokf_lint --questions: {len(found)} pregunta(s) abierta(s). "
+          "Cada una es algo que el bundle NO sabe y alguien podría contestar.")
+    return 0
+
+
 def pack(bundle: Path) -> int:
     """Emite el bundle entero como UN markdown, cada archivo una sola vez.
 
@@ -567,9 +602,14 @@ def main(argv: list[str]) -> int:
     do_pack = "--pack" in args
     if do_pack:
         args.remove("--pack")
+    do_questions = "--questions" in args
+    if do_questions:
+        args.remove("--questions")
     bundle = Path(args[0]) if args else Path("knowledge")
     if do_pack:
         return pack(bundle)
+    if do_questions:
+        return questions(bundle)
     return Linter(bundle, strict=strict, skip=skip).run()
 
 

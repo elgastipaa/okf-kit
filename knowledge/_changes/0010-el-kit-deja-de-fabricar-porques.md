@@ -74,9 +74,9 @@ decisión informada"*) y con las otras seis reconstruyó en silencio.
       (`reconstruido` + `proposed` pasa limpio).
 - [x] **"No se sabe" como contenido válido** en `_decision.md` y `_concept.md`: instrucción
       explícita de escribir la pregunta abierta en vez de reconstruir una razón.
-- [ ] **`okf_lint.py --questions`**: lista los `> Pendiente de confirmar:` del bundle. Reusa
+- [x] **`okf_lint.py --questions`**: lista los `> Pendiente de confirmar:` del bundle. Reusa
       la convención que ya existe en el template de roadmap en vez de inventar un artefacto.
-- [ ] **`okf-init` y `okf-migrate` terminan mostrando las preguntas abiertas** al usuario, con
+- [x] **`okf-init` y `okf-migrate` terminan mostrando las preguntas abiertas** al usuario, con
       su assert en el gate.
 - [ ] **Decisión** que registre todo esto y su evidencia.
 - [ ] **Arreglar el bundle de idlerpg**: las dos reconstrucciones pasan a preguntas abiertas.
@@ -85,6 +85,13 @@ decisión informada"*) y con las otras seis reconstruyó en silencio.
       línea de base: **con kit 11/18 inventadas, sin capa 14/18**. Necesita autorización.
 
 # Decisiones y descubrimientos en el camino
+
+- **La convención ya funcionaba donde el template la ofrecía.** `--questions` sobre idlerpg
+  sacó **3 preguntas abiertas, todas en `roadmap.md`** — y una es exactamente la del
+  onboarding (*"si se apagó a propósito y por cuánto tiempo"*). El roadmap era **el único
+  template que las pedía**. El mismo agente, en el mismo repo, dejó preguntas donde se las
+  pedían y fabricó donde le pedían un "Contexto". No es un problema de criterio del agente:
+  es de qué le pide el template.
 
 - La medición del brazo `kit` (11/18 inventadas) hay que **releerla** a la luz de esto: en q4 y
   q6 el agente probablemente no inventó al responder, sino que **leyó fielmente una invención

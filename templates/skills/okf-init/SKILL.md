@@ -129,5 +129,28 @@ Para herramientas que no sean Claude Code (Cursor/Copilot/Gemini…), `reference
 
 ## 5. Verificá
 Corré `python3 scripts/okf_lint.py knowledge` (o el skill `okf-verify`). Mostrale al
-usuario el árbol final, el perfil elegido, qué sembraste, y **qué te faltó por no
-tener la info**. Ver `reference/verification.md`.
+usuario el árbol final, el perfil elegido y qué sembraste. Ver `reference/verification.md`.
+
+## 6. Entregá las PREGUNTAS ABIERTAS — este paso no es opcional
+
+```
+python3 scripts/okf_lint.py knowledge --questions
+```
+
+**Mostrale al usuario esa lista y pedile las respuestas.** Es el paso que más valor entrega
+del init entero, y el más fácil de saltear porque el bundle "ya quedó lindo".
+
+Por qué es obligatorio: sembrando conceptos vas a encontrar cosas cuyo **porqué no está en
+ninguna parte** — el código muestra qué hace, no por qué se decidió. Ahí tenés dos caminos y
+uno hace daño:
+
+- **Reconstruir** una razón plausible del código. **No lo hagas.** Queda escrita como un
+  hecho, nadie la chequea, y si va en una decisión el kit la trata como normativa y después
+  le dice a alguien que su código viola algo que nunca se decidió. **Pasó de verdad**, y por
+  eso el linter ahora rechaza `origen: reconstruido` con `status: accepted`.
+- **Dejar la pregunta abierta** (`> Pendiente de confirmar: …`) y traérsela al usuario. Es la
+  única de las dos que produce conocimiento nuevo: él es el único que sabe.
+
+Si no hay usuario en la sesión, **decilo explícitamente en el reporte final** en vez de
+resolver por default. Un default silencioso es indistinguible de una respuesta informada, y
+esa confusión es exactamente lo que este kit existe para evitar.

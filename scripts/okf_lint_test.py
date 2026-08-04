@@ -26,16 +26,16 @@ from pathlib import Path
 
 KIT = Path(__file__).resolve().parents[1]
 LINT = KIT / "templates" / "scripts" / "okf_lint.py"
-CASES: list[tuple[str, str | None, object, tuple[str, ...], bool]] = []
+CASES: list[tuple[str, str | None, object, tuple[str, ...], bool, int | None]] = []
 
 
 def case(name: str, expect: str | None, extra: list[str] | None = None,
-         pack_unique: bool = False):
+         pack_unique: bool = False, questions_expect: int | None = None):
     """expect = substring que el reporte DEBE contener; None = no debe reportar nada.
 
     `extra` = flags adicionales del linter para ese caso (p.ej. `--skip`)."""
     def deco(fn):
-        CASES.append((name, expect, fn, tuple(extra or ()), pack_unique))
+        CASES.append((name, expect, fn, tuple(extra or ()), pack_unique, questions_expect))
         return fn
     return deco
 
@@ -234,6 +234,12 @@ def _(d):
          "status: accepted", "status: accepted\norigen: dictado")
 
 
+@case("--questions saca a la superficie una pregunta abierta", None, questions_expect=1)
+def _(d):
+    edit(d, "decisions/0001-relative-links-over-absolute.md", "# Contexto",
+         "# Contexto\n\n> Pendiente de confirmar: por que se eligio esto. No hay razon registrada.")
+
+
 def main() -> int:
     if not LINT.is_file():
         print(f"okf_lint_test: no encontré {LINT}", file=sys.stderr)
@@ -242,7 +248,7 @@ def main() -> int:
     print(f"{'caso':<62} {'espera':<8} {'real':<8} veredicto")
     bad = 0
     try:
-        for name, expect, fn, extra, pack_unique in CASES:
+        for name, expect, fn, extra, pack_unique, q_exp in CASES:
             # Se copia el KIT entero, no solo `knowledge/`: el dogfood linkea archivos de
             # afuera del bundle (`../../OKF-SPEC.md`) y en una copia aislada serían links
             # rotos — un falso positivo del harness que enmascararía los casos limpios.
@@ -254,6 +260,14 @@ def main() -> int:
             except AssertionError as e:
                 print(f"{name:<62} {'—':<8} {'—':<8} SETUP ROTO: {e}")
                 bad += 1
+                continue
+            if q_exp is not None:
+                rq = subprocess.run([sys.executable, str(LINT), str(d), "--questions"],
+                                    capture_output=True, text=True)
+                ok = f"{q_exp} pregunta" in rq.stdout
+                print(f"{name:<62} {'lista '+str(q_exp):<8} "
+                      f"{'ok' if ok else 'no las vio':<8} {'ok' if ok else '<<< MAL'}")
+                bad += not ok
                 continue
             if pack_unique:
                 rp = subprocess.run([sys.executable, str(LINT), str(d), "--pack"],

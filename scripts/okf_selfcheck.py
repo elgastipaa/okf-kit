@@ -620,6 +620,17 @@ check("concepto" in _prof and "wiki" in _prof and "datos" not in _prof,
       "el CLI ofrece codigo/concepto/mixto y mantiene `wiki` como alias",
       f"choices: {_prof[_prof.find('--profile'):][:120] if '--profile' in _prof else '(no salió)'}")
 
+# El paso que el kit NO hizo cuando se aplicó a un repo real: entregarle al usuario lo que
+# no pudo averiguar. Sin él, el agente reconstruye en silencio y la invención queda escrita
+# como un hecho. Se verifica en los dos caminos de entrada, no en uno.
+for _rel in ("templates/skills/okf-init/SKILL.md", "templates/skills/okf-migrate/SKILL.md"):
+    _txt = read_required(_rel) or ""
+    # Ventana ancha: el paso es un bloque entero (comando + por qué + las dos salidas),
+    # no una frase. Con la ventana por defecto fallaba por el formato, no por el contenido.
+    check(near(_txt, "--questions", "Pendiente de confirmar", "usuario", window=1500),
+          f"{_rel} termina entregándole las preguntas abiertas al usuario",
+          "sin este paso, lo que el agente no pudo averiguar se reconstruye en silencio")
+
 # Una verdad, un lugar: si el skill vuelve a describir la plomería en prosa, hay dos
 # fuentes que van a derivar (la regla dura #1 del kit y su causa raíz de bugs).
 _init_txt = read_required("templates/skills/okf-init/SKILL.md") or ""
