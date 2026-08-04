@@ -41,6 +41,26 @@ git, sin apps externas.
 
 # Después (próximo, en orden)
 
+**La hipótesis que puede redefinir el kit: elicitación, no documentación.**
+
+El diferencial no es guardar contexto —eso está medido que no paga en recuperación de hechos,
+y los harnesses lo están absorbiendo con memoria nativa—. Lo que apareció midiendo el eje
+"por qué" es otra cosa: **el kit puede producir las preguntas que solo una persona puede
+contestar**, y eso ninguna plataforma lo da porque requiere no tener la respuesta.
+
+La evidencia de que es diseñable: el mismo agente, en el mismo repo, **preguntó donde el
+template pedía `> Pendiente de confirmar:` y fabricó donde pedía un "Contexto"**. El artefacto
+determina la conducta.
+
+**Cómo se mide** (barato, y no lo hicimos nunca): aplicar el kit a un repo **con el dueño
+disponible**, y contar **cuántas preguntas produce y cuántas contesta**. Si de diez preguntas
+seis merecen respuesta, eso es conocimiento que no existía en ningún lado — el único tipo de
+valor que no se puede obtener de otra forma.
+
+Si da bien, el pitch pasa de *"guardá el contexto de tu repo"* a **"descubrí lo que tu
+proyecto no sabe de sí mismo"**.
+
+
 **Lo que dejaron las cuatro lentes sobre v0.7.3, gateado por el instrumento.**
 
 - **La dieta del contrato.** El always-on real son 8.382 chars y el presupuesto mide 6.684
