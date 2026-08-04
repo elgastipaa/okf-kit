@@ -72,7 +72,7 @@ decisión informada"*) y con las otras seis reconstruyó en silencio.
 - [x] **Regla del linter `origen-reconstruido-normativo`**: `origen: reconstruido` +
       `status: accepted` = **ERROR**, con su rotura probada y su caso legítimo
       (`reconstruido` + `proposed` pasa limpio).
-- [ ] **"No se sabe" como contenido válido** en `_decision.md` y `_concept.md`: instrucción
+- [x] **"No se sabe" como contenido válido** en `_decision.md` y `_concept.md`: instrucción
       explícita de escribir la pregunta abierta en vez de reconstruir una razón.
 - [ ] **`okf_lint.py --questions`**: lista los `> Pendiente de confirmar:` del bundle. Reusa
       la convención que ya existe en el template de roadmap en vez de inventar un artefacto.
