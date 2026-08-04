@@ -79,10 +79,19 @@ decisión informada"*) y con las otras seis reconstruyó en silencio.
 - [x] **`okf-init` y `okf-migrate` terminan mostrando las preguntas abiertas** al usuario, con
       su assert en el gate.
 - [x] **Decisión** que registre todo esto y su evidencia.
-- [ ] **Arreglar el bundle de idlerpg**: las dos reconstrucciones pasan a preguntas abiertas.
+- [x] **Arreglar el bundle de idlerpg**: las dos reconstrucciones pasan a preguntas abiertas.
       Es la demostración del cambio sobre el caso que lo originó.
 - [ ] 💰 **Re-medir** el golden-set de "por qué" (~US$25, dos brazos) y comparar contra la
       línea de base: **con kit 11/18 inventadas, sin capa 14/18**. Necesita autorización.
+
+      **Cómo leer el resultado por pregunta**, porque el bundle cambió de dos formas
+      distintas y conviene no mezclarlas:
+      - **q4 y q6** — eran fabricaciones y ahora son preguntas abiertas declaradas. Miden
+        **el rework**: deberían pasar de `inventada` a `no-hay-razon-ok`.
+      - **q2** — se sembró la razón real que dictó el dueño. Mide **otra cosa**: que el kit
+        preserva lo que una persona le cuenta. Debería pasar de `no-hay-razon-ok` a
+        `correcta`. Su mejora **no** es atribuible al rework.
+      - **q1, q3, q5** — sin cambios en el bundle; son el control interno.
 
 # Decisiones y descubrimientos en el camino
 
