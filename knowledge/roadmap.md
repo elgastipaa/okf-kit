@@ -16,7 +16,13 @@ git, sin apps externas.
 
 # Ahora (en curso)
 
-- **[Cola de ejecución de las fases 1 a 4](_changes/0009-plan-de-ejecucion.md)** — el plan que
+- **[El kit deja de fabricar porqués que nadie tomó](_changes/0010-el-kit-deja-de-fabricar-porques.md)**
+  — medido: al aplicar el kit a un repo, el agente **reconstruyó razones que nadie tomó y las
+  escribió como decisiones normativas**. La confabulación no pasa al responder, pasa al
+  escribir. Es la prioridad; la cola 0009 queda aparcada.
+
+- **[Cola de ejecución de las fases 1 a 4](_changes/0009-plan-de-ejecucion.md)** — **APARCADA**
+  mientras dure el cambio 0010. El plan que
   salió del análisis de seis herramientas del ecosistema, escrito para ejecutarse de a un ítem
   por iteración. Marca qué puede hacerse solo, qué cuesta plata (💰) y qué necesita una
   decisión del usuario (🙋).
