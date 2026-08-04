@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-08-04
+* **Update**: v0.7.7 — el kit sigue siendo **multipropósito pero sobre un eje: código + concepto** ([0026](decisions/0026-el-eje-es-codigo-mas-concepto.md)). Se rechazó la propuesta de matar los perfiles no-código y se arregló lo que estaba mal de verdad: estaban cortados por la **industria** del repo en vez de por qué documentás. `datos` sale (su vocabulario vive en `mixto`), `wiki` pasa a `concepto` **con alias**, y el alias tiene su assert y su rotura porque sin él el rename sería un cambio incompatible. Nuevo no-goal: publicar en repos ajenos.
+
 ## 2026-08-03
 * **Update**: v0.7.6 — ejecutadas las fases 0 a 4 del plan del ecosistema. **`knowledge/checks.md`** (el bundle contesta "¿cómo sé que esto anda?", sembrado también en `--minimal`), alcanzabilidad transitiva en el linter (los subárboles invisibles pasaban con el gate en verde), sello con **versión + hash** en el material instalado ([0025](decisions/0025-el-material-instalado-se-sella-con-hash.md)), `--pack` (una dependencia de npm menos), ids estables de regla con `--skip`, **`log.md` a opt-in** (0 citas en 61 corridas), **`okf-migrate` al frente** (migrate es el producto, init el accesorio), y el gate midiendo el always-on **real** (8.329 chars, no 6.912). Gate 113 → 124 asserts.
 

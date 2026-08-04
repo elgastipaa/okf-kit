@@ -612,6 +612,14 @@ for _mini in (False, True):
           f"el contrato {'mínimo' if _mini else 'completo'} manda a correr los chequeos del repo",
           "el archivo se siembra pero nadie lo abre")
 
+# Renombrar un perfil rompe el CLI de quien ya lo usó, así que el alias no es cortesía: es
+# la única razón por la que el rename no es un cambio incompatible.
+_prof = subprocess.run([sys.executable, _INSTALLER, "--help"], cwd=KIT,
+                       capture_output=True, text=True).stdout
+check("concepto" in _prof and "wiki" in _prof and "datos" not in _prof,
+      "el CLI ofrece codigo/concepto/mixto y mantiene `wiki` como alias",
+      f"choices: {_prof[_prof.find('--profile'):][:120] if '--profile' in _prof else '(no salió)'}")
+
 # Una verdad, un lugar: si el skill vuelve a describir la plomería en prosa, hay dos
 # fuentes que van a derivar (la regla dura #1 del kit y su causa raíz de bugs).
 _init_txt = read_required("templates/skills/okf-init/SKILL.md") or ""

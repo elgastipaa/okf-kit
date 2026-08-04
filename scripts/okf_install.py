@@ -53,12 +53,17 @@ KIT = Path(__file__).resolve().parents[1]
 # Carpetas recomendadas por perfil (`reference/profiles.md`). El instalador NO las crea:
 # una carpeta vacía es un WARN del linter y, peor, un lugar que nadie llenó. Las reporta
 # para que el agente las cree a medida que siembra conceptos de verdad.
+# El kit es multipropósito sobre un eje: **código + concepto**. `datos` salió en la 0.7.7
+# (0 de 131 entradas del mercado analizado eran de datos, y su vocabulario sobrevive intacto
+# en `mixto`); `wiki` se renombró a `concepto` —el nombre de la unidad de OKF, no el de una
+# herramienta— y se mantiene como alias para no romperle el CLI a nadie.
 PROFILES = {
     "codigo": ["architecture", "decisions", "domain", "schema", "runbooks", "references"],
-    "datos": ["datasets", "tables", "references/metrics", "references/joins", "glossary"],
-    "wiki": ["<un dir por tema>", "playbooks", "glossary"],
-    "mixto": ["<combiná los de arriba, o inventá los que el dominio pida>"],
+    "concepto": ["<un dir por tema>", "decisions", "playbooks", "glossary", "references"],
+    "mixto": ["<combiná los de arriba, o inventá los que el dominio pida — p. ej. un repo de "
+              "datos: datasets/, tables/, references/metrics/, glossary/>"],
 }
+PROFILE_ALIASES = {"wiki": "concepto"}
 
 SKILLS_ALWAYS = ["okf-update", "okf-verify"]
 SKILL_FUTURE = "okf-plan"
@@ -571,7 +576,9 @@ def main(argv: list[str]) -> int:
         description="Instala (o actualiza) el material del kit OKF en un repo destino.",
     )
     ap.add_argument("target", help="ruta del repo DESTINO (nunca el kit)")
-    ap.add_argument("--profile", choices=sorted(PROFILES), default="codigo",
+    # `choices` incluye los alias para que `--profile wiki` siga andando; se normaliza abajo.
+    ap.add_argument("--profile", choices=sorted(set(PROFILES) | set(PROFILE_ALIASES)),
+                    default="codigo",
                     help="dominio del repo: define qué carpetas conviene sembrar (default: codigo)")
     ap.add_argument("--name", help="nombre del proyecto, para {{PROJECT_NAME}}")
     ap.add_argument("--minimal", action="store_true",
@@ -588,6 +595,10 @@ def main(argv: list[str]) -> int:
                     help="sembrar knowledge/log.md (opt-in: 0 citas medidas en 61 corridas)")
     ap.add_argument("--dry-run", action="store_true", help="mostrar el plan, no escribir nada")
     args = ap.parse_args(argv[1:])
+    if args.profile in PROFILE_ALIASES:
+        print(f"okf_install: '--profile {args.profile}' ahora se llama "
+              f"'{PROFILE_ALIASES[args.profile]}' (el alias sigue andando).", file=sys.stderr)
+        args.profile = PROFILE_ALIASES[args.profile]
 
     target = Path(args.target).resolve()
     if not target.is_dir():

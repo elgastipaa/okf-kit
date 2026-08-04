@@ -143,24 +143,12 @@ negociado como el 7000 del contrato.
 
 # Fase 3 — matar (el kit tiene que adelgazar, no solo crecer)
 
-## [ ] 3.1 🙋 · Perfiles `datos` y `wiki`
-**Evidencia a favor de matarlos:** 0 de 131 entradas del mercado son de datos o wikis.
-
-**BLOQUEADO — la clasificación original de este ítem como autónomo estaba mal.** Al ir a
-hacerlo apareció que no es una limpieza interna sino una decisión de producto:
-
-1. La [0006](../decisions/0006-dogfood-profile-choice.md) es **normativa y `accepted`**: el kit
-   se dogfoodea con perfil `mixto`, definido como *"combinando carpetas de Código y de Wiki"*.
-   Matar `wiki` deja esa decisión hablando de un vocabulario inexistente — habría que
-   supersederla.
-2. El `README.md` promete **"agnóstico al dominio: código, datos/analytics y wikis"** y la
-   visión del roadmap dice "aplicable a cualquier repo". Es una promesa pública.
-3. `--profile datos` es contrato de CLI: rompe a quien ya lo usó.
-
-**La pregunta para Gasti:** *¿achicamos el alcance declarado del kit a repos de código
-—que es lo que el mercado pide y lo único que medimos—, o mantenemos la promesa
-multi-dominio aunque nadie la use?* Si va lo primero, arrastra superseder la 0006 y reescribir
-la promesa del README.
+## [x] 3.1 · El eje pasa a ser código + concepto (NO se mataron los perfiles)
+**Resuelto por Gasti (2026-08-04): multipropósito, código + concepto.** Se rechazó la
+propuesta original de matarlos. El problema no era la cantidad sino el **eje**: estaban
+cortados por la industria del repo. Ahora `codigo` / `concepto` / `mixto`, con `wiki` como
+alias y el vocabulario de datos vivo en `mixto`. Ver
+[0026](../decisions/0026-el-eje-es-codigo-mas-concepto.md).
 
 ## [x] 3.2 · `log.md` pasa a opt-in
 **Evidencia:** 0 citas en 61 corridas medidas, contra 13 ediciones en la historia del propio
@@ -212,8 +200,9 @@ dogfood, que está enterrado. Es lo que convierte a un desconocido.
 **Hecha la parte autónoma:** `CONTRIBUTING.md` (con las tres reglas no negociables y el
 método de medición) y los badges del README.
 
-**Falta lo que va hacia afuera y necesita tu OK:** topics de GitHub, el asciinema de 30s del
-init, y el PR a `awesome-vibe-coding` — publicar en el repo de otro no lo decide un agente.
+**Lo de afuera queda descartado:** el PR a `awesome-vibe-coding` pasó a **no-goal** (nada de
+publicar en repos ajenos). Los topics de GitHub y el asciinema son de la consola/pantalla de
+Gasti, no de un agente.
 
 ---
 

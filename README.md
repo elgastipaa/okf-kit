@@ -30,10 +30,12 @@ te ayuda a escribir, y el harness es para que no tengas que creerme.
 > Esta guía es **self-contained**: markdown + git, sin depender de ningún servicio, SDK ni
 > nube. Si podés `cat` un archivo, podés leerla; si podés `git clone`, la podés llevar.
 
-**Aplicable a cualquier proyecto.** OKF es agnóstico al dominio. La misma mecánica
-sirve para repos de **código**, proyectos de **datos/analytics** y **wikis / bases
-de conocimiento**. Lo único que cambia entre ellos es el layout de carpetas y el
-vocabulario de `type:` — eso se elige con un *perfil* (ver `reference/profiles.md`).
+**Multipropósito, sobre un eje: código + concepto.** La misma mecánica sirve para un repo de
+**código** y para uno de **conceptos** (una base de conocimiento, un dominio, un método). Lo
+único que cambia es el layout de carpetas y el vocabulario de `type:`, y eso se elige con un
+*perfil*: `codigo`, `concepto` o `mixto` (ver `reference/profiles.md`). Un repo de datos entra
+por `mixto` — el eje no es la industria, es si lo que documentás es **cómo funciona algo** o
+**qué significa algo**.
 
 **Sin apps externas ni instalaciones.** No hace falta Obsidian, Notion, MkDocs, un
 visor de grafos ni ningún servicio: es markdown + git. Un humano lo lee en GitHub o

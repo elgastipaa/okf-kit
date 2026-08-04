@@ -126,15 +126,17 @@ Antes que nada, decidí qué clase de proyecto es, porque eso define el layout y
 vocabulario de `type`. Abrí **`reference/profiles.md`** y elegí:
 
 - **Código / Software** — apps, librerías, servicios.
-- **Datos / Analytics** — datasets, warehouses, pipelines.
-- **Wiki / Base de conocimiento** — docs, manuales, notas (el contenido *es* el producto).
-- **Genérico / Mixto** — combiná perfiles o inventá carpetas/tipos si nada encaja.
+- **Concepto** (`concepto`) — bases de conocimiento, dominios, métodos: el contenido *es* el
+  producto. (Era `wiki`; el alias sigue andando.)
+- **Mixto** (`mixto`) — las dos cosas, o algo que no encaja: combiná carpetas o inventá.
+  **Un repo de datos entra por acá** (`datasets/ tables/ references/metrics/ glossary/`).
 
 Para **monorepos**, **migrar desde un `AGENTS.md`/ADRs existentes**, o decidir
 **cuándo partir un bundle** que creció, ver `reference/special-cases.md`.
 
-No tiene que ser puro: un repo de código que también documenta su dataset combina
-el perfil Código con carpetas del perfil Datos. Anotá el perfil elegido; lo vas a
+No tiene que ser puro: un repo de código que también documenta su dataset es `codigo` más
+las carpetas que haga falta. El eje no es la industria del repo sino qué documentás — **cómo
+funciona algo** o **qué significa algo**. Anotá el perfil elegido; lo vas a
 usar en los Pasos 1 y 2 del Procedimiento. (Si dudás del tipo, mirá primero §3
 "entendé el repo" y volvé.)
 

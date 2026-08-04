@@ -10,6 +10,30 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.7.7 — Multipropósito, pero sobre un eje: código + concepto
+
+Los cuatro perfiles (`codigo`, `datos`, `wiki`, `mixto`) estaban cortados por la **industria**
+del repo. El análisis del ecosistema propuso matar `datos` y `wiki` —0 de 131 entradas del
+mercado son de eso— y dejar solo código. **Se rechazó**: achicar una promesa pública a partir
+de una lista curada de herramientas de vibe-coding, romper `--profile datos` y dejar a la
+decisión 0006 describiendo el dogfood con un vocabulario inexistente era demasiado precio.
+
+El problema no era que fueran cuatro: era el eje. Ahora son tres y el eje es **qué
+documentás**, no en qué industria estás:
+
+- `codigo` — **cómo funciona algo**.
+- `concepto` — **qué significa algo** (era `wiki`, renombrado a la unidad de OKF y no al
+  nombre de una herramienta). **`--profile wiki` sigue andando como alias** y lo avisa.
+- `mixto` — las dos cosas. **Un repo de datos entra por acá**, con
+  `datasets/ tables/ references/metrics/ glossary/`: el vocabulario del viejo perfil no se
+  perdió, dejó de ser una rama propia.
+
+El alias tiene su assert y su rotura: sin él esto sería un cambio incompatible disfrazado de
+rename. Ver [decisión 0026](knowledge/decisions/0026-el-eje-es-codigo-mas-concepto.md).
+
+**No-goal nuevo:** publicar en repos ajenos (PRs a listas curadas y similares). Se trabaja en
+este repo.
+
 ## 0.7.6 — El kit adelgaza, se mide de verdad y deja de venderse por lo que no importa
 
 Ejecución de las fases 0 a 4 del plan que salió de analizar seis herramientas del ecosistema

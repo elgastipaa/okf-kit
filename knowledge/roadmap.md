@@ -121,6 +121,11 @@ git, sin apps externas.
 
 # No-goals (por ahora)
 
+- **Publicar en repos ajenos.** Nada de PRs a listas curadas (`awesome-vibe-coding` y
+  similares) ni de promoción en repos de terceros: se trabaja en este repo y punto
+  (decisión del usuario, 2026-08-04). Si algún día el kit se difunde, será porque alguien lo
+  encontró útil, no porque lo empujamos.
+
 - **Los otros tres roles de `harness-sdd`** (leader / spec_author / implementer): ceremonia de
   equipo grande, sin evidencia de que paguen para un usuario solo. El único que pagaba era el
   revisor, y ya está ([0021](decisions/0021-la-auditoria-no-se-auto-aprueba.md)).

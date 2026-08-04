@@ -362,6 +362,12 @@ def _(d):
          "**Nota:** existe un archivo de chequeos en")
 
 
+@case("el rename de perfil se hace sin alias (rompe el CLI de quien ya lo usó)", True)
+def _(d):
+    edit(d, "scripts/okf_install.py", 'PROFILE_ALIASES = {"wiki": "concepto"}',
+         "PROFILE_ALIASES = {}")
+
+
 @case("log.md vuelve a sembrarse siempre", True)
 def _(d):
     edit(d, "scripts/okf_install.py", "    if args.with_log:", "    if True:")

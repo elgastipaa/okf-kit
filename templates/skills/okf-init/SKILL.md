@@ -56,9 +56,9 @@ archivo en vez de caminar todo (opcional — ver `reference/optional-tools.md`, 
 
 **El perfil** = el dominio → define carpetas y `type` (detalle en `reference/profiles.md`):
 - **Código** (`codigo`) — `architecture/ decisions/ domain/ schema/ runbooks/ references/`
-- **Datos** (`datos`) — `datasets/ tables/ references/{metrics,joins}/ glossary/`
-- **Wiki** (`wiki`) — organizado por tema + `playbooks/ glossary`
-- **Mixto** (`mixto`) — combiná o inventá carpetas/tipos. Para monorepos/migración, ver
+- **Concepto** (`concepto`) — por tema + `decisions/ playbooks/ glossary/ references/`
+- **Mixto** (`mixto`) — combiná o inventá; **un repo de datos va acá** (`datasets/ tables/
+  references/metrics/ glossary/`). Para monorepos/migración, ver
   `reference/special-cases.md`.
 
 **El nivel** = ¿va la **capa de futuro** (rumbo + cambios en curso)? Es el default, y decide si

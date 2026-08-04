@@ -1,9 +1,18 @@
 # Perfiles — cómo organizar el bundle para cualquier dominio
 
 OKF es **agnóstico al dominio**: la mecánica (archivos markdown + frontmatter,
-`index.md`, `log.md`, cross-links, progressive disclosure) es siempre la misma.
-Lo único que cambia entre un proyecto de datos, uno de código y una wiki es **qué
-carpetas usás y qué ponés en `type:`**.
+`index.md`, cross-links, progressive disclosure) es siempre la misma. Lo único que
+cambia es **qué carpetas usás y qué ponés en `type:`**.
+
+El kit trae tres perfiles sobre un eje —**código + concepto**—, y el eje no es la industria
+sino qué estás documentando: **cómo funciona algo** (`codigo`) o **qué significa algo**
+(`concepto`). Si es las dos cosas, `mixto`.
+
+> **Nota de la 0.7.7:** el perfil `datos` se retiró y `wiki` se renombró a `concepto`
+> (`--profile wiki` sigue andando como alias). Un repo de datos entra por `mixto`, con las
+> carpetas `datasets/ tables/ references/metrics/ references/joins/ glossary/` — el
+> vocabulario no se perdió, dejó de ser una rama propia. Ver
+> [decisión 0026](../knowledge/decisions/0026-el-eje-es-codigo-mas-concepto.md).
 
 Un **perfil** es un punto de partida: un layout de carpetas + un vocabulario de
 `type`. Elegí el que más se parezca a tu proyecto, **combiná** dos si hace falta,
@@ -179,9 +188,11 @@ carpetas vacías "por las dudas".**
 ## Cómo elegir / combinar / inventar
 
 1. **Mirá qué es el repo** (manifiestos, README, estructura — ver `GUIDE.md` §3).
-2. **¿Es principalmente código, datos o contenido?** Elegí ese perfil como base.
-3. **¿Mezcla?** Combiná: un repo de código con un dataset documentado usa el perfil
-   Código + una carpeta `datasets/`/`tables/` del perfil Datos.
+2. **¿Documentás cómo funciona algo, o qué significa algo?** Lo primero es `codigo`, lo
+   segundo `concepto`. Ese es el eje.
+3. **¿Las dos?** `mixto`: combiná las carpetas que hagan falta. Un repo de código con un
+   dataset documentado es `codigo` + `datasets/`/`tables/`; un repo de datos es `mixto` con
+   ese vocabulario como base.
 4. **¿Nada encaja?** Inventá una carpeta y un `type` descriptivo y self-explanatory.
    Los consumidores OKF toleran `type` desconocidos por diseño.
 
