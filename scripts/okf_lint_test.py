@@ -212,6 +212,28 @@ def _(d):
          "Ver tambien [una decision](decisions/0001-relative-links-over-absolute.md).\n\n# Subdirectories")
 
 
+# ---- origen: una razón reconstruida no puede ser normativa
+@case("una decisión reconstruida del código declarada como normativa", "origen-reconstruido-normativo")
+def _(d):
+    # El estado exacto que produjo la peor falla que midió este kit: un agente redactó un
+    # Contexto convincente para algo que NADIE decidió, y quedó `accepted` = normativo.
+    edit(d, "decisions/0001-relative-links-over-absolute.md",
+         "status: accepted", "status: accepted\norigen: reconstruido")
+
+
+@case("una decisión reconstruida que NO se declara normativa", None)
+def _(d):
+    # Redacción legítima: reconstruir está bien mientras no se disfrace de mandato.
+    edit(d, "decisions/0001-relative-links-over-absolute.md",
+         "status: accepted", "status: proposed\norigen: reconstruido")
+
+
+@case("una decisión dictada por una persona, normativa", None)
+def _(d):
+    edit(d, "decisions/0001-relative-links-over-absolute.md",
+         "status: accepted", "status: accepted\norigen: dictado")
+
+
 def main() -> int:
     if not LINT.is_file():
         print(f"okf_lint_test: no encontré {LINT}", file=sys.stderr)

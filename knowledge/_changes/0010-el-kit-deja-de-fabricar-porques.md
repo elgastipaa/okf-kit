@@ -66,10 +66,10 @@ decisión informada"*) y con las otras seis reconstruyó en silencio.
 
 # Plan / Tareas
 
-- [ ] **`origen:` en las decisiones** — vocabulario cerrado `dictado | reconstruido`, en el
+- [x] **`origen:` en las decisiones** — vocabulario cerrado `dictado | reconstruido`, en el
       template `_decision.md` y en `OKF-SPEC.md`. Ausente = se asume dictado (no rompe bundles
       viejos).
-- [ ] **Regla del linter `origen-reconstruido-normativo`**: `origen: reconstruido` +
+- [x] **Regla del linter `origen-reconstruido-normativo`**: `origen: reconstruido` +
       `status: accepted` = **ERROR**, con su rotura probada y su caso legítimo
       (`reconstruido` + `proposed` pasa limpio).
 - [ ] **"No se sabe" como contenido válido** en `_decision.md` y `_concept.md`: instrucción

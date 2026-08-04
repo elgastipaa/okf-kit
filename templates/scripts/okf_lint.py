@@ -55,6 +55,8 @@ AUTHORING_DEFAULTS = ("title", "description", "timestamp")
 # Vocabulario CERRADO de `authority` (OKF-SPEC.md §3.1). Sin esto, `authority: banana`
 # pasaba en silencio: una clave que se escribe y nadie lee no declara nada.
 AUTHORITY_VALUES = ("normative", "descriptive")
+# `origen` declara de dónde salió el porqué de una decisión. Ver OKF-SPEC §3.1.
+ORIGEN_VALUES = ("dictado", "reconstruido")
 LINK_RE = re.compile(r"\[[^\]]*\]\(\s*([^)\s]+)")
 # Una entrada de index: `* [Título](archivo.md) - description del concepto`. El guion
 # puede ser ASCII o em-dash, y el bullet `*` o `-`.
@@ -210,6 +212,23 @@ class Linter:
         ts = keys.get("timestamp", "").strip().strip('"').strip("'")
         if ts and not ISO_DT_RE.match(ts):
             self.add("WARN", path, 1, f"`timestamp` no parece ISO 8601: '{ts}'", rid="timestamp-iso")
+        # Una decisión RECONSTRUIDA del código no puede ser normativa. Es el estado que
+        # produjo la peor falla que midió este kit: un agente redactó un "Contexto"
+        # convincente para algo que nadie decidió, quedó `accepted` —o sea normativo— y el
+        # contrato le habría dicho a alguien que su código viola una decisión inexistente.
+        # Por eso es ERROR y no WARN: un warning se ignora, y esto no se puede ignorar.
+        origen = keys.get("origen", "").split(" #", 1)[0].strip().strip('"').strip("'").lower()
+        status = keys.get("status", "").split(" #", 1)[0].strip().strip('"').strip("'").lower()
+        if origen and origen not in ORIGEN_VALUES:
+            self.add("WARN", path, 1,
+                     f"`origen: {origen}` no está en el vocabulario "
+                     f"({' | '.join(ORIGEN_VALUES)}) — no declara nada", rid="origen-vocab")
+        if origen == "reconstruido" and status == "accepted":
+            self.add("ERROR", path, 1,
+                     "`origen: reconstruido` con `status: accepted`: una razón deducida del "
+                     "código NO manda sobre el código. Dejala en `proposed` hasta que alguien "
+                     "que sepa la confirme — o, si nadie sabe por qué, no escribas una "
+                     "decisión: dejá la pregunta abierta", rid="origen-reconstruido-normativo")
         auth = keys.get("authority", "").split(" #", 1)[0].strip().strip('"').strip("'").lower()
         if auth and auth not in AUTHORITY_VALUES:
             self.add("WARN", path, 1,

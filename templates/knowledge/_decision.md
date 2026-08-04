@@ -9,6 +9,7 @@ type: Decision
 title: {{La decisión, en una frase afirmativa. Ej: "Usamos cola para emails"}}
 description: {{Una frase que resume qué se decidió y el efecto principal.}}
 status: accepted                  # proposed | accepted | "superseded by NNNN"
+origen: dictado                   # dictado | reconstruido — ver abajo, importa mucho
 supersedes: {{NNNN-slug-al-que-reemplaza — borrá esta línea si no aplica}}
 resource: {{URL al PR/commit/archivo que la implementa — opcional}}
 tags: [{{subsistema}}, {{tema}}]
@@ -17,6 +18,24 @@ timestamp: {{YYYY-MM-DDTHH:MM:SSZ}}
 
 # Contexto
 {{Qué problema o situación motivó la decisión. Qué alternativas había.}}
+
+<!-- ¿DE DÓNDE SALE ESTE "POR QUÉ"?  Es la pregunta que decide si esta decisión vale.
+
+     `origen: dictado`       — te lo contó una persona. Puede ser normativa (`accepted`).
+     `origen: reconstruido`  — lo dedujiste vos leyendo el código. **NO puede ser
+                               `accepted`**: el linter lo rechaza. Va `proposed` hasta que
+                               alguien que sabe la confirme.
+
+     **Y SI NADIE SABE POR QUÉ, NO ESCRIBAS UNA DECISIÓN.** Esa es la trampa: el código
+     muestra QUÉ se hizo, y es facilísimo redactar un Contexto convincente sobre por qué
+     "se eligió" — cuando en realidad no lo eligió nadie, salió así. Eso queda como
+     normativo y después el kit le dice a alguien que su código viola una decisión que
+     nunca existió. Pasó de verdad y por eso está escrito acá.
+
+     En su lugar, dejá la pregunta abierta donde corresponda:
+         > Pendiente de confirmar: por qué {{X}} es así. No hay razón registrada.
+     Y contásela al usuario cuando termines. Una pregunta abierta es información;
+     un porqué inventado es daño. -->
 
 # Decisión
 {{Qué se decidió, concretamente. Linkeá al runbook/schema/concepto relacionado.}}

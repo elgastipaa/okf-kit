@@ -103,6 +103,18 @@ claves desconocidas y NO DEBEN rechazar documentos por campos no reconocidos.
 manda el documento frente al código (§3.5). Si falta, se deduce del `type`
 (`reference/profiles.md`); solo hace falta escribirla cuando el `type` no lo deja claro.
 
+**Origen del porqué (opcional, para decisiones):** `origen: dictado | reconstruido` declara
+de dónde salió la razón que el documento afirma. `dictado` = lo contó una persona.
+`reconstruido` = se dedujo leyendo el código. **Una decisión `reconstruido` NO DEBE llevar
+`status: accepted`**: una reconstrucción no manda sobre el código hasta que alguien que sabe
+la confirme. Si falta la clave, se asume `dictado`.
+
+Existe porque el modo de falla más caro de una capa de contexto no es que le falte
+información: es que **fabrique** una. Un agente al que le pedís el porqué de algo que nadie
+decidió deliberadamente puede redactar un contexto convincente y falso, y el formato le da
+autoridad normativa. **Si nadie sabe por qué, no se escribe una decisión** — se deja la
+pregunta abierta.
+
 **Frescura (opcional, para references que espejan código):** una página que refleja
 el estado del código puede declarar `verified_against: "<commit-corto>"` y
 `source_of_truth: code | doc` — contra qué commit se verificó y quién manda si
