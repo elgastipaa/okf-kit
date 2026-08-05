@@ -5,9 +5,11 @@
   MANTENELO CHICO. Es lo ÚNICO que se carga en cada turno de cada sesión: cada línea de
   más se paga siempre, y un contrato largo se skimea (pierde obediencia). El detalle vive
   en knowledge/ y en los procedimientos, que se cargan bajo demanda. Si crece, mové el
-  detalle a un concepto y dejá acá el puntero. Techo: 7000 caracteres instalado
-  (~1750 tokens). Lo verifica el gate del KIT sobre su template, no el linter de tu repo:
-  acá el techo es tuyo para respetarlo.
+  detalle a un concepto y dejá acá el puntero. El kit se pone un techo de 7000 chars para
+  SU prosa (§1, §2, §3 y Procedimientos), y lo verifica su propio gate. Lo que escribís vos
+  —el stack, las reglas duras, las capas no autoritativas— se suma ENCIMA y se paga igual en
+  cada turno. `okf_lint.py knowledge --budget` te muestra el total separado por dueño, para
+  que sepas cuál de las dos columnas creció.
 
   BORRÁ lo que no instalaste (si no, mandás al agente a archivos que no existen). El
   andamiaje son las 8 líneas de comentario marcadas `OKF:future-layer:start` y

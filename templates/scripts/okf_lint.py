@@ -509,6 +509,43 @@ def questions(bundle: Path) -> int:
     return 0
 
 
+KIT_SECTIONS = ("## 1.", "## 2.", "## 3.", "## Procedimientos")
+
+
+def budget(contract: Path) -> int:
+    """Qué pesa el contrato instalado, separado por dueño.
+
+    El techo que declara el kit (7000) se mide sobre el TEMPLATE, donde las secciones del
+    usuario son placeholders de un par de cientos de chars. En una instalación real esas
+    secciones tienen contenido de verdad y el total puede ser bastante mayor — pero el agente
+    lo paga igual, en cada turno. Sin este desglose, "te pasaste del presupuesto" no dice si
+    engordó el kit o tu propio contenido, que son problemas distintos con dueños distintos.
+    """
+    if not contract.is_file():
+        print(f"okf_lint: no existe '{contract}'", file=sys.stderr)
+        return 2
+    import re as _re
+    text = contract.read_text(encoding="utf-8", errors="replace")
+    parts = _re.split(r"^(## .*)$", text, flags=_re.M)
+    rows = [("(título + stack)", len(parts[0]), "vos")]
+    for i in range(1, len(parts), 2):
+        name = parts[i].strip()
+        who = "kit" if name.startswith(KIT_SECTIONS) else "vos"
+        rows.append((name[:46], len(parts[i]) + len(parts[i + 1]), who))
+    kit_total = sum(n for _, n, w in rows if w == "kit")
+    you_total = sum(n for _, n, w in rows if w == "vos")
+    print(f"{'sección':<48}{'chars':>7}  dueño")
+    for name, n, who in rows:
+        print(f"  {name:<46}{n:>7}  {who}")
+    total = kit_total + you_total
+    print(f"\n  {'del kit':<46}{kit_total:>7}\n  {'tuyo':<46}{you_total:>7}\n  {'TOTAL':<46}{total:>7}"
+          f"  ≈ {total // 4} tokens en CADA turno")
+    print("\nEl techo de 7000 que declara el kit cubre SU prosa. Lo tuyo se suma encima y también\n"
+          "se paga por turno: si el total te parece mucho, mirá primero cuál de las dos columnas\n"
+          "creció.")
+    return 0
+
+
 def pack(bundle: Path) -> int:
     """Emite el bundle entero como UN markdown, cada archivo una sola vez.
 
@@ -602,6 +639,9 @@ def main(argv: list[str]) -> int:
     do_pack = "--pack" in args
     if do_pack:
         args.remove("--pack")
+    do_budget = "--budget" in args
+    if do_budget:
+        args.remove("--budget")
     do_questions = "--questions" in args
     if do_questions:
         args.remove("--questions")
@@ -610,6 +650,9 @@ def main(argv: list[str]) -> int:
         return pack(bundle)
     if do_questions:
         return questions(bundle)
+    if do_budget:
+        # El contrato vive en la raíz del repo, no adentro del bundle.
+        return budget(bundle.parent / "AGENTS.md" if bundle.name == "knowledge" else bundle)
     return Linter(bundle, strict=strict, skip=skip).run()
 
 

@@ -93,8 +93,9 @@ Otros smells, sin método (se ven leyendo):
 - **Duplicación** de la fuente (código/schema copiado en vez de linkeado).
 - Conceptos **huérfanos** (sin cross-links entrantes ni salientes).
 - `AGENTS.md` o `index.md` **demasiado grandes** (rompe progressive disclosure)
-  *(regla gruesa: el `AGENTS.md` instalado no debería pasar los ~7000 caracteres —
-  se paga en cada turno de cada sesión)*.
+  *(corré `python3 scripts/okf_lint.py knowledge --budget`: separa la prosa del kit —que
+  tiene su propio techo de ~7000— de la tuya, que se suma encima. Todo se paga en cada
+  turno de cada sesión.)*.
 - `description` de varias oraciones o genéricas.
 - `Decision` sin contexto/consecuencias.
 - Falta de **conocimiento tribal** (decisiones, gotchas, runbooks): estructura linda

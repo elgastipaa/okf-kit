@@ -26,16 +26,17 @@ from pathlib import Path
 
 KIT = Path(__file__).resolve().parents[1]
 LINT = KIT / "templates" / "scripts" / "okf_lint.py"
-CASES: list[tuple[str, str | None, object, tuple[str, ...], bool, int | None]] = []
+CASES: list[tuple[str, str | None, object, tuple[str, ...], bool, int | None, bool]] = []
 
 
 def case(name: str, expect: str | None, extra: list[str] | None = None,
-         pack_unique: bool = False, questions_expect: int | None = None):
+         pack_unique: bool = False, questions_expect: int | None = None,
+         budget_expect: bool = False):
     """expect = substring que el reporte DEBE contener; None = no debe reportar nada.
 
     `extra` = flags adicionales del linter para ese caso (p.ej. `--skip`)."""
     def deco(fn):
-        CASES.append((name, expect, fn, tuple(extra or ()), pack_unique, questions_expect))
+        CASES.append((name, expect, fn, tuple(extra or ()), pack_unique, questions_expect, budget_expect))
         return fn
     return deco
 
@@ -240,6 +241,11 @@ def _(d):
          "# Contexto\n\n> Pendiente de confirmar: por que se eligio esto. No hay razon registrada.")
 
 
+@case("--budget separa la prosa del kit de la del usuario", None, budget_expect=True)
+def _(d):
+    pass
+
+
 def main() -> int:
     if not LINT.is_file():
         print(f"okf_lint_test: no encontré {LINT}", file=sys.stderr)
@@ -248,7 +254,7 @@ def main() -> int:
     print(f"{'caso':<62} {'espera':<8} {'real':<8} veredicto")
     bad = 0
     try:
-        for name, expect, fn, extra, pack_unique, q_exp in CASES:
+        for name, expect, fn, extra, pack_unique, q_exp, b_exp in CASES:
             # Se copia el KIT entero, no solo `knowledge/`: el dogfood linkea archivos de
             # afuera del bundle (`../../OKF-SPEC.md`) y en una copia aislada serían links
             # rotos — un falso positivo del harness que enmascararía los casos limpios.
@@ -260,6 +266,14 @@ def main() -> int:
             except AssertionError as e:
                 print(f"{name:<62} {'—':<8} {'—':<8} SETUP ROTO: {e}")
                 bad += 1
+                continue
+            if b_exp:
+                rb = subprocess.run([sys.executable, str(LINT), str(d), "--budget"],
+                                    capture_output=True, text=True)
+                ok = "del kit" in rb.stdout and "tuyo" in rb.stdout and "TOTAL" in rb.stdout
+                print(f"{name:<62}{'desglosa':<8} {'ok' if ok else 'no':<8} "
+                      f"{'ok' if ok else '<<< MAL'}")
+                bad += not ok
                 continue
             if q_exp is not None:
                 rq = subprocess.run([sys.executable, str(LINT), str(d), "--questions"],
