@@ -113,9 +113,12 @@ que no dice nada cuesta más que no tenerlo. El trabajo en curso va como docs en
 
 Hay hechos que se preguntan seguido **y** cambian seguido: conteos, flags ON/OFF, miembros de
 un enum, rutas, modelos de datos, niveles de desbloqueo. Escribirlos a mano en prosa es la peor
-opción de las tres: driftea, y encima driftea **con la autoridad del bundle**. Está medido — un
-bundle sembrado solo con prosa quedó **indistinguible de no tener capa** para recuperar hechos,
-y el que ganó la comparación tenía justo esta pieza.
+opción de las tres: driftea, y encima driftea **con la autoridad del bundle**.
+
+**Generá por correctitud, no por velocidad.** Está medido, y el número no es el que uno
+esperaría: agregar la capa generada llevó el acierto de 10/12 a 11/12 —empatando con una capa
+escrita a mano— pero **no bajó los turnos** (indistinguible del mismo bundle sin ella). Sirve
+para que el bundle no mienta, no para que el agente lea menos.
 
 1. **Decidí si aplica.** Si los hechos volátiles del repo son pocos y estables, un puntero al
    code-of-record alcanza: **no generes por generar**, un generador es código a mantener.

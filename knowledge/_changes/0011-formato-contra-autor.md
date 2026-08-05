@@ -247,6 +247,46 @@ el mismo puntero de "Clase base", eso ya dice algo: la capa generada no lo previ
 **Anti-autoengaño** (0028 §3): si bajan los turnos pero el acierto cae por debajo de los 10/12
 de K′, el brazo se rechaza igual.
 
+# Resultado de K″: la capa generada compra correctitud, no velocidad
+
+Scorecard válido (12/12, 0 fallidas, 0 mutaciones) y **cumplimiento verificado antes de
+medir**: el agente escribió `scripts/facts-gen.mjs` desde cero, su `--check` sale 1 ante drift
+inyectado, quedó cableado en `checks.md` y en CI, y sus números coinciden con los del generador
+humano (17 flags, 13 ON, 4 OFF) por un parser distinto. Para que fuera un test real hubo que
+sacar del repo el generador del dueño: en el primer intento el agente lo **adaptó** en vez de
+escribir uno, lo que habría comparado su generador contra su propia wiki.
+
+| brazo | n | turnos | sd | acierto | ctx tokens |
+|---|---|---|---|---|---|
+| N — sin capa | 12 | 7.00 | 3.46 | 9/12 | 233 533 |
+| **W — wiki humana** | 12 | **4.92** | 1.44 | 11/12 | **154 444** |
+| K′ — bundle solo prosa | 12 | 7.33 | 3.17 | 10/12 | 242 076 |
+| K″ — bundle + capa generada | 12 | 8.75 | 5.67 | **11/12** | 278 368 |
+
+- **K″ − K′ = +1.42** (2·EE = 3.75) → **indistinguible**. Se cumple la **lectura 3**: no era eso.
+- **K″ − W = +3.83** (2·EE = 3.38) → sigue distinguiblemente peor que la capa humana.
+- **Acierto: 11/12, empata con W.** Es lo único que mejoró, y mejoró de verdad.
+
+Y el detalle que explica el mecanismo: **el generado ni siquiera cubre `q1`** (cero menciones
+de ATK/DEF; genera flags, clases, reinos, dungeons). Aun así `q1` subió de 11 a 17-19 turnos
+**y pasó de 0/3 a 2/3 correctas**. El bundle no desvió al agente: lo mandó por un camino más
+largo y más riguroso. Generar compra que el bundle no mienta; no compra que el agente lea menos.
+
+## La brecha que queda es la PUERTA DE ENTRADA, y es estructural
+
+| | qué es | qué provoca |
+|---|---|---|
+| `docs/wiki/index.md` (W) | tabla de **ruteo por necesidad**: *"Si necesitás X → leé estos 1-3 archivos → fuente de verdad"* | el agente **salta** |
+| `knowledge/index.md` (K) | índice por **`type`**: Roadmap, Glossary, Runbook, Subdirectories | el agente **navega**: index → index de carpeta → concepto |
+
+Encaja con todo lo medido: K′ y K″ ≈ N (navegar cuesta lo que grepear), W muy por debajo. El
+índice del kit está organizado por **la taxonomía del kit**, no por **las preguntas del que
+llega**. Es la hipótesis viva y la única que explica los tres brazos a la vez.
+
+> Pendiente de confirmar: si el `index.md` que siembra `okf_install.py` debe pasar a ser una
+> tabla `necesidad → archivo(s) → fuente de verdad`. Cambia el formato para todos los repos
+> instalados, así que la decisión no es solo técnica.
+
 # Tareas
 
 - [x] Rama `okf-bundle` con el front door humano apartado
