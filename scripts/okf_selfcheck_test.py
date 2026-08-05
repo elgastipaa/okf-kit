@@ -267,6 +267,11 @@ def _(d): (d / "templates/scripts/okf_lint.py").write_text("", encoding="utf-8")
 def _(d): (d / "templates/knowledge/_decision.md").unlink()
 
 
+@case("el template de decisión vuelve a regalar `origen: dictado`", True)
+def _(d): edit(d, "templates/knowledge/_decision.md",
+                "origen: reconstruido", "origen: dictado")
+
+
 @case("un template nuevo sin sus asserts (inventario corto)", True)
 def _(d): (d / "templates/knowledge/_nuevo.md").write_text("---\ntype: X\n---\n", encoding="utf-8")
 

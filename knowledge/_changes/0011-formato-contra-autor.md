@@ -94,6 +94,12 @@ siembra `origen: dictado` pre-rellenado, así que **el valor peligroso es el def
 agente que no se detiene a pensar lo copia. Acá salió bien porque el repo tenía las razones
 escritas; en un repo que no las tenga, la protección depende de que el agente elija.
 
+**Arreglado mientras esperaba la cuota**: el template ahora viene con `origen: reconstruido`,
+así que copiarlo sin elegir **rompe el linter** y obliga a decidir. `dictado` es la única de
+las dos que nadie puede auditar después — no puede ser lo que sale gratis por no pensar. El
+assert lo prueba de punta a punta (arma el archivo que dejaría un agente y corre el linter),
+y su rotura es volver el template a `dictado`.
+
 **Economía de contexto: el contrato instalado pesa 10 433 chars (~2608 tokens en cada turno),
 2,1× el `AGENTS.md` de 4886 que escribió el dueño a mano.** `--budget` atribuye bien: 6155 son
 prosa del kit (dentro del techo de 7000) y 4278 los agregó el agente en "Reglas duras" y

@@ -189,6 +189,32 @@ with tempfile.TemporaryDirectory() as _tmp:
           "el linter DETECTA una rotura conocida (no solo calla ante el dogfood)",
           f"exit={_r.returncode}; un linter vacío o roto pasaría este bundle sin `type`")
 
+# El template de decisión no puede regalar el `origen` que nadie puede verificar. Medido en
+# una instalación real: 8 de 8 decisiones salieron `dictado` sin que hubiera nadie en sesión
+# para dictar nada — pasaron porque el repo tenía las razones escritas, no porque el agente
+# hubiera elegido. `dictado` es la única de las dos que no se puede auditar después, así que
+# el default tiene que ser el que ROMPE: copiar el template sin pensar dispara el ERROR y
+# obliga a decidir. Se prueba de punta a punta, no leyendo el frontmatter.
+with tempfile.TemporaryDirectory() as _tmp:
+    _b = Path(_tmp) / "knowledge"
+    (_b / "decisions").mkdir(parents=True)
+    # Se reproduce lo que deja un agente: saca los comentarios de guía, completa los
+    # {{placeholders}} y **no toca el frontmatter que no entendió**. El template en crudo ni
+    # siquiera parsea (abre con un comentario HTML), así que copiarlo literal no probaría nada.
+    _fm = strip_comments((KIT / "templates/knowledge/_decision.md").read_text(encoding="utf-8"))
+    _fm = _fm.split("---", 2)[1] if _fm.count("---") >= 2 else ""
+    _fm = "\n".join(l for l in _fm.splitlines() if "{{" not in l)
+    (_b / "decisions" / "0001-copiada-sin-pensar.md").write_text(
+        f"---{_fm}\ntitle: Una decisión\ndescription: \"Qué se decidió.\"\n---\n\n"
+        "# Contexto\nAlgo.\n\n# Decisión\nAlgo.\n", encoding="utf-8")
+    _r = subprocess.run([sys.executable, "templates/scripts/okf_lint.py", str(_b)],
+                        cwd=KIT, capture_output=True, text=True)
+    _out = _r.stdout + _r.stderr
+    check("origen-reconstruido-normativo" in _out,
+          "copiar el template de decisión sin elegir `origen` rompe el linter",
+          f"exit={_r.returncode}; el template regala un `origen` que nadie puede verificar: "
+          "un agente que no se detiene a pensar deja una razón deducida como normativa")
+
 # ---------------------------------------------------------------- 2. kit_version
 ver = (read_required("VERSION") or "").strip()
 check(bool(ver), "VERSION existe y no está vacío")

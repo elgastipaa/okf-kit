@@ -9,7 +9,7 @@ type: Decision
 title: {{La decisión, en una frase afirmativa. Ej: "Usamos cola para emails"}}
 description: {{Una frase que resume qué se decidió y el efecto principal.}}
 status: accepted                  # proposed | accepted | "superseded by NNNN"
-origen: dictado                   # dictado | reconstruido — ver abajo, importa mucho
+origen: reconstruido              # dictado | reconstruido — ver abajo, importa mucho
 supersedes: {{NNNN-slug-al-que-reemplaza — borrá esta línea si no aplica}}
 resource: {{URL al PR/commit/archivo que la implementa — opcional}}
 tags: [{{subsistema}}, {{tema}}]
@@ -20,6 +20,11 @@ timestamp: {{YYYY-MM-DDTHH:MM:SSZ}}
 {{Qué problema o situación motivó la decisión. Qué alternativas había.}}
 
 <!-- ¿DE DÓNDE SALE ESTE "POR QUÉ"?  Es la pregunta que decide si esta decisión vale.
+
+     El template viene con `origen: reconstruido` A PROPÓSITO, y eso hace que copiarlo tal
+     cual **rompa el linter**. No es un descuido: `dictado` es la única de las dos que nadie
+     puede verificar después, así que no puede ser lo que te sale gratis por no pensar.
+     Para que quede `dictado` tenés que escribirlo vos, sabiendo qué estás afirmando.
 
      `origen: dictado`       — te lo contó una persona. Puede ser normativa (`accepted`).
      `origen: reconstruido`  — lo dedujiste vos leyendo el código. **NO puede ser
