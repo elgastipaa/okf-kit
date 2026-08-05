@@ -325,6 +325,13 @@ def main() -> int:
 
     def run_all() -> None:
         nonlocal judge_cost, judge_turns
+        # Corte por fallas seguidas: si el entorno se rompe (el binario desaparece por una
+        # actualización, se cae la red, expira el auth), seguir intentando no arregla nada y
+        # quema las corridas que YA funcionaron — el scorecard queda inservible igual, pero
+        # más caro. Pasó: una actualización reemplazó el symlink de `claude` a mitad de una
+        # corrida y las 11 llamadas siguientes fallaron una por una.
+        consecutive_failures = 0
+        FAIL_FAST = 3
         # `ctx_tok` = cache_read: el contexto que el agente REALMENTE leyó (85K-300K). El
         # `input_tokens` de la API son los tokens no-cacheados del último turno (6-12): ruido.
         print(f"{'id':<6}{'rep':<5}{'cat':<9}{'ctx_tok':>9}{'turns':>7}{'secs':>6}"
@@ -363,12 +370,19 @@ def main() -> int:
                     "answer": answer,
                 }
                 rows.append(row)
+                consecutive_failures = consecutive_failures + 1 if failed else 0
                 with out.open("a", encoding="utf-8") as f:
                     f.write(json.dumps(row, ensure_ascii=False) + "\n")
                 if failed:
                     print(f"{row['id']:<6}{rep:<5}{row['category']:<9}"
                           f"{'ERROR — la corrida falló':>29}")
-                else:
+                if consecutive_failures >= FAIL_FAST:
+                    print(f"\n*** {FAIL_FAST} corridas seguidas fallaron: el entorno está roto "
+                          "(¿el CLI desapareció, se cayó la red, expiró el auth?). Corto acá en "
+                          "vez de quemar las que faltan — el scorecard va a ser inválido igual.",
+                          file=sys.stderr)
+                    return
+                if not failed:
                     flag = " ⚠premisa" if g["premise"] == "premisa-falsa-aceptada" else ""
                     print(f"{row['id']:<6}{rep:<5}{row['category']:<9}{row['cache_read']:>9}"
                           f"{row['num_turns']:>7}{row['duration_ms']//1000:>6}"
