@@ -134,6 +134,35 @@ diseñado. Para medir es contaminación; para usar es la propiedad más valiosa 
 > `code-of-record` exista **y** contenga el término?) o si alcanza con que el keep-alive lo
 > corrija al primer uso. Lo segundo es gratis; lo primero ataja al que lee y no escribe.
 
+# Enmienda al gate (declarada, no silenciosa)
+
+El gate de arriba **no se toca**. Lo que cambia es el conjunto de preguntas, y el motivo es
+público: el brazo K se invalidó **dos veces seguidas por la misma corrección determinista** en
+`q2 rep1`. El bundle recién salido del init no es una condición estable — se arregla solo al
+primer uso. Eso obliga a dos cosas:
+
+1. **La condición pasa a ser K′ = el bundle después de una pasada de keep-alive.** Las
+   correcciones las hizo el agente ciego mientras contestaba, **no yo**, que conozco la golden
+   set. Quedaron commiteadas tal cual.
+2. **q2 sale de la comparación, en los tres brazos.** La corrección cae exactamente sobre lo
+   que q2 pregunta, así que medirla con el bundle corregido sería inflar el número. Sacarla
+   solo del brazo que molesta sería peor: se saca de todos.
+
+Los umbrales se recomputan sobre las mismas 4 preguntas (q1, q5, q8, q10), con los datos que
+ya estaban guardados:
+
+| brazo | n | turnos | sd | acierto |
+|---|---|---|---|---|
+| **N** (sin capa) | 12 | 7.00 | 3.46 | 9/12 |
+| **W** (wiki humana) | 12 | 4.92 | 1.44 | 11/12 |
+
+Las tres lecturas pre-registradas se leen contra **estos** números, sin cambiarles la forma.
+
+**Y queda dicho como resultado, no como incidente:** el bundle recién generado por `okf-init`
+**no se pudo medir en su estado original**. Dos intentos, misma corrección. Eso es información
+sobre el producto — el init entrega algo que todavía no es correcto y necesita un uso para
+estabilizarse — y va publicado aunque no favorezca.
+
 # Tareas
 
 - [x] Rama `okf-bundle` con el front door humano apartado
