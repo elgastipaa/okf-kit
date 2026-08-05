@@ -218,6 +218,35 @@ que el agente sigue de verdad se saltea la mejor idea que el kit tiene escrita.
 - **El candidato con causa medida:** que `okf-init` produzca la capa generada. Es el único
   cambio de esta lista que ataca la brecha donde se midió.
 
+# Gate del brazo K″ (la capa generada), escrito antes de correrlo
+
+<!-- ESCRITO ANTES DE MIRAR (0028). No editar después. -->
+
+Se instala el kit **de nuevo y a ciegas** sobre el mismo commit de `the-conclave`, con el
+`okf-init` que ya incluye el paso 4, y se mide sobre las **mismas 4 preguntas**.
+
+**Chequeo de cumplimiento, antes de medir nada**: si el init **no produjo** un generador con su
+`--check` cableado, el brazo no mide la función — mide que el agente se salteó el paso. En ese
+caso se reporta como *el procedimiento no se siguió* y no se compara con nadie. Un arma que
+no se dispara no falla la puntería.
+
+**Validación** (idéntica al resto): 12/12, 0 fallidas, 0 mutaciones. Si vuelve a mutar sobre
+el mismo puntero de "Clase base", eso ya dice algo: la capa generada no lo previno.
+
+**Lectura pre-registrada**, contra K′ = 7.33 (sd 3.17) y W = 4.92 (sd 1.44):
+
+1. **La pieza era esa** — `|K″ − W| < 2·EE` **y** acierto ≥ 11/12. El formato alcanza al autor
+   humano cuando incluye la capa generada. Es el resultado que más conviene, así que antes de
+   publicarlo se busca por qué no puede ser cierto.
+2. **Ayuda pero no alcanza** — K″ mejor que K′ por más de 2·EE, todavía peor que W. Se publica
+   la fracción recuperada sin redondear para arriba.
+3. **No era eso** — `|K″ − K′| < 2·EE`. La capa generada no era la causa, la brecha es calidad
+   de autoría, y el kit tiene que **decirlo**: `okf-init` produce un punto de partida, no una
+   capa que compita con una escrita por alguien que conoce el repo.
+
+**Anti-autoengaño** (0028 §3): si bajan los turnos pero el acierto cae por debajo de los 10/12
+de K′, el brazo se rechaza igual.
+
 # Tareas
 
 - [x] Rama `okf-bundle` con el front door humano apartado
