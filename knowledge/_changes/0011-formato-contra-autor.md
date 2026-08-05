@@ -72,6 +72,34 @@ el promedio. Una respuesta rápida y equivocada es peor que una lenta y correcta
 apunta a algo que la golden set pregunta. Eso mide la **elicitación** —el valor que ya se vio
 en `forgeidle`— y es una promesa distinta a la de recuperar hechos.
 
+# Lo que se puede leer sin el scorecard
+
+Medido después de la instalación ciega y **antes** de correr el brazo K, para que no se pueda
+acomodar a lo que dé el número.
+
+**Elicitación — 8 preguntas abiertas, y ninguna toca la golden set.** El init dejó 8
+`> Pendiente de confirmar:` (CI de la wiki vieja, por qué no hay Supabase de dev, si hay
+trabajo activo, si lanzar es la meta, nombres de subclase en el lore, telemetría de loot, y la
+Vida como mecánica). **Cero** apuntan a algo que la golden set pregunta, y eso es exactamente
+lo esperable: la golden set se armó con cosas que **sí** están en el repo. La elicitación
+apunta a un conjunto **disjunto** — lo que nadie escribió nunca. Es evidencia de que recuperar
+hechos y sacarle preguntas al dueño son **dos productos distintos**, no el mismo medido dos
+veces.
+
+**La 0027 se sostiene en un segundo repo.** Las 8 decisiones quedaron `accepted` +
+`origen: dictado`, y las 8 **citan una fuente escrita por una persona** (`docs/01_architecture.md`
+"A2"/"A3", `docs/PLAN.md`, los specs de `game-design/new-design/`, el ADR del Arcanista). O sea
+que cosechó en vez de fabricar. Queda una espina que **no es un hallazgo probado**: el template
+siembra `origen: dictado` pre-rellenado, así que **el valor peligroso es el default** y un
+agente que no se detiene a pensar lo copia. Acá salió bien porque el repo tenía las razones
+escritas; en un repo que no las tenga, la protección depende de que el agente elija.
+
+**Economía de contexto: el contrato instalado pesa 10 433 chars (~2608 tokens en cada turno),
+2,1× el `AGENTS.md` de 4886 que escribió el dueño a mano.** `--budget` atribuye bien: 6155 son
+prosa del kit (dentro del techo de 7000) y 4278 los agregó el agente en "Reglas duras" y
+"Capas NO autoritativas". Nadie enforcea la mitad del usuario —es su plata— pero el brazo K
+tiene que ganar **contra ese peso**, no gratis.
+
 # Tareas
 
 - [x] Rama `okf-bundle` con el front door humano apartado
