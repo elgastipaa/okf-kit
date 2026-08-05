@@ -63,7 +63,15 @@ en `roadmap.md`, el **único** template que las pedía. Donde le pedían un "Con
   escribió. Puede evitar que el próximo se pierda, y puede **producir las preguntas** que solo
   una persona puede contestar. Eso último no lo hacía y es, probablemente, lo más valioso que
   hace un init.
-- **Queda por medir.** Esta decisión ataca el camino de escritura; falta re-correr el
-  golden-set de "por qué" y ver si las invenciones bajan de la línea de base (con kit 11/18,
-  sin capa 14/18). Si no bajan, se revierte: es la misma regla que tumbó a la
-  [0022](0022-el-bundle-tambien-es-un-mapa.md).
+- **MEDIDO (2026-08-05), y pasa el gate escrito antes de mirar.** En las dos preguntas donde
+  se aplicó el fix, la invención pasó de **6/6 a 0/6**: las dos contestan ahora "no hay razón
+  registrada". En las dos que se dejaron sin tocar sigue en 100%. Total del brazo: **11/18 →
+  6/18 inventadas**, contra 14/18 sin capa. Los controles se movieron una celda cada uno, así
+  que el efecto está muy por encima del ruido.
+- **La lectura honesta es más chica que el número.** Esto no muestra que el kit haga al modelo
+  más certero: muestra que **el bundle manda sobre lo que el agente contesta**, que es
+  exactamente por qué la fabricación era tan dañina. El rework no cambia ese mecanismo — lo da
+  vuelta, para que lo que se propague sea "no se sabe" en lugar de una explicación inventada.
+- Sembrar la razón real que dictó una persona llevó esa pregunta de "no hay razón registrada"
+  a **correcta 3/3**. Eso mide otra cosa —que el kit preserva lo que le contás— y es la única
+  promesa del kit que quedó demostrada de punta a punta.

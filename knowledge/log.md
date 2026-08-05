@@ -1,5 +1,8 @@
 # Update Log
 
+## 2026-08-05
+* **Update**: **medido el rework contra la confabulación al escribir** ([0027](decisions/0027-una-razon-reconstruida-no-manda.md)) y **pasa su gate**: donde se reemplazó una fabricación por una pregunta abierta declarada, la invención pasó de **6/6 a 0/6**; donde no se tocó, sigue en 100%. Total 11/18 → 6/18, contra 14/18 sin capa. Y sembrar la razón real que dictó el dueño llevó esa pregunta a **correcta 3/3** — la única promesa del kit demostrada de punta a punta. Primer resultado claramente positivo con gate escrito antes de mirar.
+
 ## 2026-08-04
 * **Update**: v0.7.7 — el kit sigue siendo **multipropósito pero sobre un eje: código + concepto** ([0026](decisions/0026-el-eje-es-codigo-mas-concepto.md)). Se rechazó la propuesta de matar los perfiles no-código y se arregló lo que estaba mal de verdad: estaban cortados por la **industria** del repo en vez de por qué documentás. `datos` sale (su vocabulario vive en `mixto`), `wiki` pasa a `concepto` **con alias**, y el alias tiene su assert y su rotura porque sin él el rename sería un cambio incompatible. Nuevo no-goal: publicar en repos ajenos.
 
