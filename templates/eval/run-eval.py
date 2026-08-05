@@ -8,6 +8,12 @@ del repo destino, y registra tokens, turnos, tiempo y (opcional) acierto. Stdlib
 Uso:
     run-eval.py <repo-dir> <golden-set.md> [--mode kit|nokit|agentsmd] [--repeat N]
                 [--out FILE] [--grade] [--layer PATH ...] [--agentsmd-file FILE]
+    run-eval.py --summarize a.jsonl b.jsonl ...   # compara scorecards YA corridos, gratis
+
+`--summarize` no corre nada: lee scorecards guardados y saca la tabla comparativa. Sirve
+para publicar sin re-medir y sin exponer nada — lee **solo campos numéricos**, así que no
+puede filtrar el texto de una respuesta sobre un repo privado. Un scorecard con corridas
+fallidas queda marcado NO VÁLIDO y no entra en la comparación.
 
 Salida: una línea JSON por CORRIDA en --out (default scorecard.jsonl) + tabla y resumen.
 Con --repeat N > 1 el resumen agrega por pregunta (mediana y dispersión) — que es la
@@ -269,7 +275,85 @@ def aggregate(rows: list[dict]) -> list[dict]:
     return sorted(aggs, key=lambda a: a["id"])
 
 
+def summarize_files(paths: list[str]) -> int:
+    """Compara scorecards ya corridos, SIN volver a gastar y SIN exponer una sola respuesta.
+
+    Existe por dos motivos que se tocan. Uno: el resumen que imprime una corrida se va con la
+    terminal, así que publicar la tabla obligaba a re-medir (US$10-15 por brazo) o a copiar
+    números a mano. Dos: los scorecards traen la respuesta COMPLETA del agente sobre un repo
+    que casi siempre es privado, así que no se pueden publicar crudos. Esta función lee
+    **solo campos numéricos y el veredicto** — por construcción no puede filtrar el texto de
+    una respuesta ni el de una pregunta.
+
+    Valida antes de resumir: un scorecard con corridas fallidas o que modificaron el repo NO
+    es una medición (decisión 0028), y acá se dice en vez de promediar el hueco.
+    """
+    cards = []
+    for p in paths:
+        rows = [json.loads(l) for l in Path(p).read_text(encoding="utf-8").splitlines() if l.strip()]
+        good = [r for r in rows if not r.get("failed")]
+        bad, mut = len(rows) - len(good), sum(1 for r in rows if r.get("mutated_repo"))
+        turns = [r["num_turns"] for r in good]
+        grades = [r.get("grade") for r in good if r.get("grade")]
+        cards.append({
+            "archivo": Path(p).name, "modo": (good[0].get("mode") if good else "?"),
+            "corridas": len(rows), "fallidas": bad, "mutaron_el_repo": mut,
+            "turnos_prom": round(statistics.mean(turns), 2) if turns else 0,
+            "turnos_sd": round(statistics.pstdev(turns), 2) if len(turns) > 1 else 0,
+            "turnos_min": min(turns) if turns else 0, "turnos_max": max(turns) if turns else 0,
+            "aciertos": sum(1 for g in grades if g in ("correcta", "trampa-ok", "no-hay-razon-ok")),
+            "de": len(grades),
+            "inventadas": sum(1 for g in grades if g == "inventada"),
+            "ctx_tokens_prom": (sum(r["cache_read"] for r in good) // len(good)) if good else 0,
+            "costo_usd": round(sum(r.get("cost_usd", 0) + r.get("judge_cost_usd", 0)
+                                   for r in good), 2),
+            "valido": bad == 0 and mut == 0 and len(rows) > 0,
+        })
+
+    hdr = f"{'brazo':<12}{'n':>4}{'turnos':>9}{'sd':>7}{'rango':>9}{'acierto':>10}{'ctx tok':>10}{'US$':>8}"
+    print(hdr); print("-" * len(hdr))
+    for c in cards:
+        marca = "" if c["valido"] else "  ← NO VÁLIDO"
+        print(f"{c['modo']:<12}{c['corridas']:>4}{c['turnos_prom']:>9}{c['turnos_sd']:>7}"
+              f"{str(c['turnos_min']) + '-' + str(c['turnos_max']):>9}"
+              f"{str(c['aciertos']) + '/' + str(c['de']):>10}"
+              f"{c['ctx_tokens_prom']:>10}{c['costo_usd']:>8}{marca}")
+    invalid = [c for c in cards if not c["valido"]]
+    for c in invalid:
+        print(f"\n*** {c['archivo']}: {c['fallidas']} corrida(s) fallidas, "
+              f"{c['mutaron_el_repo']} modificaron el repo. No es una medición — no lo leas "
+              "como si lo fuera (decisión 0028).", file=sys.stderr)
+    if len(cards) >= 2 and not invalid:
+        base = cards[0]
+        print(f"\nBase: {base['modo']}. El ruido de referencia es la sd de cada brazo; una "
+              "diferencia menor a eso se informa como indistinguible, no como mejora.")
+        for c in cards[1:]:
+            d = c["turnos_prom"] - base["turnos_prom"]
+            pct = (d / base["turnos_prom"] * 100) if base["turnos_prom"] else 0
+            # Error estándar de la DIFERENCIA de medias: sqrt(sd1²/n1 + sd2²/n2). Con estos n
+            # (15 por brazo) no alcanza para un test formal, así que se usa como umbral de
+            # honestidad — por debajo de 2 EE la diferencia no se reporta como mejora.
+            ee = ((base["turnos_sd"] ** 2 / max(base["corridas"], 1))
+                  + (c["turnos_sd"] ** 2 / max(c["corridas"], 1))) ** 0.5
+            veredicto = (f"indistinguible (|Δ| < 2·EE = {2 * ee:.2f})" if abs(d) < 2 * ee
+                         else f"distinguible (|Δ| > 2·EE = {2 * ee:.2f})")
+            print(f"  {c['modo']:<12} {d:+.2f} turnos ({pct:+.0f}%) — {veredicto}"
+                  f" · acierto {c['aciertos']}/{c['de']} vs {base['aciertos']}/{base['de']}")
+    print(json.dumps(cards, ensure_ascii=False, indent=2))
+    return 0 if not invalid else 1
+
+
 def main() -> int:
+    # --summarize no corre nada: lee scorecards. Va antes del parser normal porque ese exige
+    # repo y golden-set, que acá no aplican.
+    if "--summarize" in sys.argv:
+        i = sys.argv.index("--summarize")
+        files = [x for x in sys.argv[i + 1:] if not x.startswith("-")]
+        if not files:
+            print("--summarize necesita al menos un scorecard .jsonl", file=sys.stderr)
+            return 2
+        return summarize_files(files)
+
     ap = argparse.ArgumentParser()
     ap.add_argument("repo"); ap.add_argument("golden")
     ap.add_argument("--mode", choices=["kit", "nokit", "agentsmd"], default="kit")
