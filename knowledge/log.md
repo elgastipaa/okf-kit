@@ -1,6 +1,7 @@
 # Update Log
 
 ## 2026-08-05
+* **Update**: cosechados los cambios **0005** (el instrumento) y **0006** (los primeros cinco minutos), que llevaban tres versiones shippeadas sin cerrar — el kit tenía **tres cambios activos con su propia regla en ≤1**. Dos decisiones nuevas, y las dos son aprendizajes que solo vivían en docs efímeros: [0028](decisions/0028-la-medicion-manda-y-el-gate-se-escribe-antes.md) (un cambio de comportamiento no se acepta sin medirlo, y el gate se escribe **antes** de mirar) y [0029](decisions/0029-nunca-se-destruye-lo-que-git-no-puede-devolver.md) (la misma clase de bug destructivo apareció en tres herramientas distintas). Y el roadmap deja de afirmar que la regresión de acierto sigue abierta: se explicó y se arregló.
 * **Update**: **v0.8.0** — minor y no patch porque cambia el formato: las decisiones ganan `origen: dictado | reconstruido` y el linter la regla de ERROR que impide que una razón deducida del código sea normativa. Un bundle existente sigue siendo válido (clave ausente = `dictado`).
 * **Update**: **medido el rework contra la confabulación al escribir** ([0027](decisions/0027-una-razon-reconstruida-no-manda.md)) y **pasa su gate**: donde se reemplazó una fabricación por una pregunta abierta declarada, la invención pasó de **6/6 a 0/6**; donde no se tocó, sigue en 100%. Total 11/18 → 6/18, contra 14/18 sin capa. Y sembrar la razón real que dictó el dueño llevó esa pregunta a **correcta 3/3** — la única promesa del kit demostrada de punta a punta. Primer resultado claramente positivo con gate escrito antes de mirar.
 

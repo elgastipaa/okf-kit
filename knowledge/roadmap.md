@@ -27,17 +27,6 @@ git, sin apps externas.
   por iteración. Marca qué puede hacerse solo, qué cuesta plata (💰) y qué necesita una
   decisión del usuario (🙋).
 
-- **La regresión de acierto sigue abierta.** La medición dio **4 fallos contra 0** de no tener
-  capa. El primer intento de fix (la 0022: obligar a verificar en la fuente) **se midió y se
-  revirtió** — +28% de turnos sin alcanzar el acierto que su propio gate exigía
-  ([0023](decisions/0023-verificar-siempre-no-paga.md)). Lo único con evidencia a favor es la
-  **cláusula de ambigüedad** (premisas falsas 1→0), que es barata y hay que probar sola.
-  Aprendido por la vía dura: **agregar prosa al contrato no mueve el acierto**.
-- **[El instrumento puede arbitrar mejoras del kit](_changes/0005-el-instrumento-antes-que-el-kit.md)**
-  — el harness corre n=1 contra un ruido medido de 3,3 turnos/pregunta, con un juez que corre
-  ciego y un brazo `nokit` que nunca se ejecutó. Hasta que mida, ninguna mejora del kit se
-  puede aceptar ni descartar. Sale de las cuatro revisiones en frío sobre v0.7.3 (anexos en
-  `_changes/`).
 
 # Después (próximo, en orden)
 
@@ -135,11 +124,10 @@ proyecto no sabe de sí mismo"**.
 
 **Deudas del tooling.**
 
-- El juez `--grade` del harness de medición no sirve para preguntas de comportamiento: puntuó
-  bien una respuesta con premisa falsa. (La métrica de contexto ya se arregló en 0.7.1.)
-  **En curso** — es parte del cambio
-  [0005](_changes/0005-el-instrumento-antes-que-el-kit.md), junto con la causa mayor que
-  nadie había visto: el juez corre sin `cwd=repo`, o sea que no puede verificar nada.
+- ~~El juez `--grade` no sirve para preguntas de comportamiento~~ — **hecho.** La causa mayor
+  era que corría **sin `cwd=repo`**, o sea que no podía abrir un archivo del repo que juzgaba.
+  Además ganó el veredicto de premisa falsa y el de explicación inventada. Método en la
+  [0028](decisions/0028-la-medicion-manda-y-el-gate-se-escribe-antes.md).
 - El pre-commit hook del kit valida el working tree en vez de lo staged, al revés que el que
   el kit shippea a otros repos. CI ataja el escape, por eso no es urgente.
 - Higiene de `_changes/` (cambios zombie) en el linter — **solo si** la medición muestra que
