@@ -10,6 +10,61 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.8.0 — El kit deja de fabricar porqués que nadie tomó
+
+**Minor y no patch porque cambia el formato**: las decisiones ganan `origen:` y el linter una
+regla de ERROR. Un bundle existente sigue siendo válido (la clave ausente se asume `dictado`).
+
+### El hallazgo
+Se midió por primera vez el eje **"por qué"**, con ground truth **dictado por el dueño de un
+repo real**. De seis preguntas sacadas del código, **tres no las sabía nadie**: las decidió una
+IA meses antes y no dejó registro. Los dos brazos —con kit y sin capa— inventaron una
+explicación en **9 de 9** corridas.
+
+Pero al buscar *dónde* nacía la invención apareció lo importante: **no ocurre al responder,
+ocurre al escribir el bundle.** El agente que había aplicado el kit a ese repo escribió en un
+runbook *"no es cosmético: el repo se trabaja en entornos donde npm no deja el bit de
+ejecución…"* y una **decisión con `status: accepted`** —normativa según nuestro propio
+contrato— argumentando por qué "se eligió" el esquema de persistencia. El dueño, sobre las
+dos: *"no lo sé, lo hizo otra IA"*.
+
+Es peor que confabular al responder: es **consistente**, es **citable**, y el contrato la trata
+como **normativa** — el kit le habría dicho a alguien que su código viola una decisión que
+nunca se tomó.
+
+**La causa no era el criterio del agente sino qué le pedía el template**, y hay evidencia
+directa: en ese mismo repo el mismo agente **dejó tres preguntas abiertas, todas en
+`roadmap.md`** — el único template que las pedía.
+
+### Qué cambia
+- **`origen: dictado | reconstruido`** en las decisiones. **`reconstruido` + `accepted` es
+  ERROR** del linter: una razón deducida del código no manda sobre el código hasta que alguien
+  que sabe la confirme.
+- **"No se sabe" es contenido válido.** Los templates de concepto y decisión piden dejar
+  `> Pendiente de confirmar: …` en vez de reconstruir una razón.
+- **`okf_lint.py --questions`** lista las preguntas abiertas. Si no hay ninguna, **avisa que
+  eso es ambiguo**: puede ser que esté todo averiguado, o que se haya reconstruido en silencio.
+- **`okf-init` y `okf-migrate` terminan entregándole las preguntas al usuario**, y si no hay
+  usuario en sesión tienen que decirlo: un default silencioso es indistinguible de una
+  respuesta informada.
+
+### Medido, con el gate escrito antes de mirar
+Donde se reemplazó una fabricación por una pregunta abierta declarada, la invención pasó de
+**6/6 a 0/6**; donde no se tocó, sigue en 100%. Total del brazo **11/18 → 6/18**, contra 14/18
+sin capa; los controles se movieron una celda.
+
+**La lectura honesta es más chica que el número:** esto no muestra que el kit haga al modelo
+más certero. Muestra que **el bundle manda sobre lo que el agente contesta** — que es
+exactamente por qué la fabricación era tan dañina. El rework da vuelta ese mecanismo.
+
+Y sembrar la razón que **dictó una persona** llevó esa pregunta a `correcta` 3/3: el kit no
+recupera un porqué que nadie escribió, pero **preserva el que le contás**.
+
+### También
+El harness **corta a las 3 fallas seguidas**: una actualización automática reemplazó el binario
+de `claude` a mitad de una corrida y las 11 llamadas siguientes fallaron una por una, quemando
+las 7 útiles que ya habían salido. Verificar el CLI una vez al arrancar no alcanza.
+
 ## 0.7.7 — Multipropósito, pero sobre un eje: código + concepto
 
 Los cuatro perfiles (`codigo`, `datos`, `wiki`, `mixto`) estaban cortados por la **industria**

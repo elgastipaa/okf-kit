@@ -1,6 +1,7 @@
 # Update Log
 
 ## 2026-08-05
+* **Update**: **v0.8.0** — minor y no patch porque cambia el formato: las decisiones ganan `origen: dictado | reconstruido` y el linter la regla de ERROR que impide que una razón deducida del código sea normativa. Un bundle existente sigue siendo válido (clave ausente = `dictado`).
 * **Update**: **medido el rework contra la confabulación al escribir** ([0027](decisions/0027-una-razon-reconstruida-no-manda.md)) y **pasa su gate**: donde se reemplazó una fabricación por una pregunta abierta declarada, la invención pasó de **6/6 a 0/6**; donde no se tocó, sigue en 100%. Total 11/18 → 6/18, contra 14/18 sin capa. Y sembrar la razón real que dictó el dueño llevó esa pregunta a **correcta 3/3** — la única promesa del kit demostrada de punta a punta. Primer resultado claramente positivo con gate escrito antes de mirar.
 
 ## 2026-08-04
