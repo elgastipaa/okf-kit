@@ -106,6 +106,34 @@ prosa del kit (dentro del techo de 7000) y 4278 los agregó el agente en "Reglas
 "Capas NO autoritativas". Nadie enforcea la mitad del usuario —es su plata— pero el brazo K
 tiene que ganar **contra ese peso**, no gratis.
 
+# El puntero plausible y equivocado (hallazgo, no resultado)
+
+El primer intento del brazo K salió **inválido por el guard de mutación**: 15/15 corridas
+completas, 0 fallidas, pero **una modificó el bundle mientras contestaba**. Se descartó sin
+leer los turnos, como manda el gate. Lo que se encontró al revisar *por qué* mutó es más
+importante que el brazo:
+
+El init dejó en el glosario que el término **"Clase base"** tiene su code-of-record en
+`src/lib/game/data/classes.ts`. **Ese archivo existe** —por eso el error es tan bueno— pero es
+otra cosa: son las clases/arquetipos coleccionables de la decisión A1. Las clases base con su
+triángulo de counters viven en `subclasses-types.ts`, `combat-tuning.ts` y `combat-engine.ts`,
+que es exactamente lo que el agente terminó escribiendo cuando lo corrigió.
+
+Es la **misma falla que la [0027](../decisions/0027-una-razon-reconstruida-no-manda.md), en un
+campo que nadie protege**. Ahí el agente fabricaba un *porqué*; acá fabricó una *ubicación*, y
+las dos comparten la propiedad que las hace dañinas: son plausibles, son citables y vienen con
+la autoridad del bundle. Un puntero equivocado no se lee como error, se lee como dato — y el
+que lo sigue paga el desvío sin saber que lo está pagando.
+
+Se nota que costó: esa pregunta llevó 11 turnos hasta que el agente encontró los archivos
+reales. Y el kit tiene la contracara buena en la misma escena: **el agente detectó la mentira
+contra el código y arregló el bundle**, que es el keep-alive funcionando exactamente como está
+diseñado. Para medir es contaminación; para usar es la propiedad más valiosa que tiene.
+
+> Pendiente de confirmar: si esto merece regla propia (¿el linter puede exigir que un
+> `code-of-record` exista **y** contenga el término?) o si alcanza con que el keep-alive lo
+> corrija al primer uso. Lo segundo es gratis; lo primero ataja al que lee y no escribe.
+
 # Tareas
 
 - [x] Rama `okf-bundle` con el front door humano apartado
