@@ -16,6 +16,12 @@ git, sin apps externas.
 
 # Ahora (en curso)
 
+- **La condición de alcance del kit quedó medida en las dos direcciones (2026-08-05).** En un
+  repo chico y bien nombrado la capa **no paga** en recuperación de hechos; en uno de 8,8 GB con
+  código forkeado y términos ambiguos paga **−34% de turnos y 14/15 de acierto contra 10/15**.
+  El kit no sirve siempre: sirve **cuando el routing es genuinamente difícil**, y eso hay que
+  decirlo en la puerta en vez de prometer que sirve para todo.
+
 - **[Cola de ejecución de las fases 1 a 4](_changes/0009-plan-de-ejecucion.md)** — el plan que
   salió del análisis de seis herramientas del ecosistema, escrito para ejecutarse de a un ítem
   por iteración. Marca qué puede hacerse solo, qué cuesta plata (💰) y qué necesita una
