@@ -163,6 +163,61 @@ Las tres lecturas pre-registradas se leen contra **estos** números, sin cambiar
 sobre el producto — el init entrega algo que todavía no es correcto y necesita un uso para
 estabilizarse — y va publicado aunque no favorezca.
 
+# Resultado: gana el autor. Se cumple la lectura 3, la que no conviene
+
+Scorecard válido: 12/12 corridas, 0 fallidas, 0 mutaciones, capa intacta.
+
+| brazo | n | turnos | sd | acierto | ctx tokens |
+|---|---|---|---|---|---|
+| **N** — sin capa | 12 | 7.00 | 3.46 | 9/12 | 233 533 |
+| **W** — wiki humana | 12 | **4.92** | 1.44 | **11/12** | **154 444** |
+| **K′** — bundle de `okf-init` | 12 | 7.33 | 3.17 | 10/12 | 242 076 |
+
+- **K′ − N = +0.33 turnos** (2·EE = 2.71) → **indistinguible de no tener capa.**
+- **K′ − W = +2.42 turnos** (2·EE = 2.01) → **distinguiblemente peor que la wiki humana.**
+- En contexto leído, K′ (242k) tampoco mejora a N (233k); W lee **154k**.
+
+Se cumple la **lectura 3** del gate: *el valor era el autor*. El −34% que el kit venía citando
+como su mejor número **no lo produjo el formato OKF: lo produjo que Gasti escribió su wiki**.
+
+Por pregunta (mediana de turnos) se ve dónde:
+
+| | q1 ATK/DEF | q5 Vigor | q8 por qué flags | q10 trampa |
+|---|---|---|---|---|
+| N | 11.0 | 6.0 | 6.0 | 5.0 |
+| W | **4.0** | 6.0 | 5.0 | 4.0 |
+| K′ | 11.0 | 8.0 | **3.0** | 6.0 |
+
+K′ **gana en una sola**: `q8`, el "por qué" — que es donde viven las decisiones, y donde el
+init cosechó razones que una persona había escrito. Justo el eje que la 0027 trabajó. En
+recuperación de hechos (`q1`) empata con no tener nada.
+
+## La causa es concreta, no un misterio de calidad
+
+La wiki que gana tiene `docs/wiki/_generated/state.md`: **37 líneas emitidas por un script
+desde el código** (`scripts/wiki-gen.mjs`), con `wiki:check` fallando en CI si driftea. Dice
+qué flags están ON/OFF, cuántas subclases hay y cuáles, qué modelos existen. **Es fiel por
+construcción: no puede mentir.**
+
+El bundle de `okf-init` **no generó nada**. Y el puntero equivocado que costó 11 turnos era
+**imposible** en un archivo generado: `subclasses-types.ts` es exactamente la fuente que
+`state.md` cita.
+
+**El kit conoce la idea y no la instala.** `GUIDE.md` la enseña —"hechos volátiles: generalos,
+no los copies", con el patrón `_generated/state.md` + `gen`/`check`—, `templates/knowledge/_generated.md`
+existe… y `templates/skills/okf-init/SKILL.md` **no la menciona ni una vez**. El procedimiento
+que el agente sigue de verdad se saltea la mejor idea que el kit tiene escrita.
+
+## Qué cambia
+
+- **El número que el kit publica.** El −34% pasa a ser *"lo que gana una capa bien escrita por
+  una persona"*, no *"lo que gana instalar el kit"*.
+- **La promesa del `init`.** Hoy entrega, medido: prosa que **no** acelera la recuperación de
+  hechos, **sí** preserva los porqués que alguien escribió (`q8`), preguntas abiertas útiles, y
+  al menos un puntero plausible y equivocado que se corrige al primer uso.
+- **El candidato con causa medida:** que `okf-init` produzca la capa generada. Es el único
+  cambio de esta lista que ataca la brecha donde se midió.
+
 # Tareas
 
 - [x] Rama `okf-bundle` con el front door humano apartado
