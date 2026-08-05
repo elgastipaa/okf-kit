@@ -276,9 +276,19 @@ def main() -> int:
                 bad += not ok
                 continue
             if q_exp is not None:
+                # Se mide el DELTA contra el dogfood, no el total. Exigir "1 pregunta" daba
+                # por sentado que el bundle del kit tiene cero preguntas abiertas — y tener
+                # preguntas abiertas es exactamente la práctica que el kit predica, así que
+                # el propio kit rompía este test al usarla. Un test de la herramienta no
+                # puede depender del contenido del dogfood.
                 rq = subprocess.run([sys.executable, str(LINT), str(d), "--questions"],
                                     capture_output=True, text=True)
-                ok = f"{q_exp} pregunta" in rq.stdout
+                base = subprocess.run([sys.executable, str(LINT), str(KIT / "knowledge"),
+                                       "--questions"], capture_output=True, text=True)
+                def _n(out: str) -> int:
+                    m = re.search(r"(\d+) pregunta", out)
+                    return int(m.group(1)) if m else -1
+                ok = _n(rq.stdout) == _n(base.stdout) + q_exp
                 print(f"{name:<62} {'lista '+str(q_exp):<8} "
                       f"{'ok' if ok else 'no las vio':<8} {'ok' if ok else '<<< MAL'}")
                 bad += not ok

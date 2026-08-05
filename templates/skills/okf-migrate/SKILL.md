@@ -59,11 +59,11 @@ terminaría ruteando a los agentes hacia la basura).
 - **Procedimientos operativos** → `knowledge/runbooks/`.
 - **Material externo** → `knowledge/references/` (resumido, con `# Citations`).
 - **Planes / TODOs / roadmaps**: **preguntale al usuario si quiere la capa de futuro**
-  (misma pregunta que en `okf-init` §3 — en su idioma, no en el del kit). Si va: la
+  (misma pregunta que en `okf-init` §1 — en su idioma, no en el del kit). Si va: la
   intención que sigue viva → `knowledge/roadmap.md` (visión, qué sigue, no-goals —
   confirmala con él) y, si hay trabajo a medio hacer, un doc por cambio en
-  `knowledge/_changes/` (ver `okf-plan`). Si no va, es la instalación **mínima**: aplicá el
-  borrado por marcadores del `AGENTS.md` que describe `okf-init` §5. Los planes muertos
+  `knowledge/_changes/` (ver `okf-plan`). Si no va, es la instalación **mínima**: la hace el
+  instalador con `--minimal` (`okf-init` §2), que recorta el contrato por sus marcadores. Los planes muertos
   → no-autoritativos o borrar (preguntá la disposición, como con cualquier doc stale).
 
 ## 4. Instalá la maquinaria (sin perder el entrypoint del usuario)

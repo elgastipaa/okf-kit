@@ -638,6 +638,48 @@ for _mini in (False, True):
           f"el contrato {'mínimo' if _mini else 'completo'} manda a correr los chequeos del repo",
           "el archivo se siembra pero nadie lo abre")
 
+# La capa generada es lo único que el kit sabía y no instalaba. Medido sobre the-conclave: un
+# bundle sembrado solo con prosa quedó indistinguible de no tener capa para recuperar hechos
+# (7.33 turnos vs 7.00 sin capa), y la wiki que ganó (4.92) tenía un state.md emitido por un
+# script y verificado en CI. El GUIDE lo enseñaba, el template `_generated.md` existía, y el
+# procedimiento que el agente sigue de verdad no lo nombraba ni una vez.
+_init = read_required("templates/skills/okf-init/SKILL.md") or ""
+check(near(_init, "_generated/state.md", "generador", "code-of-record"),
+      "okf-init manda a generar los hechos volátiles, no a escribirlos",
+      "el kit enseña el patrón en GUIDE.md y tiene el template, pero el procedimiento "
+      "no rutea ahí: el agente siembra prosa que driftea con la autoridad del bundle")
+
+# Generar sin check es peor que no generar: un archivo rápido de leer Y falso. Se exige el
+# imperativo del drift ("sale con código != 0 si difiere" + CI), no la palabra `--check`
+# suelta, que aparecería igual en una mención de pasada.
+check(near(_init, "--check", "difiere", "CI"),
+      "okf-init exige que el generado traiga su propio check de drift",
+      "un generado sin check en CI es una promesa, no una garantía: miente igual que la "
+      "prosa, solo que más rápido")
+
+# Las referencias `§N` entre procedimientos no las chequeaba nadie: el linter valida links
+# entre archivos del bundle, y esto son punteros a SECCIONES dentro de un skill. Al agregar un
+# paso a okf-init aparecieron tres rotas, y dos ya lo estaban desde antes — una mandaba a una
+# sección que no existe en ningún lado. Es justo la deriva que el kit vende evitar, adentro del
+# kit. Se verifica que cada `§N` tenga su heading `## N.` en el archivo al que apunta.
+_SKILLS = {p.parent.name: p for p in (KIT / "templates/skills").glob("*/SKILL.md")}
+_dangling: list[str] = []
+for _name, _p in sorted(_SKILLS.items()):
+    _txt = _p.read_text(encoding="utf-8")
+    _own = set(re.findall(r"(?m)^## (\d+)\.", _txt))
+    # `okf-otro §N` apunta a otro skill; `§N` suelto, al propio archivo.
+    for _target, _num in re.findall(r"`(okf-[a-z-]+)`\s*§(\d+)", _txt):
+        _tp = _SKILLS.get(_target)
+        if _tp is None:
+            continue  # skill que no ship**eamos: lo cubre el assert de autosuficiencia
+        if _num not in set(re.findall(r"(?m)^## (\d+)\.", _tp.read_text(encoding="utf-8"))):
+            _dangling.append(f"{_name} → {_target} §{_num}")
+    for _num in re.findall(r"(?<!`)\(§(\d+)\)", _txt) + re.findall(r"(?<!\w) ver §(\d+)", _txt):
+        if _num not in _own:
+            _dangling.append(f"{_name} → §{_num} (propio)")
+check(not _dangling, "las referencias §N entre procedimientos apuntan a una sección que existe",
+      "punteros colgados: " + ", ".join(sorted(set(_dangling))))
+
 # Renombrar un perfil rompe el CLI de quien ya lo usó, así que el alias no es cortesía: es
 # la única razón por la que el rename no es un cambio incompatible.
 _prof = subprocess.run([sys.executable, _INSTALLER, "--help"], cwd=KIT,

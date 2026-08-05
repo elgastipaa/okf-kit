@@ -79,7 +79,7 @@ python3 <ruta-al-kit>/scripts/okf_install.py <repo-destino> --profile <perfil> -
 ```
 
 - Instalado como **plugin** de Claude Code, la ruta del kit es `${CLAUDE_PLUGIN_ROOT}`.
-- Flags: `--minimal` (sin capa de futuro, ver §3) · `--no-claude` (procedimientos a `docs/okf/`
+- Flags: `--minimal` (sin capa de futuro, ver §1) · `--no-claude` (procedimientos a `docs/okf/`
   en vez de `.claude/skills/`) · `--no-ci` · `--no-hook` · `--dry-run` (mostrar sin escribir).
 - **No pisa un `knowledge/` existente**: aborta y te rutea (§0).
 - Al terminar corre el linter sobre lo instalado y **lista lo que falta**, que es exactamente
@@ -109,7 +109,30 @@ que sí puedas inferir del código/README y marcá cada hueco con un blockquote
 que no dice nada cuesta más que no tenerlo. El trabajo en curso va como docs en
 `knowledge/_changes/` (template `_change.md`; el linter la ignora). Ciclo completo: `okf-plan`.
 
-## 4. Completá lo que el instalador dejó marcado
+## 4. Generá los hechos volátiles — no los escribas
+
+Hay hechos que se preguntan seguido **y** cambian seguido: conteos, flags ON/OFF, miembros de
+un enum, rutas, modelos de datos, niveles de desbloqueo. Escribirlos a mano en prosa es la peor
+opción de las tres: driftea, y encima driftea **con la autoridad del bundle**. Está medido — un
+bundle sembrado solo con prosa quedó **indistinguible de no tener capa** para recuperar hechos,
+y el que ganó la comparación tenía justo esta pieza.
+
+1. **Decidí si aplica.** Si los hechos volátiles del repo son pocos y estables, un puntero al
+   code-of-record alcanza: **no generes por generar**, un generador es código a mantener.
+2. **Escribí el generador** en el lenguaje del repo (`scripts/facts-gen.…`), que emita
+   `knowledge/_generated/state.md` — template `templates/knowledge/_generated.md`. Parsea el
+   código; no repitas a mano lo que el código ya dice.
+3. **Dale modo `--check`**: regenera en memoria y **sale con código ≠ 0 si difiere** del
+   archivo commiteado. Sin esto el archivo miente igual que la prosa, solo que más rápido.
+4. **Cableá el check** en `knowledge/checks.md` y en el CI. Un generado sin check en CI es una
+   promesa, no una garantía.
+5. **Apuntá el glosario y el `index.md`** a ese archivo como code-of-record de esos hechos —
+   uno solo, en vez de ocho archivos de código.
+
+El archivo es de **solo lectura**: si está mal, se arregla el generador o el código, nunca el
+archivo.
+
+## 5. Completá lo que el instalador dejó marcado
 
 Su reporte final lista los archivos con `{{placeholders}}`. Los que importan:
 
@@ -127,11 +150,11 @@ Si es un repo de **wiki o datos** que se navega a mano y no lo va a trabajar un 
 código: borrá el `AGENTS.md` y el `CLAUDE.md`, y poné un puntero a `knowledge/` en el `README`.
 Para herramientas que no sean Claude Code (Cursor/Copilot/Gemini…), `reference/install-per-tool.md`.
 
-## 5. Verificá
+## 6. Verificá
 Corré `python3 scripts/okf_lint.py knowledge` (o el skill `okf-verify`). Mostrale al
 usuario el árbol final, el perfil elegido y qué sembraste. Ver `reference/verification.md`.
 
-## 6. Entregá las PREGUNTAS ABIERTAS — este paso no es opcional
+## 7. Entregá las PREGUNTAS ABIERTAS — este paso no es opcional
 
 ```
 python3 scripts/okf_lint.py knowledge --questions

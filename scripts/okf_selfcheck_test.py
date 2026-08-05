@@ -267,6 +267,30 @@ def _(d): (d / "templates/scripts/okf_lint.py").write_text("", encoding="utf-8")
 def _(d): (d / "templates/knowledge/_decision.md").unlink()
 
 
+@case("okf-init vuelve a no nombrar la capa generada", True)
+def _(d):
+    # Borrar solo el heading NO alcanza: el cuerpo sigue nombrando el patrón, y el assert
+    # mira la sustancia y no el título. La regresión real es que el paso desaparezca.
+    p = d / "templates/skills/okf-init/SKILL.md"
+    t = p.read_text(encoding="utf-8")
+    a = t.index("## 4. Generá los hechos volátiles")
+    b = t.index("## 5. Completá lo que el instalador")
+    p.write_text(t[:a] + t[b:], encoding="utf-8")
+
+
+@case("el generado se pide sin su check de drift", True)
+def _(d): edit(d, "templates/skills/okf-init/SKILL.md",
+                "**sale con código ≠ 0 si difiere** del", "**se ve lindo** comparado con el")
+
+
+@case("una referencia §N a la propia sección queda colgada", True)
+def _(d): edit(d, "templates/skills/okf-init/SKILL.md", "ver §1)", "ver §9)")
+
+
+@case("una referencia §N de un skill a otro queda colgada", True)
+def _(d): edit(d, "templates/skills/okf-migrate/SKILL.md", "`okf-init` §1", "`okf-init` §9")
+
+
 @case("el template de decisión vuelve a regalar `origen: dictado`", True)
 def _(d): edit(d, "templates/knowledge/_decision.md",
                 "origen: reconstruido", "origen: dictado")
@@ -375,7 +399,7 @@ def _(d):
     # reescritura del skill. Cambiar solo el heading deja el cuerpo y el assert lo ve igual.
     f = d / "templates/skills/okf-init/SKILL.md"
     txt = f.read_text(encoding="utf-8")
-    f.write_text(txt[:txt.index("## 6. Entregá las PREGUNTAS ABIERTAS")], encoding="utf-8")
+    f.write_text(txt[:txt.index("## 7. Entregá las PREGUNTAS ABIERTAS")], encoding="utf-8")
 
 
 @case("el rename de perfil se hace sin alias (rompe el CLI de quien ya lo usó)", True)
