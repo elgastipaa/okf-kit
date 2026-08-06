@@ -29,13 +29,17 @@ git, sin apps externas.
   pagar, el instrumento no resuelve efectos menores a ~20-40%. Lo que sigue midiéndose es la
   **elicitación**, que es barata y no depende de este instrumento.
 
-- **[Cola de ejecución de las fases 1 a 4](_changes/0009-plan-de-ejecucion.md)** — el plan que
-  salió del análisis de seis herramientas del ecosistema, escrito para ejecutarse de a un ítem
-  por iteración. Marca qué puede hacerse solo, qué cuesta plata (💰) y qué necesita una
-  decisión del usuario (🙋).
-
 
 # Después (próximo, en orden)
+
+**La cola de ejecución (0009) se cerró (2026-08-06).** Lo que sobrevive ya vive abajo, en
+"Adopción". **Dados de baja por la
+[0032](decisions/0032-el-instrumento-tiene-un-piso-de-resolucion.md):** `fuente primaria` como
+palabra líder, la restricción de tipo sobre el artefacto y la dieta del contrato con la navaja
+no-op. Los tres eran cambios de prosa del contrato que **solo se podían justificar
+midiéndolos**, en el eje que el instrumento no resuelve. No están descartados por malos: están
+**fuera del alcance de lo que se puede saber** con lo que cuesta medir. Si algún día hay un
+instrumento más fino, vuelven.
 
 **La hipótesis que puede redefinir el kit: elicitación, no documentación.**
 

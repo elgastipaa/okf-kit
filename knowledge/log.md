@@ -1,6 +1,7 @@
 # Update Log
 
 ## 2026-08-06
+* **Update**: **v0.9.0** — minor porque cambia el material que se instala (la puerta que rutea en el `index.md`, el paso de la capa generada en `okf-init`, el `origen` del template de decisión) sin invalidar ningún bundle existente. La cola de ejecución **0009 se cerró**: lo que sobrevive pasó al roadmap y tres ítems quedaron dados de baja con su motivo escrito ([0032](decisions/0032-el-instrumento-tiene-un-piso-de-resolucion.md)). El kit queda **sin cambios activos** por primera vez desde 0.7.0.
 * **Update**: cosechados los cambios **0011** y **0012**, que midieron si el kit gana por **formato** o por **autor**. Gana el autor: el −34% que el kit citaba se produjo con la capa escrita a mano por el dueño del repo, y un bundle instalado **a ciegas** quedó indistinguible de no tener capa en recuperación de hechos. Se probaron las dos hipótesis caras y ninguna separó por encima del ruido — [0031](decisions/0031-generar-compra-correctitud-no-velocidad.md) (la capa generada compra correctitud, no velocidad) y [0030](decisions/0030-la-puerta-de-entrada-rutea-por-necesidad.md) (la puerta rutea por necesidad, que se mantiene **sin reclamar un número**). De ahí salieron las dos decisiones que más pesan: [0032](decisions/0032-el-instrumento-tiene-un-piso-de-resolucion.md), el instrumento tiene un piso de resolución y abajo de eso no se compara, y [0033](decisions/0033-el-kit-preserva-porques-no-acelera-hechos.md), que corrige lo que el kit promete.
 
 

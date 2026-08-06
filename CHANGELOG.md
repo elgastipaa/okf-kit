@@ -10,6 +10,50 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.9.0 — El kit mide qué parte del mérito era suyo, y corrige lo que promete
+
+**Lo importante de esta versión no es una función: es que el mejor número del kit resultó no
+ser del kit.** El −34% de turnos que se citaba se había medido con una capa escrita **a mano
+por el dueño del repo**. Instalando el kit **a ciegas** sobre el mismo repo y las mismas
+preguntas, el bundle quedó **indistinguible de no tener capa** en recuperación de hechos. Se
+probaron las dos hipótesis caras —capa generada y puerta que rutea— y ninguna separó por
+encima del ruido del instrumento. Está todo publicado, negativos incluidos.
+
+### La promesa, corregida
+- **El kit ya no promete que la IA vaya a ser más rápida averiguando cómo funciona tu código.**
+  Lo que hace, medido: **preserva los porqués** que viven en chats borrados y **produce las
+  preguntas que solo vos podés contestar**. Un init sobre un repo real dejó 8 preguntas
+  abiertas, ninguna deducible del código.
+- El `README` lo dice con el link a la decisión que incluye los números que lo contradicen.
+
+### Nuevo
+- **La puerta de entrada rutea por necesidad.** El `index.md` raíz arranca con una tabla
+  `necesidad → 1-3 archivos → fuente de verdad`; el listado por `type` queda abajo, intacto.
+  **Ningún bundle existente deja de ser válido** (`OKF-SPEC` §5 lo llama convención, no
+  requisito).
+- **`okf-init` genera los hechos volátiles** (paso 4): un generador en el lenguaje del repo,
+  con su propio `--check` que falla si el archivo quedó viejo, cableado en `checks.md` y en CI.
+  Se pide **por correctitud, no por velocidad** — está medido que sube el acierto y no baja los
+  turnos.
+- **`run-eval.py --summarize`**: compara scorecards ya corridos sin volver a gastar, leyendo
+  **solo campos numéricos**, así que no puede filtrar una respuesta sobre un repo privado.
+
+### Corregido
+- **El template de decisión ya no regala `origen: dictado`**, que es el único valor de los dos
+  que nadie puede auditar después. Ahora viene `reconstruido`: copiarlo sin elegir **rompe el
+  linter** y obliga a decidir.
+- Tres referencias `§N` entre procedimientos apuntaban a secciones equivocadas o inexistentes,
+  y **nadie las chequeaba**. Ahora hay un assert que resuelve cada una contra su heading real.
+- La cabecera del `index.md` se recortaba buscando un heading puntual, lo que arrastraba una
+  fila de ejemplo con un link roto a las instalaciones reales.
+
+### Decisiones
+[0030](knowledge/decisions/0030-la-puerta-de-entrada-rutea-por-necesidad.md) ·
+[0031](knowledge/decisions/0031-generar-compra-correctitud-no-velocidad.md) ·
+[0032](knowledge/decisions/0032-el-instrumento-tiene-un-piso-de-resolucion.md) (el instrumento
+tiene un piso de resolución: abajo de ~20-40% no se compara, y ese eje se cierra) ·
+[0033](knowledge/decisions/0033-el-kit-preserva-porques-no-acelera-hechos.md)
+
 ## 0.8.0 — El kit deja de fabricar porqués que nadie tomó
 
 **Minor y no patch porque cambia el formato**: las decisiones ganan `origen:` y el linter una
