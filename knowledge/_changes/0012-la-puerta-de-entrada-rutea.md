@@ -71,6 +71,59 @@ propias del repo, el brazo no mide la función — mide que el agente se salteó
 **Presupuesto**: es la cuarta instalación ciega de esta línea. Si esta lectura da 3, **se para
 de gastar** en este eje y se publica lo aprendido.
 
+# Resultado: se cumple la lectura 3, y el instrumento tocó su techo
+
+Scorecard válido (12/12, 0 fallidas, 0 mutaciones). Cumplimiento holgado: el init llenó la
+tabla con **17 filas** en las palabras del que pregunta, a 1-3 archivos cada una.
+
+| brazo | n | turnos | sd | acierto | ctx tokens | sd ctx |
+|---|---|---|---|---|---|---|
+| N — sin capa | 12 | 7.00 | 3.46 | 9/12 | 233 534 | 119 158 |
+| **W — wiki humana** | 12 | **4.92** | 1.44 | 11/12 | **154 444** | 54 131 |
+| K′ — prosa | 12 | 7.33 | 3.17 | 10/12 | 242 077 | 174 479 |
+| K″ — + capa generada | 12 | 8.75 | 5.67 | 11/12 | 278 368 | 216 920 |
+| **K‴ — + puerta que rutea** | 12 | 5.83 | **1.34** | 10/12 | 159 778 | **37 666** |
+
+**Se cumple la lectura 3**: `|K‴ − K″| = 2.92 < 2·EE = 3.37`. La mejora de turnos **no es
+distinguible**, y el acierto no llegó a 11/12 (las dos fallas son `q1 parcial`). Por el gate
+que escribí antes, esto **no** es una victoria y no se publica como tal.
+
+**Y el hallazgo de método es más importante que el brazo: el instrumento tocó su techo.** Con
+n=12 por brazo, `2·EE` en este golden set vale entre **1.1 y 3.4 turnos** — o sea que
+**ningún efecto menor a ~20-40% es medible acá**, por más real que sea. Las cinco condiciones
+quedan indistinguibles de a pares salvo K‴ contra N en contexto. Seguir comparando prosa contra
+prosa en este eje es comprar ruido a US$10 el brazo.
+
+## Lo que sí se puede afirmar, y lo que no
+
+**Se puede**: K‴ es **el primer brazo del kit indistinguible de la capa humana** en las tres
+métricas a la vez — turnos (+0.92, 2·EE 1.14), contexto (+3%, 2·EE 38k) y acierto (una celda).
+Y es el único brazo del kit **distinguiblemente mejor que no tener capa** en contexto (−32%,
+2·EE 72k).
+
+**No se puede**: decir que la puerta causó eso. La comparación directa contra K″ no clarifica,
+y la caída de dispersión —turnos de sd 5.67 a 1.34, contexto de 216k a 37k— es **post-hoc**:
+no estaba pre-registrada, así que es una **hipótesis nueva**, no un resultado. Si alguna vez se
+mide, se pre-registra primero.
+
+## Decisión: se mantiene, sin reclamar nada
+
+El gate decía *"se revierte salvo que se sostenga solo"*. Se sostiene, y por razones que no
+dependen del número:
+
+- **No cuesta nada**: dos filas que siembra el instalador y una tabla que escribe el agente. No
+  agrega maquinaria, ni scripts, ni superficie que mantener.
+- **No degradó nada medido**, y es la única configuración que aterriza sobre los números de la
+  capa humana en las tres métricas juntas.
+- Revertir significaría elegir K″ —peor en toda tendencia central: 8.75 turnos y 278k de
+  contexto— sobre la base de que la diferencia no es distinguible. La simetría corta para los
+  dos lados.
+
+Lo que **no** se hace es ponerlo en el README como logro. La prosa del kit dice que rutear por
+necesidad es mejor práctica que listar por tipo, sin número atrás.
+
+**Se para de gastar en este eje**, como decía el gate.
+
 # Tareas
 
 - [ ] Gate escrito antes de codear
