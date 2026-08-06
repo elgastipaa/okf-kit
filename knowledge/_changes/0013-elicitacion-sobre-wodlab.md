@@ -72,6 +72,36 @@ las que me convienen). De cada una, el dueño dice:
 **Lo que este test NO mide**: si las decisiones son *correctas*. Una razón fabricada puede
 acertar. Mide si tienen **autoridad legítima**, que es lo que la 0027 dice que importa.
 
+# El agujero que apareció antes de medir: la autoridad se puede lavar
+
+El dueño confirmó que **`DECISIONS.md` (6699 líneas) lo escribió una IA**. Eso rompe la forma
+en que veníamos operacionalizando la [0027](../decisions/0027-una-razon-reconstruida-no-manda.md):
+
+- La regla dice que `origen: dictado` significa **"te lo contó una persona"**.
+- En la práctica se venía chequeando como **"cita una fuente escrita"**.
+- En un repo vibecodeado **las dos cosas no coinciden**: un init que cosecha de un doc escrito
+  por una IA produce una decisión que **cita una fuente y sigue siendo reconstruida**. La
+  autoridad no se fabrica en el bundle: se **lava** un paso más arriba.
+
+`okf-migrate` ya advierte que estás leyendo "docs que escribió otra persona u otra IA hace
+meses", pero la regla de `origen` **solo cubre el caso "la dedujiste del código"**. Copiarla de
+un doc de autor desconocido cae en el hueco.
+
+> Pendiente de confirmar: si el arreglo es (a) que `dictado` exija una **persona** identificable
+> y un doc no alcance salvo que alguien confirme quién lo escribió, o (b) que `okf-migrate`
+> haga **una sola pregunta al principio** —"¿quién escribió estos docs?"— que determina la
+> autoridad de todo lo que se cosecha después. La (b) es una pregunta y decide decenas de
+> archivos.
+
+**No se arregla antes de medir.** La corrida a ciegas está en vuelo con la prosa actual, y el
+test B existe justamente para cuantificar cuánto daño hace este hueco en un repo real. Arreglar
+primero convertiría la medición en una confirmación de lo que ya creo.
+
+**Corrección al registro**: en el análisis de `the-conclave` se afirmó que las 8 decisiones
+"citan una fuente escrita **por el dueño**". Lo verificado fue que citan una **fuente escrita**;
+la autoría se asumió. Con esto, esa conclusión queda en duda y no debe citarse como evidencia
+de que la 0027 se sostiene.
+
 # El loop
 
 Un ítem por iteración, y **se para en los pasos que necesitan al dueño** — que en este
