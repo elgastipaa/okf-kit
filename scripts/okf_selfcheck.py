@@ -488,6 +488,15 @@ if (KIT / _INSTALLER).is_file():
                   f"la instalación {_mode} NO siembra log.md (es opt-in)",
                   "vuelve a costarle una escritura por concepto a alguien que nunca lo lee")
 
+            # La puerta de entrada rutea por NECESIDAD. Es la única diferencia estructural
+            # que explica los tres brazos medidos: el índice que lista por `type` hace navegar
+            # (índice → índice de carpeta → concepto) y sale casi igual de caro que grepear;
+            # el que manda a 1-3 archivos hace saltar.
+            _door = (_dst / "knowledge" / "index.md").read_text(encoding="utf-8")
+            check(near(_door, "# Por dónde empezar", "Si necesitás", "Fuente de verdad"),
+                  f"la instalación {_mode} siembra la puerta que rutea por necesidad",
+                  "el index arranca listando por `type`: el agente navega en vez de saltar")
+
             _chk = _dst / "knowledge" / "checks.md"
             check(_chk.is_file(),
                   f"la instalación {_mode} siembra knowledge/checks.md",
@@ -637,6 +646,12 @@ for _mini in (False, True):
     check("checks.md" in _c and near(_c, "checks.md", "corré", "listo"),
           f"el contrato {'mínimo' if _mini else 'completo'} manda a correr los chequeos del repo",
           "el archivo se siembra pero nadie lo abre")
+
+_init_door = read_required("templates/skills/okf-init/SKILL.md") or ""
+check(near(_init_door, "# Por dónde empezar", "1-3 archivos", "carpeta"),
+      "okf-init completa la puerta con las preguntas del repo, no con categorías",
+      "sin esto la tabla queda con las dos filas que sabe el instalador y nada más — "
+      "y mandar a una carpeta es volver a hacer navegar")
 
 # La capa generada es lo único que el kit sabía y no instalaba. Medido sobre the-conclave: un
 # bundle sembrado solo con prosa quedó indistinguible de no tener capa para recuperar hechos

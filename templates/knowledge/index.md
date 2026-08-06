@@ -7,10 +7,15 @@
 
   Hay dos formas según dónde esté el index:
 
-  (A) RAÍZ del bundle (knowledge/index.md) → lista los SUBDIRECTORIOS bajo
-      "# Subdirectories". Es el bloque de abajo. Si hay conceptos EN la raíz
-      (p.ej. roadmap.md o un glossary.md), van antes, agrupados por type como
-      en las hojas (el bloque "# Roadmap" de abajo; borralo si no aplica).
+  (A) RAÍZ del bundle (knowledge/index.md) → arranca con "# Por dónde empezar",
+      la tabla que RUTEA POR NECESIDAD, y después lista los SUBDIRECTORIOS bajo
+      "# Subdirectories". Si hay conceptos EN la raíz (p.ej. roadmap.md o un
+      glossary.md), van entre medio, agrupados por type como en las hojas.
+
+      La tabla es la parte que más rinde y la más fácil de hacer mal: va en las
+      palabras del que PREGUNTA, no en las categorías del kit, y manda a 1-3
+      archivos concretos. Mandar a una carpeta es volver a hacer navegar, que es
+      exactamente lo que se paga en turnos.
 
   (B) HOJAS (knowledge/<carpeta>/index.md) → agrupa los CONCEPTOS bajo un heading
       por su `type`, así (sin frontmatter):
@@ -31,6 +36,12 @@
 okf_version: "0.1"
 kit_version: "{{KIT_VERSION}}"   # okf-init lo reemplaza con el contenido de VERSION
 ---
+
+# Por dónde empezar
+
+| Si necesitás… | Leé | Fuente de verdad |
+|---|---|---|
+| {{la pregunta, en las palabras del que la hace}} | {{[`archivo.md`](archivo.md) — 1 a 3, nunca una carpeta}} | {{código / doc / el equipo}} |
 
 # Roadmap
 

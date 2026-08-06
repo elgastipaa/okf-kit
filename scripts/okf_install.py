@@ -277,8 +277,29 @@ def build_index(version: str, minimal: bool, name: str | None,
         "* [Cómo se comprueba que este repo anda](checks.md) - "
         "Los comandos que prueban que el código funciona, y qué cubre cada uno.\n"
     )
-    head = text.split("# Roadmap", 1)[0].rstrip() + "\n\n"
-    return head + ("" if minimal else roadmap_block + "\n") + checks_block + "\n" + subdirs_block
+    # La PUERTA DE ENTRADA va primero y rutea por NECESIDAD, no por `type`. Medido sobre un
+    # repo real: un bundle cuyo index lista por tipo hace que el agente navegue (index →
+    # index de carpeta → concepto) y sale igual de caro que grepear el código; el índice que
+    # ganó la comparación mandaba directo a 1-3 archivos. El listado por `type` se conserva
+    # abajo — es la convención de OKF-SPEC §5 y lo que el linter cruza.
+    rows = [("Cómo sé que esto anda / qué comandos correr",
+             "[`checks.md`](checks.md)", "el repo")]
+    if not minimal:
+        rows.insert(0, (f"Qué se está haciendo y qué sigue",
+                        "[`roadmap.md`](roadmap.md)", "el equipo"))
+    door = ("# Por dónde empezar\n\n"
+            "| Si necesitás… | Leé | Fuente de verdad |\n|---|---|---|\n"
+            + "".join(f"| {a} | {b} | {c} |\n" for a, b, c in rows)
+            + "{{una fila por PREGUNTA que este repo recibe de verdad, en las palabras del que "
+              "pregunta (no en las categorías del kit). Mandá a 1-3 archivos concretos, nunca "
+              "a una carpeta: mandar a una carpeta es volver a hacer navegar.}}\n")
+    # La cabecera es todo lo anterior al PRIMER heading, no lo anterior a "# Roadmap": el
+    # template arranca con la tabla de la puerta, y cortar por un heading puntual arrastraba
+    # su fila de ejemplo (con un link a un `archivo.md` que no existe) dentro de la
+    # instalación. Todos los bloques de abajo se reconstruyen, así que el corte va al primero.
+    head = re.split(r"(?m)^# ", text, maxsplit=1)[0].rstrip() + "\n\n"
+    return (head + door + "\n" + ("" if minimal else roadmap_block + "\n")
+            + checks_block + "\n" + subdirs_block)
 
 
 def build_log(version: str) -> str:

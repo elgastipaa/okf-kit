@@ -146,7 +146,13 @@ Su reporte final lista los archivos con `{{placeholders}}`. Los que importan:
   `package.json`/`Makefile`/CI — **no los inventes**. Si el repo no tiene ninguno,
   escribí eso tal cual: "este repo no tiene chequeos automáticos" es información y hoy
   es invisible. Es el único concepto que contesta *"¿cómo sé que esto anda?"*.
-- **`knowledge/index.md`**: la `description` del roadmap y una línea por carpeta sembrada.
+- **`knowledge/index.md`**: la `description` del roadmap, una línea por carpeta sembrada, y
+  —lo que más rinde— la tabla **`# Por dónde empezar`**. Es la **puerta de entrada**: una fila
+  por **pregunta que este repo recibe de verdad**, en las palabras del que pregunta, mandando a
+  **1-3 archivos concretos**. Está medido: un índice que lista por `type` hace que el agente
+  **navegue** (índice → índice de carpeta → concepto) y sale casi igual de caro que grepear el
+  código; el que rutea hace que **salte**. **Mandar a una carpeta es volver a hacer navegar** —
+  si te sale poner `decisions/`, la fila todavía no está terminada.
 - **`knowledge/log.md`**: qué conceptos sembraste en este primer pase.
 
 Si es un repo de **wiki o datos** que se navega a mano y no lo va a trabajar un agente de

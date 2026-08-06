@@ -267,6 +267,22 @@ def _(d): (d / "templates/scripts/okf_lint.py").write_text("", encoding="utf-8")
 def _(d): (d / "templates/knowledge/_decision.md").unlink()
 
 
+@case("el instalador vuelve a sembrar un index que lista por type", True)
+def _(d):
+    # Se borra el bloque entero de la puerta en el instalador: cambiarle el título dejaría la
+    # tabla, y lo que se paga en turnos es no tener la tabla.
+    p = d / "scripts/okf_install.py"
+    t = p.read_text(encoding="utf-8")
+    a = t.index('    door = ("# Por dónde empezar\\n\\n"')
+    b = t.index("    # La cabecera es todo lo anterior")
+    p.write_text(t[:a] + '    door = ""\n' + t[b:], encoding="utf-8")
+
+
+@case("okf-init deja de mandar a 1-3 archivos concretos", True)
+def _(d): edit(d, "templates/skills/okf-init/SKILL.md",
+                "**1-3 archivos concretos**", "**la carpeta que corresponda**")
+
+
 @case("okf-init vuelve a no nombrar la capa generada", True)
 def _(d):
     # Borrar solo el heading NO alcanza: el cuerpo sigue nombrando el patrón, y el assert
