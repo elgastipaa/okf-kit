@@ -286,6 +286,11 @@ def main() -> int:
                 base = subprocess.run([sys.executable, str(LINT), str(KIT / "knowledge"),
                                        "--questions"], capture_output=True, text=True)
                 def _n(out: str) -> int:
+                    # Con cero preguntas el linter no imprime ningún número, dice "no hay
+                    # preguntas abiertas". Sin este caso, el dogfood limpio daba -1 y el
+                    # delta nunca cerraba.
+                    if "no hay preguntas abiertas" in out:
+                        return 0
                     m = re.search(r"(\d+) pregunta", out)
                     return int(m.group(1)) if m else -1
                 ok = _n(rq.stdout) == _n(base.stdout) + q_exp

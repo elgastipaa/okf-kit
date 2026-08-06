@@ -16,11 +16,18 @@ git, sin apps externas.
 
 # Ahora (en curso)
 
-- **La condición de alcance del kit quedó medida en las dos direcciones (2026-08-05).** En un
-  repo chico y bien nombrado la capa **no paga** en recuperación de hechos; en uno de 8,8 GB con
-  código forkeado y términos ambiguos paga **−34% de turnos y 14/15 de acierto contra 10/15**.
-  El kit no sirve siempre: sirve **cuando el routing es genuinamente difícil**, y eso hay que
-  decirlo en la puerta en vez de prometer que sirve para todo.
+- **El −34% no era del kit: era del autor (2026-08-06).** Ese número se midió con la capa que
+  escribió **a mano el dueño del repo**. Instalando el kit **a ciegas** sobre el mismo repo y
+  las mismas preguntas, el bundle quedó **indistinguible de no tener capa** en recuperación de
+  hechos. Se probaron las dos hipótesis caras —capa generada y puerta que rutea— y ninguna
+  separó por encima del ruido del instrumento. La promesa se corrigió en la
+  [0033](decisions/0033-el-kit-preserva-porques-no-acelera-hechos.md): el kit **preserva
+  porqués y produce preguntas**; no acelera la recuperación de hechos por sí solo.
+
+- **El eje de medición "prosa contra prosa" está cerrado, y por qué**
+  ([0032](decisions/0032-el-instrumento-tiene-un-piso-de-resolucion.md)). Con el n que se puede
+  pagar, el instrumento no resuelve efectos menores a ~20-40%. Lo que sigue midiéndose es la
+  **elicitación**, que es barata y no depende de este instrumento.
 
 - **[Cola de ejecución de las fases 1 a 4](_changes/0009-plan-de-ejecucion.md)** — el plan que
   salió del análisis de seis herramientas del ecosistema, escrito para ejecutarse de a un ítem
