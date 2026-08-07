@@ -647,6 +647,16 @@ for _mini in (False, True):
           f"el contrato {'mínimo' if _mini else 'completo'} manda a correr los chequeos del repo",
           "el archivo se siembra pero nadie lo abre")
 
+# Los dos caminos de entrada tienen que dejar el mismo material. La v0.9.0 agregó la capa
+# generada solo a `okf-init`, y una migración real sobre un repo con 6699 líneas de docs a mano
+# no generó nada — que es justo donde más hace falta, porque ese material ya demostró que
+# envejece. Un procedimiento que existe en uno de los dos caminos no existe.
+_migr = read_required("templates/skills/okf-migrate/SKILL.md") or ""
+check(near(_migr, "generalos", "okf-init", "correctitud"),
+      "okf-migrate manda a generar los hechos volátiles igual que okf-init",
+      "migrar conteos y flags copiados a mano solo mueve el drift de lugar, y le suma la "
+      "autoridad recién estrenada del bundle")
+
 _init_door = read_required("templates/skills/okf-init/SKILL.md") or ""
 check(near(_init_door, "# Por dónde empezar", "1-3 archivos", "carpeta"),
       "okf-init completa la puerta con las preguntas del repo, no con categorías",

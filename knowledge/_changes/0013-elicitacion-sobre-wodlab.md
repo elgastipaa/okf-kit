@@ -102,6 +102,70 @@ primero convertiría la medición en una confirmación de lo que ya creo.
 la autoría se asumió. Con esto, esa conclusión queda en duda y no debe citarse como evidencia
 de que la 0027 se sostiene.
 
+# Resultados
+
+El agente **eligió `okf-migrate` solo** (ruteo correcto: el repo tenía `DECISIONS.md` de 6699
+líneas, `DESIGN.md`, `ROADMAP.md` y `PANORAMA.md`). Verificado en su transcript que **no espió**
+la capa v0.6.2 en la historia de git.
+
+## Test A — 4 preguntas, cero ruido: se cumple la lectura 2
+
+| pregunta | veredicto del dueño |
+|---|---|
+| El porqué de dos reglas que el código cita como si obligaran | **"no sé"** — hueco real, sin respuesta |
+| ¿Hay algo abierto hoy? | contestada, y era correcta |
+| ¿El orden del roadmap es ese? | contestada **+ información que el repo no tenía** ("tengo otra conversación abierta") |
+| ¿El secret del backup está en GitHub? ¿Se probó restaurar? | **"creo que está local… y ni idea lo de restaurar"** |
+
+**Lectura 2: existe pero es flojo en volumen.** Cuatro preguntas contra las 12 de `forgeidle`,
+o sea que **el gate de ≥8 no se cumple** y eso se informa como tal. Pero **cero ruido** y las
+cuatro legítimas.
+
+La explicación más probable no es que el kit preguntara menos, sino que **había menos que
+preguntar**: `wodlab` llegaba con 6699 líneas de decisiones escritas. Preguntar poco en un repo
+bien documentado es la conducta correcta, no una falla — pero eso es una **explicación
+post-hoc** y no cancela el gate.
+
+**Y el volumen no mide el valor.** La cuarta pregunta destapó que el secret del backup podría
+no estar cargado en GitHub y que **la restauración nunca se probó**: un riesgo operativo real
+que ningún doc del repo decía. Vale más que doce preguntas triviales. El gate midió cantidad
+porque es lo que se puede pre-registrar; queda anotado que la métrica es incompleta.
+
+## Test B — 12 de 12 "la decidí yo": mi hipótesis no se sostuvo
+
+Muestra de 12 sobre 51, semilla `20260806`. **Cero "no la decidí". Cero "no sé".**
+
+El gate pedía ≥25% para concluir que el kit viejo fabricaba autoridad a escala. Dio **0%**.
+
+**Esto refuta la alarma que levanté en la vuelta anterior.** Al enterarme de que `DECISIONS.md`
+lo había escrito una IA, escribí que la autoridad "se lava un paso más arriba" y que las 51
+decisiones estaban en duda. **La medición dice que no**: *"lo escribió una IA"* y *"lo decidió
+una IA"* son cosas distintas, y en este repo la IA estaba **transcribiendo decisiones del
+dueño**.
+
+Lo que sí queda, y es más preciso que la alarma original:
+
+- **Cosechar de un documento escrito preservó decisiones reales. Reconstruir desde el código
+  las fabricó** (`the-conclave`, `forgeidle`). El riesgo no es el intermediario: es la
+  **ausencia de fuente**. Eso afina el alcance de la
+  [0027](../decisions/0027-una-razon-reconstruida-no-manda.md) en vez de contradecirla.
+- El lavado sigue siendo **posible** —un doc escrito por una IA sin supervisión produciría
+  exactamente el efecto temido— pero **no está demostrado**, y el kit no puede cambiar una
+  regla por un miedo que su propia medición no encontró.
+
+## Lo que apareció y no estaba en ningún gate
+
+- **Falta un casillero en el vocabulario.** El dueño **confirmó que decidió** dos reglas (test
+  B, #6 y #12) y a la vez **no supo decir por qué** (test A, #1). `origen: dictado |
+  reconstruido` no distingue *"lo decidí y el razonamiento se perdió"* de *"me lo contaron"*.
+  El primero es una decisión legítimamente normativa **sin** un porqué recuperable, que es un
+  estado real y frecuente en un repo vibecodeado.
+- **Una decisión del bundle real está mal escrita.** La #7 dice "los minutos medidos, **no** los
+  que el template presupuestó"; el dueño corrigió que **guarda los dos** para poder compararlos.
+- **`okf-migrate` no generaba la capa de hechos volátiles** — la v0.9.0 le agregó el paso solo a
+  `okf-init`. Es un bug introducido por este kit, encontrado por esta corrida y **arreglado
+  acá** (paso 5b + assert de paridad entre los dos caminos, con su rotura).
+
 # El loop
 
 Un ítem por iteración, y **se para en los pasos que necesitan al dueño** — que en este

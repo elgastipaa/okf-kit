@@ -96,6 +96,16 @@ Por cada pieza: creá el concepto OKF en `knowledge/` (frontmatter `type`+`title
 `knowledge/<...>`"). El `AGENTS.md` y el `CLAUDE.md` ya los dejó el Paso 4 (contrato +
 shim): acá solo se le suman las reglas duras del usuario, no se reescriben.
 
+## 5b. Los hechos volátiles se generan, no se migran
+
+Un doc viejo está **lleno** de conteos, flags, listas y rutas copiados a mano — y por eso está
+desactualizado. Migrarlos a markdown nuevo solo mueve el drift de lugar, con la autoridad
+recién estrenada del bundle. Seguí el **paso 4 de `okf-init`** y generalos: es el mismo
+procedimiento y la misma justificación (se genera por **correctitud**, no por velocidad), y
+acá pesa más, porque el material que estás migrando ya demostró que envejece.
+
+Regla práctica: si al migrar una pieza dudás de un número, **ese número va al generador**.
+
 ## 6. Anti-duplicación + verificá
 **Una verdad, un lugar.** Si algo quedó en dos lados, borralo de uno y linkeá. Generá
 los `index.md` (raíz —subdirectorios **y** los conceptos que vivan en la raíz, como

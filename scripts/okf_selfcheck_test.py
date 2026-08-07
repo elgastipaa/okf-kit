@@ -267,6 +267,15 @@ def _(d): (d / "templates/scripts/okf_lint.py").write_text("", encoding="utf-8")
 def _(d): (d / "templates/knowledge/_decision.md").unlink()
 
 
+@case("la capa generada vuelve a existir solo en okf-init", True)
+def _(d):
+    p = d / "templates/skills/okf-migrate/SKILL.md"
+    t = p.read_text(encoding="utf-8")
+    a = t.index("## 5b. Los hechos volátiles se generan")
+    b = t.index("## 6. Anti-duplicación")
+    p.write_text(t[:a] + t[b:], encoding="utf-8")
+
+
 @case("el instalador vuelve a sembrar un index que lista por type", True)
 def _(d):
     # Se borra el bloque entero de la puerta en el instalador: cambiarle el título dejaría la
