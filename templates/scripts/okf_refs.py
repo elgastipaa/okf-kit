@@ -15,7 +15,11 @@ Chequea, dentro del bundle:
   1. `resource:` del frontmatter, cuando apunta al repo y no a una URL.
   2. Paths entre backticks (`src/lib/x.ts`), con soporte de `*` y `**`.
   3. Símbolos entre backticks (`nombreDeFuncion()`) contra las definiciones del repo —
-     **opt-in con `--symbols`**: es la parte con más falsos positivos.
+     **opt-in con `--symbols`, y es una heurística ruidosa**. Validado sobre cinco bundles
+     reales: los únicos hallazgos fueron **APIs externas** (`scale()` de canvas, `unlink()`
+     de la stdlib de Python), o sea 100% de falsos positivos. Un bundle nombra APIs de
+     librerías todo el tiempo y buscarlas en el repo no tiene sentido. Sirve para una pasada
+     manual filtrando con `--ignore`; **no para el CI**, y por eso no está en el default.
 
 Un path cuenta como referencia al repo si su **primer segmento existe en la raíz**. No hay
 lista blanca de carpetas que mantener: se adapta a cualquier layout.
@@ -174,7 +178,8 @@ def main() -> int:
     ap.add_argument("bundle", nargs="?", default="knowledge")
     ap.add_argument("--repo", default=".", help="raíz del repo contra la que se resuelve")
     ap.add_argument("--symbols", action="store_true",
-                    help="chequear también `simbolo()` contra las definiciones del repo")
+                    help="chequear también `simbolo()` — HEURÍSTICA RUIDOSA: reporta las APIs "
+                         "externas que el bundle nombra. Para una pasada manual, no para CI")
     ap.add_argument("--ignore", action="append", default=[],
                     help="no reportar referencias que contengan este texto (repetible)")
     a = ap.parse_args()
@@ -218,8 +223,9 @@ def main() -> int:
                         and not ignored(ref)):
                     problems.append((doc, i, "path", ref))
             if a.symbols:
-                for mm in SYMBOL_RE.finditer(line):
-                    name = mm.group(1)
+                # `dict.fromkeys` y no `set`: se deduplica conservando el orden de aparición.
+                # El mismo símbolo dos veces en una línea se reportaba dos veces.
+                for name in dict.fromkeys(mm.group(1) for mm in SYMBOL_RE.finditer(line)):
                     if name not in symbols and not ignored(f"{name}()"):
                         problems.append((doc, i, "símbolo", f"{name}()"))
 
@@ -233,6 +239,10 @@ def main() -> int:
     print(f"okf_refs: {len(problems)} referencia(s) muerta(s)\n", file=sys.stderr)
     for doc, line, kind, ref in problems:
         print(f"  {doc}:{line} — {kind}: {ref} no existe en el repo", file=sys.stderr)
+    if any(k == "símbolo" for _, _, k, _ in problems):
+        print("\nOjo con los `símbolo()`: un bundle nombra APIs de librerías y del browser todo\n"
+              "el tiempo, y buscarlas en tu repo no tiene sentido. Filtralas con --ignore.",
+              file=sys.stderr)
     print("\nEl bundle nombra algo que ya no está. **Gana el código**: corregí el concepto.\n"
           "Si la referencia es a algo externo (una API del browser, una lib), sacala de la\n"
           "corrida con --ignore en vez de editar este script, que es material instalado.",
