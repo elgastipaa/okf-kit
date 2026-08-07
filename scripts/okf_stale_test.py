@@ -59,6 +59,13 @@ def build(root: Path, *, dirty: bool) -> None:
         concept(k / "churn.md", ts="2026-01-01T00:00:00Z", resource="src/motor.js")
         concept(k / "sello.md", ts="2026-01-01T00:00:00Z", resource="src/motor.js")
         concept(k / "sinfuente.md", ts="2026-01-01T00:00:00Z")
+        # Decisión con `verify:` que se va a editar DESPUÉS de fijarlo: el comando pasa
+        # igual, pero puede estar custodiando lo que la decisión decía antes.
+        (k / "guardada.md").write_text(
+            "---\ntype: Decision\nstatus: accepted\n"
+            "verify: 'echo ok -t \"CASO.1\"'\n"
+            "title: Guardada\ndescription: Una decisión con chequeo.\n"
+            "timestamp: 2026-03-01T00:00:00Z\n---\n\n# Contexto\n\nv1\n", encoding="utf-8")
 
     run(root, "git", "add", "-A")
     run(root, "git", "commit", "-qm", "inicial", env_date="2026-02-01T12:00:00+0000")
@@ -74,6 +81,12 @@ def build(root: Path, *, dirty: bool) -> None:
         p.write_text(p.read_text(encoding="utf-8") + "\nEditado sin re-sellar.\n", encoding="utf-8")
         run(root, "git", "add", "-A")
         run(root, "git", "commit", "-qm", "editar sin re-sellar", env_date="2026-02-15T12:00:00+0000")
+        # el cuerpo de la decisión cambia; su `verify:` NO
+        g = k / "guardada.md"
+        g.write_text(g.read_text(encoding="utf-8").replace("v1", "v2 — la regla cambió"),
+                     encoding="utf-8")
+        run(root, "git", "add", "-A")
+        run(root, "git", "commit", "-qm", "cambiar la regla", env_date="2026-02-16T12:00:00+0000")
 
 
 def out(root: Path) -> str:
@@ -113,6 +126,12 @@ def main() -> int:
             ("sobre limpio no inventa drift",          "DRIFT CONFIRMADO" not in c),
             ("sobre limpio no inventa sello podrido",  "SELLO PODRIDO" not in c),
             ("sobre limpio no inventa sospechosos",    "SOSPECHOSOS" not in c),
+            ("avisa que el chequeo puede custodiar la regla vieja",
+             "CUSTODIANDO LA REGLA VIEJA" in d and "guardada.md" in d),
+            ("no corta el comando que trae comillas adentro",
+             'echo ok -t "CASO.1"' in d),
+            ("sobre limpio no inventa deriva de verify",
+             "CUSTODIANDO LA REGLA VIEJA" not in c),
             ("no crashea con timestamp sin offset (ISO válido para el linter)",
              "Traceback" not in naive and "fechacorta.md" in naive),
         ]

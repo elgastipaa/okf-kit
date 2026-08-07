@@ -39,6 +39,18 @@ from pathlib import Path
 RESERVED = {"index.md", "log.md"}
 
 
+def unquote(v: str) -> str:
+    """Saca las comillas de YAML SOLO si envuelven el valor entero.
+
+    Un `.strip('"')` ingenuo se come la comilla de cierre de un comando como
+    `... -t "WAKE.1"`, y entonces se busca en git una cadena que nunca se escribió.
+    """
+    v = v.strip()
+    if len(v) >= 2 and v[0] == v[-1] and v[0] in "\"'":
+        v = v[1:-1]
+    return v.strip()
+
+
 def frontmatter(text: str) -> dict[str, str]:
     """Claves de primer nivel del frontmatter. Sin PyYAML, igual que okf_lint."""
     m = re.match(r"---\r?\n(.*?)\r?\n---", text, re.S)
@@ -48,7 +60,10 @@ def frontmatter(text: str) -> dict[str, str]:
     for line in m.group(1).splitlines():
         km = re.match(r"^([a-z_][a-z0-9_]*):\s*(.*)$", line)
         if km:
-            out[km.group(1)] = km.group(2).strip().strip("\"'")
+            # `.strip("\"'")` acá se comía la comilla de cierre de un valor que CONTIENE
+            # comillas —`verify: 'npx ... -t "WAKE.1"'`— y dejaba una cadena rota. Se
+            # desenvuelve solo si las comillas envuelven el valor entero.
+            out[km.group(1)] = unquote(km.group(2))
     return out
 
 
@@ -109,6 +124,7 @@ def main() -> int:
 
     now = datetime.now(timezone.utc)
     broken, unstamped, suspects, no_source = [], [], [], []
+    verify_drift: list[tuple[str, str, int]] = []
 
     for c in concepts(bundle):
         fm = frontmatter(c.read_text(encoding="utf-8", errors="replace"))
@@ -117,6 +133,22 @@ def main() -> int:
         rel = c.relative_to(bundle).as_posix()
         res = fm.get("resource", "")
         target = resolve(repo, c, res)
+
+        # La decisión y su `verify:` escriben la MISMA regla dos veces —una en prosa, otra en
+        # un comando— y nada garantiza que digan lo mismo. Si el documento se editó después de
+        # fijar su chequeo, el chequeo puede estar custodiando la regla vieja y **pasando**.
+        # Medido sobre un bundle real de 50 decisiones con comando: dispara en 2 (4%), y las
+        # dos eran de verdad — una quedó superseded en parte, la otra revirtió una cláusula el
+        # mismo día. Es una SOSPECHA, no un hallazgo: por eso vive acá y no en el linter.
+        verify = unquote(fm.get("verify", ""))
+        if verify and verify.lower() != "none":
+            intro = git(repo, "log", "-S", verify, "--format=%H", "--", str(c.resolve()))
+            first = intro.splitlines()[0] if intro else ""
+            if first:
+                after = git(repo, "log", "--format=%H", f"{first}..HEAD", "--", str(c.resolve()))
+                n_after = len(after.splitlines()) if after else 0
+                if n_after:
+                    verify_drift.append((rel, verify, n_after))
 
         if res and target is not None and not target.exists():
             broken.append((rel, res))
@@ -160,6 +192,14 @@ def main() -> int:
         print("  (las demás señales se calculan desde ese valor, así que miden mal)")
         for rel, declared, real in unstamped:
             print(f"  {rel}\n      declara {declared} · último commit {real}")
+        print()
+
+    if verify_drift:
+        print("EL CHEQUEO PUEDE ESTAR CUSTODIANDO LA REGLA VIEJA")
+        print("  (la decisión se editó después de fijar su `verify:`; el comando pasa igual,")
+        print("   pero puede estar midiendo lo que la decisión decía antes)")
+        for rel, cmd, n in verify_drift:
+            print(f"  {rel}\n      $ {cmd}\n      {n} commit(s) al doc desde que se fijó")
         print()
 
     if suspects:

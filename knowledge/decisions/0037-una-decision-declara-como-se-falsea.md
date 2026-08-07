@@ -49,5 +49,13 @@ Una decisión declara **`verify: <comando>`** —lo que falla si alguien la romp
 - **Corre en la dirección contraria al resto del kit.** Un hallazgo no significa "el documento
   quedó viejo": significa que **el código está en violación**. Editar la decisión para que
   coincida con el código de hoy es el modo de falla que esto existe para cazar.
+- **`verify:` NO compara la prosa con el código.** Ejecuta un comando y mira su exit code, así
+  que la regla queda escrita **dos veces** —una en el documento, otra en el comando— y nada
+  garantiza que digan lo mismo. Comparar prosa contra código es semántico: eso es el Nivel 3
+  (`okf_coldtest.py`), y cuesta tokens. Lo que sí se puede detectar gratis es **la sospecha**:
+  si el documento se editó después de fijar su `verify:`, el chequeo puede estar custodiando la
+  regla vieja **y pasando igual**. Esa señal vive en `okf_stale.py` —que rankea, no
+  gatea— y está medida: sobre 50 decisiones reales dispara en **2 (4%)**, y las dos eran
+  legítimas (una quedó superseded en parte, la otra revirtió una cláusula el mismo día).
 - **Empujó a que el kit se hiciera chequeable.** Varias decisiones sin assert propio ahora
   apuntan a uno; escribir el `verify` obligó a mirar si existía.

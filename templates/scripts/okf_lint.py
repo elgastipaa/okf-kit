@@ -251,7 +251,9 @@ class Linter:
         # ¿Cómo se sabría que alguien rompió esta decisión? La pregunta vale al ESCRIBIRLA,
         # que es cuando alguien todavía se acuerda de qué la protege.
         if keys.get("type", "").strip().strip('"').strip("'").lower() == "decision":
-            verify = keys.get("verify", "").split(" #", 1)[0].strip().strip('"').strip("'")
+            verify = keys.get("verify", "").split(" #", 1)[0].strip()
+            if len(verify) >= 2 and verify[0] == verify[-1] and verify[0] in "\"'":
+                verify = verify[1:-1].strip()
             note = keys.get("verify_note", "").strip().strip('"').strip("'")
             if verify:
                 self.verify_declared.append(path)
