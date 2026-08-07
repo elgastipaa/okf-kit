@@ -10,6 +10,37 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.10.0 — Se puede decir "lo decidí yo, y no me acuerdo por qué"
+
+### Nuevo
+- **`origen: confirmado`** — el tercer valor del vocabulario de decisiones, para el estado más
+  común de un repo trabajado con IAs durante meses: **alguien confirma que la decisión se tomó,
+  pero el porqué no se recuperó**. Puede ser normativa (lo que falta es la razón, no la
+  decisión) y **obliga a declarar el hueco**: sin un `> Pendiente de confirmar: …` en el
+  archivo, es ERROR del linter. Esas decisiones entran solas en `--questions`, así que el
+  porqué queda como deuda visible en vez de como prosa inventada. **Aditivo**: ningún bundle
+  existente deja de ser válido.
+
+### Corregido
+- **`okf-migrate` no generaba la capa de hechos volátiles.** La 0.9.0 le agregó el paso solo a
+  `okf-init`, y una migración real sobre un repo con miles de líneas de docs a mano no generó
+  nada — justo donde más hace falta, porque ese material ya demostró que envejece. Hay assert
+  de paridad entre los dos caminos de entrada.
+
+### Una regla que NO se agregó
+Al descubrir que el `DECISIONS.md` del que un bundle viejo había cosechado **lo escribió una
+IA**, pareció que la autoridad se "lavaba" un paso más arriba. Se midió antes de arreglar nada:
+**12 de 12 decisiones, muestreadas al azar, eran del dueño**. La hipótesis se refutó y la regla
+no se agregó ([0035](knowledge/decisions/0035-el-riesgo-es-la-ausencia-de-fuente.md)). El
+riesgo es **la ausencia de fuente**, no quién tecleó el documento.
+
+### Medición
+Elicitación sobre un segundo repo, con el dueño contestando: **4 preguntas, cero ruido**, contra
+las 12 del primero. **El gate de ≥8 no se cumplió y se informa como tal.** El repo llegaba con
+6699 líneas de decisiones ya escritas — explicación razonable y post-hoc, que no cancela el
+gate. Y el volumen no mide el valor: una de las cuatro destapó que un backup automático nunca
+se había verificado.
+
 ## 0.9.0 — El kit mide qué parte del mérito era suyo, y corrige lo que promete
 
 **Lo importante de esta versión no es una función: es que el mejor número del kit resultó no
