@@ -46,6 +46,19 @@ que te estás perdiendo — y de lo que hay que re-copiar.
    `templates/skills/{okf-update,okf-verify}` (+ `okf-plan` si va la capa de futuro) →
    `<repo>/.claude/skills/`, `templates/agents/okf-reviewer.md` → `<repo>/.claude/agents/`, `templates/ci/okf.yml` y `templates/hooks/pre-commit` si estaban
    instalados. Un `pre-commit` que **no** es del kit no se pisa: puede ser del usuario.
+
+   **Si el reporte dice `sin sello del kit: NO se pisa`, agregá `--adopt`.** Cada archivo que
+   el kit instala lleva su versión y el hash de lo que escribió, y eso es lo que distingue "es
+   mi copia vieja" de "lo editaste vos" ([0025](../knowledge/decisions/0025-el-material-instalado-se-sella-con-hash.md)).
+   Un repo instalado **antes de que existiera el sello** no tiene ninguno, así que el upgrade
+   se abstiene y ese repo se queda **para siempre** con el material con el que nació. Medido
+   sobre un repo real de la v0.6.2: su linter tenía 320 líneas contra 713, sin `--questions`,
+   `--budget`, `--pack` ni `--skip`.
+
+   `--adopt` reemplaza también lo que no tiene sello, **archivo por archivo y solo si git lo
+   puede devolver**: si alguno tiene cambios sin commitear, ese se omite y se te nombra
+   ([0029](../knowledge/decisions/0029-nunca-se-destruye-lo-que-git-no-puede-devolver.md)).
+   Commiteá antes y mirá el `git diff` después.
 4. **El `AGENTS.md` se actualiza por secciones** (esto lo hace `--upgrade`). Es el único
    archivo que mezcla contenido del proyecto con contenido del kit, así que **no se reemplaza
    entero**: el instalador cambia solo `## 1.`, `## 2.`, `## 3.` y `## Procedimientos`, y deja

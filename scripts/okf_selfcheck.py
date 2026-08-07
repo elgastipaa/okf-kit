@@ -710,6 +710,19 @@ check(near(read_required("templates/scripts/okf_decisions.py") or "",
       "okf_decisions.py advierte que ejecuta comandos y ofrece verlos antes",
       "sin la advertencia, el usuario lo pone en CI sin saber qué está habilitando")
 
+# --adopt destraba los repos instalados ANTES del sellado, que si no se quedan para siempre
+# con el material con el que nacieron (medido: un repo v0.6.2 tenía el linter de 320 líneas
+# contra 713). Pero pisa material del usuario, así que hereda la prudencia de la 0029: solo
+# lo que git puede devolver. Los dos asserts van juntos — el que adopta y el que se planta.
+_inst_src = read_required("scripts/okf_install.py") or ""
+check(near(_inst_src, '"--adopt"', "SIN SELLO", "git puede devolver"),
+      "el instalador ofrece --adopt para el material sin sello",
+      "un repo instalado antes del sellado no puede recibir nunca una actualización de sus "
+      "scripts: se queda con el linter con el que nació")
+check(near(_inst_src, "sin sello Y con cambios sin commitear", "_uncommitted"),
+      "--adopt no pisa material sin sello que git no pueda devolver",
+      "adoptar a ciegas destruiría la edición de alguien que sí tocó el archivo")
+
 # El ejemplo navegable vive DENTRO del kit y no en un repo aparte, justamente para poder
 # gatearlo: un ejemplo que muestra un kit de tres versiones atrás es peor que no tenerlo, y
 # afuera nadie se enteraría. Acá el CI se pone rojo.

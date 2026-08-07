@@ -393,7 +393,7 @@ def classify_managed(dst: Path) -> str:
 
 def install_machinery(plan: Plan, target: Path, *, minimal: bool, no_claude: bool,
                       want_ci: bool, want_hook: bool, version: str = "",
-                      respect_edits: bool = False) -> None:
+                      respect_edits: bool = False, adopt: bool = False) -> None:
     """Skills + scripts + CI + hook. Es idéntico en instalación y en --upgrade.
 
     Con `respect_edits` (el camino de `--upgrade`) no pisa un archivo que el usuario editó:
@@ -403,8 +403,20 @@ def install_machinery(plan: Plan, target: Path, *, minimal: bool, no_claude: boo
         body = src.read_text(encoding="utf-8")
         if respect_edits:
             state = classify_managed(dst)
-            if state in ("editado", "sin-sello"):
-                plan.skip(f"{dst.relative_to(target)} ({'lo editaste' if state == 'editado' else 'sin sello del kit'}: NO se pisa)")
+            # `sin-sello` es material de un kit ANTERIOR al sellado, así que un repo instalado
+            # antes de la 0.7.5 no recibía nunca una actualización de sus scripts: quedaba con
+            # el linter con el que nació. Medido sobre un repo real de v0.6.2: su linter tenía
+            # 320 líneas contra 713, sin --questions, --budget, --pack ni --skip.
+            # `--adopt` lo destraba, y con la misma prudencia que `--force` (0029): solo pisa
+            # lo que git puede devolver.
+            if state == "sin-sello" and adopt:
+                rel = dst.relative_to(target).as_posix()
+                if _uncommitted(target, [rel]):
+                    plan.skip(f"{rel} (sin sello Y con cambios sin commitear: NO se pisa)")
+                    return
+                plan.actions.append(f"adoptar   {rel} (sin sello, limpio en git)")
+            elif state in ("editado", "sin-sello"):
+                plan.skip(f"{dst.relative_to(target)} ({'lo editaste' if state == 'editado' else 'sin sello del kit'}: NO se pisa — si nunca lo tocaste, --adopt)")
                 return
         plan.write(dst, _stamped(dst, body, version) if version else body, executable=executable)
     skills = list(SKILLS_ALWAYS) + ([] if minimal else [SKILL_FUTURE])
@@ -500,7 +512,7 @@ def install_upgrade(plan: Plan, target: Path, args, version: str) -> str | None:
         # En upgrade sí se respeta lo que el usuario haya editado: la maquinaria es del kit,
         # pero si alguien la tocó, pisarla en silencio es la misma pérdida de datos que la
         # 0.7.4 arregló para el entrypoint, un nivel más abajo.
-        respect_edits=True,
+        respect_edits=True, adopt=getattr(args, "adopt", False),
         want_ci=not args.no_ci and (target / ".github" / "workflows" / "okf.yml").is_file(),
         # Un pre-commit que no es nuestro no se pisa: puede ser del usuario.
         want_hook=not args.no_hook and _hook_is_ours(target),
@@ -609,6 +621,9 @@ def main(argv: list[str]) -> int:
                     help="los procedimientos van a docs/okf/ en vez de .claude/skills/")
     ap.add_argument("--no-ci", action="store_true", help="no instalar el workflow de CI")
     ap.add_argument("--no-hook", action="store_true", help="no instalar el git hook")
+    ap.add_argument("--adopt", action="store_true",
+                    help="con --upgrade: reemplaza también el material SIN SELLO (instalado por "
+                         "un kit anterior al sellado). Solo pisa lo que git puede devolver")
     ap.add_argument("--upgrade", action="store_true",
                     help="reemplazar solo la maquinaria (no toca AGENTS.md ni el bundle)")
     ap.add_argument("--force", action="store_true",

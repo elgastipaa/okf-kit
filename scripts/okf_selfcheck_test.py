@@ -283,6 +283,12 @@ def _(d): edit(d, "templates/scripts/okf_decisions.py",
                 "Este script corre los chequeos declarados.")
 
 
+@case("--adopt pierde el guard de trabajo sin commitear", True)
+def _(d): edit(d, "scripts/okf_install.py",
+                'if _uncommitted(target, [rel]):',
+                'if False:  # guard removido')
+
+
 @case("el ejemplo queda mostrando una versión vieja del kit", True)
 def _(d): edit(d, "example/knowledge/index.md", 'kit_version: "', 'kit_version: "0.0.1-')
 
