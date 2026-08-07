@@ -568,7 +568,17 @@ def modernize(bundle: Path) -> int:
                                 "`origen:`, así que todas afirman por default que **una "
                                 "persona dictó** ese porqué. Las que se dedujeron del código "
                                 "van `reconstruido` + `proposed`; si se decidió pero nadie "
-                                "recuerda por qué, `confirmado` con su pregunta abierta"))
+                                "recuerda por qué, `confirmado` con su pregunta abierta.\n"
+                                "      NO las selles todas de una: sellar en masa afirma sobre "
+                                "cada documento algo que nadie miró, que es justo lo que\n"
+                                "      `origen` existe para impedir. Criterio objetivo y barato "
+                                "para clasificar de a muchas:\n"
+                                "        git log --diff-filter=A --format=%s -- "
+                                "knowledge/decisions/NNNN-*.md\n"
+                                "      Si la decisión se agregó en el commit que shippeó la cosa "
+                                "que decide, es un registro contemporáneo y `dictado` se\n"
+                                "      sostiene. Si apareció después, describiendo algo que ya "
+                                "existía, es `reconstruido` hasta que alguien la confirme"))
 
     if not any(p.is_dir() and p.name == "_generated" for p in bundle.rglob("*")):
         faltan.append(("0.9.0", "no hay capa generada (`_generated/`). Si el repo tiene hechos "
