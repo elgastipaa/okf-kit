@@ -27,14 +27,14 @@ lo único que sí paga (+4%) es lo que un humano sabe y el código no dice: las 
 restricciones que no se ven leyendo, la configuración no obvia. Eso es exactamente lo que OKF
 te ayuda a escribir, y el harness es para que no tengas que creerme.
 
-**Y lo que salió de medirnos a nosotros mismos, que no favorece:** instalar el kit **no te
-hace la IA más rápida** para averiguar cómo funciona tu código — eso lo mide igual de bien
-grepeando. Lo que sí hace, medido, es **preservar los porqués** que hoy viven en chats
-borrados y **producir las preguntas que solo vos podés contestar**, en vez de inventarles una
-respuesta plausible. Un init sobre un repo real dejó 8 preguntas abiertas y ninguna la sabía
-el código. Ese es el trato, y está en
-[`knowledge/decisions/0033`](knowledge/decisions/0033-el-kit-preserva-porques-no-acelera-hechos.md)
-con los números que lo contradicen incluidos.
+**Y ya nos lo aplicamos, con el resultado que no nos conviene.** Instalar el kit **no te hace
+la IA más rápida** para averiguar cómo funciona tu código — eso lo mide igual de bien
+grepeando—, y el mejor número que este kit supo citar resultó ser mérito del **humano** que
+escribió esa capa, no del formato. Lo que sí hace, medido, es **preservar los porqués** que hoy
+viven en chats borrados y **producir las preguntas que solo vos podés contestar**, en vez de
+inventarles una respuesta plausible. Está todo —incluidos los errores que le encontramos a
+nuestro propio instrumento— en **[`MEASUREMENT.md`](MEASUREMENT.md)**, y el trato en
+[`decisions/0033`](knowledge/decisions/0033-el-kit-preserva-porques-no-acelera-hechos.md).
 
 > Esta guía es **self-contained**: markdown + git, sin depender de ningún servicio, SDK ni
 > nube. Si podés `cat` un archivo, podés leerla; si podés `git clone`, la podés llevar.

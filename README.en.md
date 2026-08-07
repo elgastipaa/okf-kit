@@ -25,9 +25,14 @@ code cannot say: decisions, constraints you can't see by reading, non-obvious te
 configuration. That's exactly what this kit helps you write, and the harness is there so you
 don't have to take my word for it.
 
-**We publish the measurement even when it's bad.** The first defensible run on a real repo
-found the layer cost accuracy, and it's written down in the repo. A kit that only publishes
-its wins isn't measuring — it's advertising.
+**We publish the measurement even when it's bad — and it mostly is.** Installing this kit does
+**not** make your AI faster at figuring out how your code works; plain grepping does just as
+well. The best number this kit used to quote turned out to be the merit of the **human** who
+wrote that layer, not of the format. What it does do, measured, is **preserve the whys** that
+today live in deleted chats and **produce the questions only you can answer**, instead of
+inventing a plausible answer for them. All of it — including the bugs we found in our own
+instrument — is in **[`MEASUREMENT.md`](MEASUREMENT.md)**. A kit that only publishes its wins
+isn't measuring — it's advertising.
 
 > **Self-contained**: markdown + git, no service, SDK or cloud. If you can `cat` a file you
 > can read it; if you can `git clone`, you can take it with you.
