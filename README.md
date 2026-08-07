@@ -36,6 +36,12 @@ inventarles una respuesta plausible. Está todo —incluidos los errores que le 
 nuestro propio instrumento— en **[`MEASUREMENT.md`](MEASUREMENT.md)**, y el trato en
 [`decisions/0033`](knowledge/decisions/0033-el-kit-preserva-porques-no-acelera-hechos.md).
 
+**¿Querés ver qué produce antes de instalarlo?** [`example/`](example/) es un repo chico y real
+—un acortador de links, 10 archivos, con sus bugs— sobre el que se corrió `okf-init` **a ciegas**.
+Documentando el código **encontró dos bugs que su autor no sabía**, dejó 8 preguntas abiertas, y
+las tres decisiones que dedujo quedaron en `proposed` en vez de arrogarse autoridad. El CI del kit
+lo mantiene al día, así que no te va a mostrar una versión vieja.
+
 > Esta guía es **self-contained**: markdown + git, sin depender de ningún servicio, SDK ni
 > nube. Si podés `cat` un archivo, podés leerla; si podés `git clone`, la podés llevar.
 

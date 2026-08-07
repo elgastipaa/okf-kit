@@ -283,6 +283,14 @@ def _(d): edit(d, "templates/scripts/okf_decisions.py",
                 "Este script corre los chequeos declarados.")
 
 
+@case("el ejemplo queda mostrando una versión vieja del kit", True)
+def _(d): edit(d, "example/knowledge/index.md", 'kit_version: "', 'kit_version: "0.0.1-')
+
+
+@case("el ejemplo nombra un archivo que ya no existe", True)
+def _(d): (d / "example/src/codes.py").unlink()
+
+
 @case("okf_refs deja de instalarse en el repo destino", True)
 def _(d): edit(d, "scripts/okf_install.py",
                 '"okf_stale.py", "okf_refs.py"', '"okf_stale.py"')

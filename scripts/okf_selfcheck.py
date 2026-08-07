@@ -710,6 +710,31 @@ check(near(read_required("templates/scripts/okf_decisions.py") or "",
       "okf_decisions.py advierte que ejecuta comandos y ofrece verlos antes",
       "sin la advertencia, el usuario lo pone en CI sin saber qué está habilitando")
 
+# El ejemplo navegable vive DENTRO del kit y no en un repo aparte, justamente para poder
+# gatearlo: un ejemplo que muestra un kit de tres versiones atrás es peor que no tenerlo, y
+# afuera nadie se enteraría. Acá el CI se pone rojo.
+_ex = KIT / "example"
+if _ex.is_dir():
+    _exk = _ex / "knowledge"
+    _r = subprocess.run([sys.executable, "templates/scripts/okf_lint.py", str(_exk), "--strict"],
+                        cwd=KIT, capture_output=True, text=True)
+    check(_r.returncode == 0, "el bundle del ejemplo pasa el linter (--strict)",
+          (_r.stdout + _r.stderr).strip()[-400:] if _r.returncode else "")
+    _r = subprocess.run([sys.executable, "templates/scripts/okf_refs.py", str(_exk),
+                         "--repo", str(_ex)], cwd=KIT, capture_output=True, text=True)
+    check(_r.returncode == 0, "el ejemplo no nombra archivos que ya no existen",
+          (_r.stdout + _r.stderr).strip()[-400:] if _r.returncode else "")
+    _idx = (_exk / "index.md").read_text(encoding="utf-8") if (_exk / "index.md").is_file() else ""
+    check(f'kit_version: "{ver}"' in _idx,
+          "el ejemplo se regeneró con la versión actual del kit",
+          f"muestra un kit viejo: el bundle dice otra cosa que VERSION ({ver})")
+    _r = subprocess.run([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-t", ".",
+                         "-q"], cwd=_ex, capture_output=True, text=True)
+    check(_r.returncode == 0, "los tests del ejemplo pasan",
+          (_r.stdout + _r.stderr).strip()[-300:] if _r.returncode else "")
+else:
+    check(False, "existe el ejemplo navegable en example/")
+
 _init_door = read_required("templates/skills/okf-init/SKILL.md") or ""
 check(near(_init_door, "# Por dónde empezar", "1-3 archivos", "carpeta"),
       "okf-init completa la puerta con las preguntas del repo, no con categorías",
