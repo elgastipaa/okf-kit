@@ -32,8 +32,14 @@ con el skill `okf-update` si el usuario quiere.
 salida — es la fuente de verdad del Nivel 1:
 
 ```
-python3 scripts/okf_lint.py knowledge
+python3 scripts/okf_lint.py knowledge   # estructura: frontmatter, links, índices
+python3 scripts/okf_refs.py  knowledge  # referencias vivas: ¿nombra archivos que ya no están?
 ```
+
+El segundo es el que caza el drift más barato y más común —renombres y borrados—, que es
+el que convierte un `code-of-record` en una mentira sin que nadie se entere. **No dice si un
+concepto es verdad**: eso es el Nivel 2. Si reporta algo, gana el código: se corrige el
+concepto. Si la referencia es a algo externo, se saca con `--ignore`, no editando el script.
 
 Exit 0 = conforme (warnings permitidos), 1 = errores. Reportá su output tal cual en
 la sección Nivel 1 del reporte.

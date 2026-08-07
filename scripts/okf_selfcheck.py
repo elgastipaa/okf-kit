@@ -671,6 +671,28 @@ check(near(_dec_tpl, "origen: confirmado", "Obliga a dejar la pregunta abierta",
       "sin esa condición, `confirmado` es permiso para redactar un Contexto convincente "
       "esquivando el ERROR de `reconstruido`")
 
+# El chequeo de referencias vivas se instala y se corre, o no existe. Es la única herramienta
+# del kit que verifica que el bundle no MIENTA (el linter valida estructura y `okf_stale`
+# rankea prioridades), y encontró errores reales en bundles que el propio `okf-init` generó:
+# un glosario mandando el término al archivo equivocado por un renombre.
+_refs = KIT / "templates/scripts/okf_refs.py"
+check(_refs.is_file(), "templates/scripts/okf_refs.py existe (el chequeo de referencias vivas)")
+check("okf_refs.py" in (read_required("scripts/okf_install.py") or ""),
+      "el instalador copia okf_refs.py al repo destino",
+      "la herramienta existe en el kit y no llega al usuario")
+# Se exige el PASO que lo ejecuta, no la mención: el nombre del script sobrevive en los
+# filtros `paths:` del workflow aunque alguien borre el step, y el assert pasaba igual.
+check("run: python3 scripts/okf_refs.py" in (read_required("templates/ci/okf.yml") or ""),
+      "el CI del repo destino corre okf_refs.py",
+      "sin CI, una referencia muerta entra igual y nadie se entera hasta que alguien la sigue")
+# Ventana amplia a propósito: la guía de qué hacer con un hallazgo es un párrafo entero, no
+# una frase. Con la ventana default fallaba por 10 caracteres.
+check(near(read_required("templates/skills/okf-verify/SKILL.md") or "",
+           "okf_refs.py", "gana el código", "--ignore", window=700),
+      "okf-verify corre okf_refs y dice qué hacer con lo que encuentre",
+      "un hallazgo sin salida se resuelve editando el concepto para que coincida con lo "
+      "que sea, que es el failure mode contrario")
+
 _init_door = read_required("templates/skills/okf-init/SKILL.md") or ""
 check(near(_init_door, "# Por dónde empezar", "1-3 archivos", "carpeta"),
       "okf-init completa la puerta con las preguntas del repo, no con categorías",

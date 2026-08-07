@@ -7,6 +7,10 @@ kit_version: "0.10.0"
 
 * [Rumbo del kit OKF](roadmap.md) - Hacia dónde va el kit hoy: ingeniería de contexto completa (pasado, presente y futuro) aplicable a cualquier repo sin tooling.
 
+# Runbook
+
+* [Cómo se comprueba que el kit anda](checks.md) - Los comandos que prueban que el kit funciona, y qué cubre cada uno.
+
 # Subdirectories
 
 * [architecture](architecture/index.md) - Qué es el kit OKF, su anatomía y el modelo de tres capas.

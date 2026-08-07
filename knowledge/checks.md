@@ -1,0 +1,37 @@
+---
+type: Runbook
+title: Cómo se comprueba que el kit anda
+description: Los comandos que prueban que el kit funciona, y qué cubre cada uno.
+tags: [checks, gate]
+timestamp: 2026-08-07T00:00:00Z
+---
+
+# Los cuatro que corre el CI
+
+Son los mismos que exige el gate de release. Si tocaste un assert o un criterio, se prueba acá.
+
+| Comando | Qué cubre | Cuánto tarda |
+|---|---|---|
+| `python3 scripts/okf_selfcheck.py` | Consistencia interna del kit: linter limpio sobre el dogfood, `kit_version` sembrado, keep-alive y capa de futuro coincidentes, presupuesto del contrato, instalación mínima y completa sin huérfanos, referencias que resuelven. | ~20 s |
+| `python3 scripts/okf_selfcheck_test.py` | **¿El gate falla cuando debe?** Inyecta cada rotura conocida sobre una copia del kit y verifica el veredicto. | ~2 min |
+| `python3 scripts/okf_lint_test.py` | ¿El linter reporta cuando debe, y calla ante redacción legítima? | ~30 s |
+| `python3 scripts/okf_stale_test.py` | ¿El ranker de drift ordena como corresponde? | ~5 s |
+
+**Un assert sin su rotura probada es decoración.** Por eso las suites 2 a 4 no son opcionales:
+miden que las herramientas *fallen*, no solo que pasen.
+
+# Sobre el propio bundle
+
+```bash
+python3 templates/scripts/okf_lint.py knowledge --strict   # estructura
+python3 templates/scripts/okf_refs.py  knowledge           # referencias vivas
+```
+
+El linter se consume **desde `templates/`**: copiarlo a la raíz crearía dos copias, que es la
+deriva que el kit existe para evitar.
+
+# Lo que ninguno de estos cubre
+
+Que el kit **sirva**. Eso no lo dice un chequeo determinista: lo dice la medición
+(`templates/eval/run-eval.py`, resultados en `MEASUREMENT.md`), y su método está en la
+[0028](decisions/0028-la-medicion-manda-y-el-gate-se-escribe-antes.md).

@@ -140,8 +140,8 @@ def _(d):
 
 @case("la instalación deja de copiar okf_stale.py", True)
 def _(d):
-    edit(d, "reference/manual-install.md", "y **`okf_stale.py`** (rankea dónde buscar",
-         "y ~~okf_stale~~ (rankea dónde buscar")
+    edit(d, "reference/manual-install.md", "**`okf_stale.py`** (rankea dónde buscar",
+         "~~okf_stale~~ (rankea dónde buscar")
 
 
 @case("el camino manual pierde el conteo de marcadores", True)
@@ -270,6 +270,17 @@ def _(d): (d / "templates/knowledge/_decision.md").unlink()
 @case("el template ofrece `confirmado` sin atarlo a declarar el hueco", True)
 def _(d): edit(d, "templates/knowledge/_decision.md",
                 "**Obliga a dejar la pregunta abierta**", "Podés dejar la pregunta abierta")
+
+
+@case("okf_refs deja de instalarse en el repo destino", True)
+def _(d): edit(d, "scripts/okf_install.py",
+                '"okf_stale.py", "okf_refs.py"', '"okf_stale.py"')
+
+
+@case("el CI del repo destino deja de correr okf_refs", True)
+def _(d): edit(d, "templates/ci/okf.yml",
+                "      - name: okf_refs\n        run: python3 scripts/okf_refs.py knowledge",
+                "      # (paso removido)")
 
 
 @case("la capa generada vuelve a existir solo en okf-init", True)

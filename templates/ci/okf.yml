@@ -12,9 +12,9 @@ name: OKF
 
 on:
   push:
-    paths: ["knowledge/**", "scripts/okf_lint.py", ".github/workflows/okf.yml"]
+    paths: ["knowledge/**", "scripts/okf_lint.py", "scripts/okf_refs.py", ".github/workflows/okf.yml"]
   pull_request:
-    paths: ["knowledge/**", "scripts/okf_lint.py", ".github/workflows/okf.yml"]
+    paths: ["knowledge/**", "scripts/okf_lint.py", "scripts/okf_refs.py", ".github/workflows/okf.yml"]
 
 jobs:
   lint:
@@ -30,3 +30,9 @@ jobs:
       # que también falle con warnings (links rotos, defaults faltantes, etc.).
       - name: okf_lint
         run: python3 scripts/okf_lint.py knowledge
+
+      # Referencias vivas: el bundle no puede nombrar archivos que ya no existen. Es
+      # determinista y no cuesta tokens. Un renombre convierte un `code-of-record` en una
+      # mentira sin que nadie se entere, y esto lo caza en el PR que lo produjo.
+      - name: okf_refs
+        run: python3 scripts/okf_refs.py knowledge

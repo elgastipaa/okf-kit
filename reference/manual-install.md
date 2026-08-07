@@ -85,9 +85,10 @@ Claude Code va a `docs/okf/okf-reviewer.md`, junto a los procedimientos.
 
 Copiá también los scripts a `<repo>/scripts/`: **`okf_lint.py`** (chequeador de conformidad
 determinista, solo stdlib, sin `pip install`, ideal para CI), **`okf_coldtest.py`** (arma el
-entorno aislado para el test en frío del Nivel 3) y **`okf_stale.py`** (rankea dónde buscar
+entorno aislado para el test en frío del Nivel 3) **`okf_stale.py`** (rankea dónde buscar
 divergencia entre el bundle y el código, con git + frontmatter: no es un gate, es el paso 1
-del Nivel 2). Sirven aunque no uses Claude Code.
+del Nivel 2) y **`okf_refs.py`** (chequea que el bundle no nombre archivos que ya no
+existen — determinista, va al CI). Sirven aunque no uses Claude Code.
 
 **Si decidís NO instalar el linter**, ajustá la línea de §3 del `AGENTS.md` que manda correrlo:
 si no, el contrato ordena un comando inexistente en cada turno.
