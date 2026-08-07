@@ -32,6 +32,14 @@ git, sin apps externas.
   quedó claro es que **el volumen no mide el valor**: una de las cuatro destapó que un backup
   automático nunca se había verificado. **Falta una métrica de elicitación que no sea contar.**
 
+- **El kit ya chequea si el bundle dice la verdad (2026-08-07).** Faltaban las dos capas de
+  coherencia código↔concepto, y las dos las había escrito **un usuario por su cuenta** sobre su
+  propio bundle: referencias vivas
+  ([0036](decisions/0036-una-referencia-muerta-solo-molesta-si-se-afirma-viva.md)) y `verify:`
+  por decisión ([0037](decisions/0037-una-decision-declara-como-se-falsea.md)). Que un usuario
+  tenga que escribir una herramienta es la mejor señal de qué le falta al kit — **conviene
+  mirar qué más escribieron los repos que ya lo usan**.
+
 - **El eje de medición "prosa contra prosa" está cerrado, y por qué**
   ([0032](decisions/0032-el-instrumento-tiene-un-piso-de-resolucion.md)). Con el n que se puede
   pagar, el instrumento no resuelve efectos menores a ~20-40%. Lo que sigue midiéndose es la

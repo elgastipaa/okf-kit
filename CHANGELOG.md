@@ -10,6 +10,43 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.11.0 — Dos herramientas nuevas para lo que el kit no chequeaba: si el bundle dice la verdad
+
+El linter valida **estructura** y `okf_stale` **rankea** por antigüedad. Ninguna miraba si lo
+que el bundle afirma sigue siendo cierto. Las dos ideas de esta versión salieron de scripts que
+**un usuario escribió por su cuenta** sobre su propio bundle: que haya tenido que hacerlo es la
+evidencia de que faltaban.
+
+### `okf_refs.py` — referencias vivas
+Chequea que los paths, el `resource:` y (opt-in) los símbolos que el bundle nombra **existan**.
+Determinista, stdlib, cero tokens, **va al CI**.
+
+La regla que lo hace usable salió de validarlo contra cinco bundles reales: **una referencia
+muerta solo es un problema si el documento la afirma como viva**. Nombrar algo muerto a
+propósito —un triage de docs viejos, una capa no-autoritativa— es legítimo y frecuente.
+
+Falló su propio criterio **tres veces** antes de pasar. Encontró dos errores reales en un
+bundle que generó `okf-init` a ciegas, y destapó que **el kit no dogfoodeaba su propio
+`checks.md`**.
+
+### `verify:` — cada decisión declara cómo se sabría que alguien la rompió
+Una decisión `accepted` declara el comando que **falla si alguien la rompe**, o `verify: none`
+con su motivo. El valor está en contestarlo **al escribirla**.
+
+- **Se adopta por uso**: si alguna decisión del bundle lo declara, las demás son WARN; si
+  ninguna lo hace, la regla calla. **Ningún bundle existente deja de ser válido.**
+- **`verify: none` sin `verify_note` es ERROR.**
+- **El runner no se cablea al CI**: ejecuta comandos escritos en markdown, y en un PR desde un
+  fork eso es ejecución de código arbitrario. Usá `--list` antes de confiar en un bundle ajeno.
+
+**No es ceremonia**, y se midió en el caso difícil: adoptándolo en el propio kit (prosa y
+tooling) **26 de 34** decisiones quedaron con un comando real. Los 8 `none` son el método de
+medición y lo que el kit promete — y saber **cuáles** no se pueden chequear es el producto.
+
+### Decisiones
+[0036](knowledge/decisions/0036-una-referencia-muerta-solo-molesta-si-se-afirma-viva.md) ·
+[0037](knowledge/decisions/0037-una-decision-declara-como-se-falsea.md)
+
 ## 0.10.0 — Se puede decir "lo decidí yo, y no me acuerdo por qué"
 
 ### Nuevo

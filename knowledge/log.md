@@ -1,6 +1,10 @@
 # Update Log
 
 ## 2026-08-07
+* **Update**: **v0.11.0** — cosechados **0014** y **0015**. Dos herramientas para lo que el kit no chequeaba (si el bundle dice la verdad), las dos nacidas de scripts que un usuario escribió solo: [0036](decisions/0036-una-referencia-muerta-solo-molesta-si-se-afirma-viva.md) (referencias vivas, con la regla de que una referencia muerta solo molesta si el doc la afirma viva) y [0037](decisions/0037-una-decision-declara-como-se-falsea.md) (`verify:`, adoptado por uso, con el runner fuera del CI por seguridad). El kit adoptó la convención en sus propias decisiones: **26 con comando real, 8 sin chequeo mecánico**.
+
+
+## 2026-08-07
 * **Update**: **v0.10.0** — cosechado el cambio **0013** (elicitación medida sobre `wodlab`, con el dueño contestando). Dos decisiones: [0034](decisions/0034-el-porque-perdido-tiene-su-propio-casillero.md) (`origen: confirmado`, el casillero para "lo decidí y no me acuerdo por qué", que **obliga** a declarar el hueco) y [0035](decisions/0035-el-riesgo-es-la-ausencia-de-fuente.md) (**una regla que se iba a agregar por miedo no se agrega**: la hipótesis de que la autoridad se lavaba a través de un doc escrito por una IA se midió y se refutó, 12 de 12 decisiones eran del dueño). Arreglado un bug propio de la 0.9.0: `okf-migrate` no generaba la capa de hechos volátiles porque el paso se le agregó solo a `okf-init` — ahora hay assert de paridad entre los dos caminos de entrada.
 
 
