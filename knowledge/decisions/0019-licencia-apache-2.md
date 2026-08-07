@@ -3,6 +3,7 @@ type: Decision
 title: El kit se licencia Apache-2.0, no MIT
 description: "Apache-2.0 porque OKF-SPEC.md es un derivado condensado del OKF de Google Cloud, que es Apache-2.0, y porque el grant de patentes baja la fricción de adopción."
 status: accepted
+verify: grep -q "Apache License" LICENSE && grep -q "Apache-2.0" README.md
 tags: [licencia, adopcion]
 timestamp: 2026-07-29T00:00:00Z
 resource: ../../LICENSE

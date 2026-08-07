@@ -1,6 +1,8 @@
 ---
 type: Decision
 status: accepted
+verify: none
+verify_note: es el resultado de una medición revertida; su evidencia está en MEASUREMENT.md
 supersedes: 0022-el-bundle-tambien-es-un-mapa
 title: Obligar a verificar siempre no paga — se revierte la 0022 y vuelve el alcance de la 0009
 description: Mandar abrir la fuente en toda pregunta de estado actual costó 28% más turnos sin alcanzar el acierto que su propio gate exigía; se revierte y sobrevive solo la cláusula de ambigüedad.

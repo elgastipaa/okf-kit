@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+verify: python3 scripts/okf_lint_test.py 2>&1 | grep -q "reconstruida del código declarada como normativa"
 origen: dictado
 title: Una razón reconstruida del código no manda, y si nadie la sabe se deja como pregunta
 description: "El kit fabricaba porqués al escribir el bundle y les daba autoridad normativa; ahora una razón deducida se declara y no puede ser accepted."

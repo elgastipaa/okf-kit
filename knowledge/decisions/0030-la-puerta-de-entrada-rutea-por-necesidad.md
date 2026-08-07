@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*siembra la puerta que rutea"
 origen: dictado
 title: La puerta de entrada del bundle rutea por necesidad, no lista por tipo
 description: "El index.md raíz arranca con una tabla necesidad → 1-3 archivos → fuente de verdad, y el listado por type queda abajo."

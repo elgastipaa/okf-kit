@@ -3,6 +3,7 @@ type: Decision
 title: La plomería del init la ejecuta un script; el criterio se queda en el agente
 description: "Todo lo mecánico del init/upgrade vive en okf_install.py como fuente única, y el skill delega en vez de re-statearlo; sembrar conceptos y mergear el contrato siguen siendo del agente."
 status: accepted
+verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*delega la plomería al instalador"
 tags: [instalacion, tooling, anti-drift]
 timestamp: 2026-07-29T00:00:00Z
 resource: ../../scripts/okf_install.py

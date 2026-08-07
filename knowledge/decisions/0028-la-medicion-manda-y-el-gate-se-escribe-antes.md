@@ -1,6 +1,8 @@
 ---
 type: Decision
 status: accepted
+verify: none
+verify_note: es el método con el que se aceptan cambios; lo hace cumplir la revisión, no un comando
 origen: dictado
 title: Un cambio de comportamiento no se acepta sin medirlo, y el gate se escribe antes de mirar
 description: "El kit revierte sus propias mejoras cuando la medición no las respalda, y para que eso sea posible el criterio de éxito se fija antes de ver el resultado."

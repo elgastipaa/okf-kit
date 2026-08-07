@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*link absoluto\|PASS.*linter pasa limpio"
 title: Los cross-links son relativos al archivo, no absolutos al bundle
 description: Se usan links relativos (../x.md) porque los absolutos (/x.md) rompen en GitHub.
 resource: ../../OKF-SPEC.md

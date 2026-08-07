@@ -172,7 +172,10 @@ def _(d):
     # ALCANZABILIDAD, no de "todo tiene que colgar de un índice".
     p = d / "decisions" / "0099-alcanzable-por-cross-link.md"
     p.write_text(
-        "---\ntype: Decision\nstatus: accepted\ntitle: Alcanzable por cross-link\n"
+        # Lleva `verify:` porque el dogfood adoptó la convención: en un bundle adoptado, una
+        # decisión `accepted` sin declararlo es WARN, y este caso mide OTRA cosa.
+        "---\ntype: Decision\nstatus: accepted\nverify: none\n"
+        "verify_note: fixture del test de alcanzabilidad\ntitle: Alcanzable por cross-link\n"
         "description: Concepto al que se llega desde otro concepto y no desde un índice.\n"
         "timestamp: 2026-08-03T00:00:00Z\n---\n\n# Contexto\n\ncuerpo\n",
         encoding="utf-8")
@@ -251,6 +254,33 @@ def _(d):
     edit(d, "decisions/0001-relative-links-over-absolute.md", "# Contexto",
          "# Contexto\n\n> Pendiente de confirmar: por que se decidio esto. La decision esta\n"
          "> confirmada; el razonamiento no quedo registrado.")
+
+
+# ---- verify: la convención se exige sola cuando el bundle la adopta
+@case("una decisión `accepted` sin `verify` en un bundle que ya lo usa",
+      "decision-sin-verify")
+def _(d):
+    # El dogfood ya adoptó la convención, así que alcanza con sacársela a una.
+    edit(d, "decisions/0001-relative-links-over-absolute.md", "\nverify:", "\nverify_x:")
+
+
+@case("`verify: none` sin decir por qué", "verify-none-sin-nota")
+def _(d):
+    p = d / "decisions" / "0019-licencia-apache-2.md"
+    txt = p.read_text(encoding="utf-8")
+    import re as _re
+    txt = _re.sub(r"^verify:.*$", "verify: none", txt, count=1, flags=_re.M)
+    p.write_text(txt, encoding="utf-8")
+
+
+@case("`verify: none` CON su motivo declarado", None)
+def _(d):
+    p = d / "decisions" / "0019-licencia-apache-2.md"
+    txt = p.read_text(encoding="utf-8")
+    import re as _re
+    txt = _re.sub(r"^verify:.*$", "verify: none\nverify_note: es una decisión legal",
+                  txt, count=1, flags=_re.M)
+    p.write_text(txt, encoding="utf-8")
 
 
 @case("--questions saca a la superficie una pregunta abierta", None, questions_expect=1)

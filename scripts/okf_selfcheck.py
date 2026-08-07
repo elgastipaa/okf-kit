@@ -693,6 +693,23 @@ check(near(read_required("templates/skills/okf-verify/SKILL.md") or "",
       "un hallazgo sin salida se resuelve editando el concepto para que coincida con lo "
       "que sea, que es el failure mode contrario")
 
+# El runner de decisiones se instala, pero NO se cablea al CI, y eso es una decisión de
+# seguridad que hay que clavar: ejecuta comandos escritos en markdown, así que en un PR desde
+# un fork sería ejecución de código arbitrario en el runner del usuario. El linter sí va al CI
+# porque no ejecuta nada. Si alguien lo agrega al workflow del template, este assert lo caza.
+check((KIT / "templates/scripts/okf_decisions.py").is_file(),
+      "templates/scripts/okf_decisions.py existe (el runner de decisiones)")
+check("okf_decisions.py" in (read_required("scripts/okf_install.py") or ""),
+      "el instalador copia okf_decisions.py al repo destino")
+check("okf_decisions" not in (read_required("templates/ci/okf.yml") or ""),
+      "el CI que instala el kit NO ejecuta okf_decisions.py",
+      "ejecuta comandos escritos en markdown: en un PR desde un fork es ejecución de código "
+      "arbitrario. Que lo agregue el usuario a conciencia, no el kit por default")
+check(near(read_required("templates/scripts/okf_decisions.py") or "",
+           "EJECUTA COMANDOS", "fork", "--list", window=700),
+      "okf_decisions.py advierte que ejecuta comandos y ofrece verlos antes",
+      "sin la advertencia, el usuario lo pone en CI sin saber qué está habilitando")
+
 _init_door = read_required("templates/skills/okf-init/SKILL.md") or ""
 check(near(_init_door, "# Por dónde empezar", "1-3 archivos", "carpeta"),
       "okf-init completa la puerta con las preguntas del repo, no con categorías",

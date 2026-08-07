@@ -10,6 +10,8 @@ title: {{La decisión, en una frase afirmativa. Ej: "Usamos cola para emails"}}
 description: {{Una frase que resume qué se decidió y el efecto principal.}}
 status: accepted                  # proposed | accepted | "superseded by NNNN"
 origen: reconstruido              # dictado | reconstruido — ver abajo, importa mucho
+verify: {{el comando que FALLA si alguien rompe esta decisión — o `none`}}
+verify_note: {{si es `none`, por qué no se puede chequear. Borrá esta línea si hay comando}}
 supersedes: {{NNNN-slug-al-que-reemplaza — borrá esta línea si no aplica}}
 resource: {{URL al PR/commit/archivo que la implementa — opcional}}
 tags: [{{subsistema}}, {{tema}}]
@@ -55,6 +57,16 @@ timestamp: {{YYYY-MM-DDTHH:MM:SSZ}}
 # Decisión
 {{Qué se decidió, concretamente. Linkeá al runbook/schema/concepto relacionado.}}
 
+<!-- ¿CÓMO SABRÍAS QUE ALGUIEN LA ROMPIÓ?  Contestala ACÁ, no después: ahora es cuando
+     alguien todavía se acuerda de qué la protege. Casi siempre ya existe un test que la
+     cubre — `verify:` lo apunta. Si no existe, suele salir un script chico con el nombre
+     de la decisión, y eso es mejor que la decisión sola.
+
+     `verify: none` es una respuesta legítima —hay decisiones que dependen de que alguien
+     las lea— pero **con su `verify_note`**: saber CUÁLES no se pueden chequear también es
+     información. Corré todas con `okf_decisions.py`; ojo que ejecuta comandos escritos en
+     markdown, así que no va al CI por default. -->
+
 # Consecuencias
 {{Qué implica esto — lo bueno y lo malo. Qué NO hacer por culpa de esta decisión.
 Esto es lo que evita que alguien la rompa sin querer.}}
@@ -63,12 +75,6 @@ Esto es lo que evita que alguien la rompa sin querer.}}
      código que la viola, el bug es el código — no edites esta decisión para que
      "coincida" con lo que el código hace hoy. Avisale al usuario y ofrecé: arreglar el
      código, o superseder esta decisión explícitamente (ver abajo). -->
-
-<!-- Cómo verificar que se cumple (opcional pero muy útil): {{el comando, test o
-     grep que delata una violación — ej. "no debe haber imports de `nodemailer`
-     fuera de `src/email/queue.ts`"}}. Una decisión chequeable es una decisión que
-     sobrevive. -->
-
 
 <!-- Deprecar/reemplazar: esta decisión NO se edita para "darla de baja". Creá una
      decisión NUEVA con `status: accepted` y `supersedes: NNNN`, y poné en ESTA

@@ -25,7 +25,12 @@ miden que las herramientas *fallen*, no solo que pasen.
 ```bash
 python3 templates/scripts/okf_lint.py knowledge --strict   # estructura
 python3 templates/scripts/okf_refs.py  knowledge           # referencias vivas
+python3 templates/scripts/okf_decisions.py knowledge/decisions  # ¿el kit cumple sus decisiones?
 ```
+
+El tercero corre los `verify:` de las decisiones. Hoy: **26 con comando real, 8 sin chequeo
+mecánico** (método de medición, límites del instrumento, lo que el kit promete — cosas que
+ningún comando puede falsear).
 
 El linter se consume **desde `templates/`**: copiarlo a la raíz crearía dos copias, que es la
 deriva que el kit existe para evitar.

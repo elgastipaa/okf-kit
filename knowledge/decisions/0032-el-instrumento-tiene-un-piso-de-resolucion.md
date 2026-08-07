@@ -1,6 +1,8 @@
 ---
 type: Decision
 status: accepted
+verify: none
+verify_note: es un límite del instrumento de medición, no una regla sobre el código del kit
 origen: dictado
 title: El instrumento tiene un piso de resolución, y abajo de eso no se compara
 description: "Con el n que el kit puede pagar, efectos menores a ~20-40% son indistinguibles del ruido; se declara el piso y se deja de gastar en ese eje en vez de comprar ruido."

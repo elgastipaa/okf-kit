@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*git no puede devolver"
 origen: dictado
 title: El kit nunca destruye trabajo que git no pueda devolver
 description: "Antes de reemplazar o apartar algo del repo del usuario, el kit exige que git lo pueda restaurar, y si no puede se planta en vez de seguir."

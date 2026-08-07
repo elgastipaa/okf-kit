@@ -101,6 +101,12 @@ class Linter:
         self.issues: list[tuple[str, str, int, str, str]] = []
         # description de cada concepto, para cruzarla contra el texto de su entrada de index
         self.descriptions: dict[Path, str] = {}
+        # La convención `verify:` se adopta POR USO: si alguna decisión la declara, el bundle
+        # la adoptó y las demás que no la traigan son WARN. Si ninguna la declara, la regla
+        # calla. Así no se rompe ningún bundle existente ni hace falta un flag que nadie
+        # enciende: la adopción se declara usándola.
+        self.verify_declared: list[Path] = []
+        self.verify_missing: list[Path] = []
 
     def add(self, sev: str, path: Path, line: int, msg: str, rid: str = "misc") -> None:
         """`rid` es el **id estable** de la regla: lo que se puede silenciar con `--skip`.
@@ -242,6 +248,22 @@ class Linter:
                      "código NO manda sobre el código. Dejala en `proposed` hasta que alguien "
                      "que sepa la confirme — o, si nadie sabe por qué, no escribas una "
                      "decisión: dejá la pregunta abierta", rid="origen-reconstruido-normativo")
+        # ¿Cómo se sabría que alguien rompió esta decisión? La pregunta vale al ESCRIBIRLA,
+        # que es cuando alguien todavía se acuerda de qué la protege.
+        if keys.get("type", "").strip().strip('"').strip("'").lower() == "decision":
+            verify = keys.get("verify", "").split(" #", 1)[0].strip().strip('"').strip("'")
+            note = keys.get("verify_note", "").strip().strip('"').strip("'")
+            if verify:
+                self.verify_declared.append(path)
+                if verify.lower() == "none" and not note:
+                    self.add("ERROR", path, 1,
+                             "`verify: none` sin `verify_note`: decir que una decisión no se "
+                             "puede chequear mecánicamente es legítimo, pero hay que decir por "
+                             "qué — si no, es el atajo para no pensar cómo se la falsea",
+                             rid="verify-none-sin-nota")
+            elif status == "accepted":
+                self.verify_missing.append(path)
+
         auth = keys.get("authority", "").split(" #", 1)[0].strip().strip('"').strip("'").lower()
         if auth and auth not in AUTHORITY_VALUES:
             self.add("WARN", path, 1,
@@ -470,7 +492,23 @@ class Linter:
             self.check_concept(p)
         self.check_dirs()
         self.check_navigable()
+        self.check_verify_adoption()
         return self.report()
+
+    def check_verify_adoption(self) -> None:
+        """Si el bundle adoptó `verify:`, exigirlo parejo. Si no lo adoptó, callar.
+
+        Media adopción es peor que ninguna: las decisiones sin `verify` parecen chequeadas
+        porque sus vecinas lo están, y nadie vuelve a mirarlas.
+        """
+        if not self.verify_declared:
+            return
+        for path in self.verify_missing:
+            self.add("WARN", path, 1,
+                     f"decisión `accepted` sin `verify:` — este bundle ya lo declara en "
+                     f"{len(self.verify_declared)} decisión(es). Poné el comando que falla si "
+                     "alguien la rompe, o `verify: none` con su `verify_note`",
+                     rid="decision-sin-verify")
 
     def report(self) -> int:
         errors = [i for i in self.issues if i[0] == "ERROR"]

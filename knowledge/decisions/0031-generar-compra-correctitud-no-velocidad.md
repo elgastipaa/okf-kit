@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*traiga su propio check de drift"
 origen: dictado
 title: La capa generada se instala por correctitud, no por velocidad
 description: "Generar hechos volátiles del código evita que el bundle mienta, pero no reduce los turnos; el kit lo pide por lo primero y no promete lo segundo."

@@ -1,6 +1,8 @@
 ---
 type: Decision
 status: accepted
+verify: none
+verify_note: "el dogfood del kit no tiene glosario — es un repo de tooling, no de dominio"
 title: Glosario de dominio + code-of-record para abaratar preguntas a nivel término
 description: El kit ofrece un template de glosario que rutea término→página canónica→archivo del valor, porque las preguntas de término eran las más caras en turnos.
 tags: [okf, glossary, routing, efficiency, eval]

@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+verify: grep -q "Capas NO autoritativas" templates/AGENTS.md
 title: Declarar capas no-autoritativas en el entrypoint para no reconciliar basura
 description: El AGENTS.md template lista los dirs scratch/legacy que NO son estado, porque las preguntas adversariales (código vs notas viejas) explotan en turnos.
 tags: [okf, authority, staleness, efficiency, eval]

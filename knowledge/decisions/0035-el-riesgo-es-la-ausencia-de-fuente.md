@@ -1,6 +1,8 @@
 ---
 type: Decision
 status: accepted
+verify: none
+verify_note: documenta una regla que NO se agregó; no hay código que pueda violarla
 origen: dictado
 title: El riesgo no es que la fuente la haya escrito una IA, es que no haya fuente
 description: "Cosechar de un documento escrito preservó decisiones reales aunque lo hubiera tecleado una IA, así que el kit no agrega gating por autoría de la fuente."

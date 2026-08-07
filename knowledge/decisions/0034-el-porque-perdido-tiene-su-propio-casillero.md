@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*atado a declarar el hueco"
 origen: dictado
 title: Una decisión puede ser normativa sin porqué recuperable, y eso se declara
 description: "origen: confirmado cubre el caso real de una decisión que alguien tomó y cuyo razonamiento se perdió; obliga a declarar el hueco en vez de redactarlo."

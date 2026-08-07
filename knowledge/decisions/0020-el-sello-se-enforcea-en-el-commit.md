@@ -3,6 +3,7 @@ type: Decision
 title: El sello de frescura se enforcea en el commit, porque es la base de la detección de drift
 description: "El hook avisa si un concepto se editó sin bumpear su timestamp, porque okf_stale.py calcula todas sus señales desde ese valor y un sello podrido degrada la detección del bundle entero."
 status: accepted
+verify: grep -q "timestamp" templates/hooks/pre-commit
 tags: [drift, enforcement, hook]
 timestamp: 2026-07-30T00:00:00Z
 resource: ../../templates/hooks/pre-commit

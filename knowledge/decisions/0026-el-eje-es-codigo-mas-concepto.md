@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*ofrece codigo/concepto/mixto"
 title: El kit sigue siendo multipropósito, pero sobre un eje — código + concepto
 description: "Se retira el perfil datos y wiki se renombra a concepto: el eje no es la industria del repo sino si documentás cómo funciona algo o qué significa algo."
 tags: [okf, perfiles, alcance, mercado]

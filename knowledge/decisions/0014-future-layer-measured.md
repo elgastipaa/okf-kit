@@ -3,6 +3,8 @@ type: Decision
 title: "La capa de futuro se queda, con una condición medida: el roadmap solo paga si es correcto y auto-contenido"
 description: Medido en dos repos con n=3 — un roadmap vigente y auto-contenido baja las preguntas de rumbo de 12 a 4 turnos; uno desactualizado o que solo rutea cuesta más que no tenerlo.
 status: accepted
+verify: none
+verify_note: la condición se estableció midiendo; re-medirla cuesta plata y no la corre un check
 tags: [future-work, measurement, roadmap, negative-result]
 timestamp: 2026-07-26T00:00:00Z
 ---

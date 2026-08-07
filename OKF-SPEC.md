@@ -103,6 +103,12 @@ claves desconocidas y NO DEBEN rechazar documentos por campos no reconocidos.
 manda el documento frente al código (§3.5). Si falta, se deduce del `type`
 (`reference/profiles.md`); solo hace falta escribirla cuando el `type` no lo deja claro.
 
+**Cómo se falsea (opcional, para decisiones):** `verify: <comando>` declara qué comando falla
+si el código dejó de cumplir la decisión; `verify: none` + `verify_note: <por qué>` declara que
+no se puede chequear mecánicamente. El valor está en contestar la pregunta **al escribir la
+decisión**. Si algún documento del bundle lo declara, se espera que todas las `accepted` lo
+hagan: media adopción es peor que ninguna, porque las que no lo traen parecen chequeadas.
+
 **Origen del porqué (opcional, para decisiones):** `origen: dictado | reconstruido |
 confirmado` declara de dónde salió la razón que el documento afirma. `dictado` = lo contó una
 persona. `reconstruido` = se dedujo leyendo el código. `confirmado` = alguien confirma que la

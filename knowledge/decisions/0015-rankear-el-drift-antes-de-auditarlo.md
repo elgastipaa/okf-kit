@@ -3,6 +3,7 @@ type: Decision
 title: "El drift se rankea antes de auditarlo: la auditoría no se corre porque es cara, no porque falte"
 description: Un script determinista usa resource + timestamp + git para decir dónde buscar divergencia, y el Nivel 2 gana el método que solo tenía el Nivel 4.
 status: accepted
+verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*da método al Nivel 2"
 resource: templates/scripts/okf_stale.py
 tags: [verification, drift, enforcement]
 timestamp: 2026-07-26T00:00:00Z

@@ -272,6 +272,17 @@ def _(d): edit(d, "templates/knowledge/_decision.md",
                 "**Obliga a dejar la pregunta abierta**", "Podés dejar la pregunta abierta")
 
 
+@case("el CI del kit empieza a ejecutar okf_decisions (ejecución arbitraria)", True)
+def _(d): edit(d, "templates/ci/okf.yml", "      - name: okf_refs",
+                "      - name: okf_decisions\n        run: python3 scripts/okf_decisions.py\n\n      - name: okf_refs")
+
+
+@case("okf_decisions pierde la advertencia de que ejecuta comandos", True)
+def _(d): edit(d, "templates/scripts/okf_decisions.py",
+                "**ESTE SCRIPT EJECUTA COMANDOS ESCRITOS EN MARKDOWN.**",
+                "Este script corre los chequeos declarados.")
+
+
 @case("okf_refs deja de instalarse en el repo destino", True)
 def _(d): edit(d, "scripts/okf_install.py",
                 '"okf_stale.py", "okf_refs.py"', '"okf_stale.py"')

@@ -41,6 +41,19 @@ el que convierte un `code-of-record` en una mentira sin que nadie se entere. **N
 concepto es verdad**: eso es el Nivel 2. Si reporta algo, gana el código: se corrige el
 concepto. Si la referencia es a algo externo, se saca con `--ignore`, no editando el script.
 
+Y si el bundle declara `verify:` en sus decisiones, corré también:
+
+```
+python3 scripts/okf_decisions.py knowledge/decisions
+```
+
+Corre **en la dirección contraria** a todo lo demás: una decisión `accepted` es normativa, así
+que un hallazgo acá significa que **el código está en violación**, no que el documento quedó
+viejo. Las salidas son arreglar el código o superseder la decisión — **nunca** editar la
+decisión para que coincida con lo que el código hace hoy.
+**Ojo: ejecuta comandos escritos en markdown.** Si el bundle no es tuyo, mirá primero con
+`--list`.
+
 Exit 0 = conforme (warnings permitidos), 1 = errores. Reportá su output tal cual en
 la sección Nivel 1 del reporte.
 

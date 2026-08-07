@@ -70,7 +70,8 @@ SKILL_FUTURE = "okf-plan"
 # Subagentes. Van al repo destino y NO los shippea el plugin, por lo mismo que los skills de
 # mantenimiento: un clone sin el plugin tiene que seguir teniéndolos (decisión 0013).
 AGENTS = ["okf-reviewer"]
-SCRIPTS = ["okf_lint.py", "okf_coldtest.py", "okf_stale.py", "okf_refs.py"]
+SCRIPTS = ["okf_lint.py", "okf_coldtest.py", "okf_stale.py", "okf_refs.py",
+           "okf_decisions.py"]
 
 # Un comentario HTML termina en el PRIMER `-->`. El `.*?` ingenuo se trunca cuando el
 # cuerpo del comentario cita un `-->` (mismo bug que cazó el selfcheck en 0.6.0).

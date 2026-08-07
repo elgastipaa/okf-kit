@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*okf-init manda a generar"
 title: Hechos volátiles se generan del código, no se copian a mano
 description: El kit ofrece un template y una convención para generar los hechos volátiles desde el código (script + check de frescura en CI), como punto medio entre copiar (drift) y solo apuntar.
 tags: [okf, generated, drift, efficiency, eval]

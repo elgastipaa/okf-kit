@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+verify: ! grep -rqE "^\s*(import|from) (yaml|requests|pytest|click|rich|numpy)" templates/scripts scripts
 title: Sin apps externas; vendor-neutral; solo stdlib en el tooling
 description: OKF es markdown + git; el único extra es un linter Python stdlib-only, sin pip ni apps.
 resource: ../../README.md

@@ -1,6 +1,8 @@
 ---
 type: Decision
 status: accepted
+verify: none
+verify_note: es lo que el kit promete; lo falsea una medición, no un comando
 origen: dictado
 title: "Lo que el kit promete: preserva porqués y produce preguntas, no acelera la recuperación de hechos"
 description: "El −34% que el kit citaba como su mejor número lo produjo el autor humano de esa capa, no el formato; instalar el kit a ciegas no lo reproduce y la promesa se corrige."
