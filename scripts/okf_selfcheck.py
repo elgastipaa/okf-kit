@@ -657,6 +657,20 @@ check(near(_migr, "generalos", "okf-init", "correctitud"),
       "migrar conteos y flags copiados a mano solo mueve el drift de lugar, y le suma la "
       "autoridad recién estrenada del bundle")
 
+# El tercer valor de `origen` es el que más fácil se vuelve un agujero: es exactamente el
+# casillero que un agente usaría para escapar del ERROR de `reconstruido` si el template no
+# dijera que obliga a declarar el hueco. Si el template lo ofrece sin esa condición, el kit
+# estaría repartiendo el atajo.
+_dec_tpl = read_required("templates/knowledge/_decision.md") or ""
+# Se exige el IMPERATIVO ("Obliga" + que el linter lo exige), no que los tres términos
+# coocurran: "podés dejar la pregunta abierta" contiene las mismas palabras y convierte la
+# condición en una sugerencia, que es justo la regresión que importa.
+check(near(_dec_tpl, "origen: confirmado", "Obliga a dejar la pregunta abierta",
+           "el linter lo exige"),
+      "el template ofrece `origen: confirmado` atado a declarar el hueco del porqué",
+      "sin esa condición, `confirmado` es permiso para redactar un Contexto convincente "
+      "esquivando el ERROR de `reconstruido`")
+
 _init_door = read_required("templates/skills/okf-init/SKILL.md") or ""
 check(near(_init_door, "# Por dónde empezar", "1-3 archivos", "carpeta"),
       "okf-init completa la puerta con las preguntas del repo, no con categorías",

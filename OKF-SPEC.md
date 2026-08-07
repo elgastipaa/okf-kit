@@ -103,11 +103,14 @@ claves desconocidas y NO DEBEN rechazar documentos por campos no reconocidos.
 manda el documento frente al código (§3.5). Si falta, se deduce del `type`
 (`reference/profiles.md`); solo hace falta escribirla cuando el `type` no lo deja claro.
 
-**Origen del porqué (opcional, para decisiones):** `origen: dictado | reconstruido` declara
-de dónde salió la razón que el documento afirma. `dictado` = lo contó una persona.
-`reconstruido` = se dedujo leyendo el código. **Una decisión `reconstruido` NO DEBE llevar
-`status: accepted`**: una reconstrucción no manda sobre el código hasta que alguien que sabe
-la confirme. Si falta la clave, se asume `dictado`.
+**Origen del porqué (opcional, para decisiones):** `origen: dictado | reconstruido |
+confirmado` declara de dónde salió la razón que el documento afirma. `dictado` = lo contó una
+persona. `reconstruido` = se dedujo leyendo el código. `confirmado` = alguien confirma que la
+decisión se tomó, pero **el porqué no se recuperó**. **Una decisión `reconstruido` NO DEBE
+llevar `status: accepted`**: una reconstrucción no manda sobre el código hasta que alguien que
+sabe la confirme. Una `confirmado` **sí puede** ser normativa —lo que falta es la razón, no la
+decisión— pero **DEBE dejar la pregunta abierta** en el documento, o el valor se vuelve un
+atajo para afirmar un porqué que nadie tiene. Si falta la clave, se asume `dictado`.
 
 Existe porque el modo de falla más caro de una capa de contexto no es que le falte
 información: es que **fabrique** una. Un agente al que le pedís el porqué de algo que nadie

@@ -267,6 +267,11 @@ def _(d): (d / "templates/scripts/okf_lint.py").write_text("", encoding="utf-8")
 def _(d): (d / "templates/knowledge/_decision.md").unlink()
 
 
+@case("el template ofrece `confirmado` sin atarlo a declarar el hueco", True)
+def _(d): edit(d, "templates/knowledge/_decision.md",
+                "**Obliga a dejar la pregunta abierta**", "Podés dejar la pregunta abierta")
+
+
 @case("la capa generada vuelve a existir solo en okf-init", True)
 def _(d):
     p = d / "templates/skills/okf-migrate/SKILL.md"

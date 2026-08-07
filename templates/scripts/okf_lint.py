@@ -56,7 +56,7 @@ AUTHORING_DEFAULTS = ("title", "description", "timestamp")
 # pasaba en silencio: una clave que se escribe y nadie lee no declara nada.
 AUTHORITY_VALUES = ("normative", "descriptive")
 # `origen` declara de dónde salió el porqué de una decisión. Ver OKF-SPEC §3.1.
-ORIGEN_VALUES = ("dictado", "reconstruido")
+ORIGEN_VALUES = ("dictado", "reconstruido", "confirmado")
 LINK_RE = re.compile(r"\[[^\]]*\]\(\s*([^)\s]+)")
 # Una entrada de index: `* [Título](archivo.md) - description del concepto`. El guion
 # puede ser ASCII o em-dash, y el bullet `*` o `-`.
@@ -223,6 +223,19 @@ class Linter:
             self.add("WARN", path, 1,
                      f"`origen: {origen}` no está en el vocabulario "
                      f"({' | '.join(ORIGEN_VALUES)}) — no declara nada", rid="origen-vocab")
+        # `confirmado` = una persona confirma que la decisión se tomó, pero el PORQUÉ no se
+        # recuperó. Es un estado real y frecuente —medido: el dueño de un repo confirmó dos
+        # reglas y a la vez no supo decir por qué— que el vocabulario de dos valores obligaba
+        # a mentir en algún sentido. Puede ser normativa: lo que no se sabe es la razón, no la
+        # decisión. Pero es exactamente el casillero que un agente apurado usaría para escapar
+        # del ERROR de `reconstruido`, así que **tiene que declarar el hueco**: sin la pregunta
+        # abierta, `confirmado` sería un permiso para redactar un Contexto convincente.
+        if origen == "confirmado" and not QUESTION_RE.search(text):
+            self.add("ERROR", path, 1,
+                     "`origen: confirmado` sin una pregunta abierta: si el porqué no se "
+                     "recuperó, decilo con `> Pendiente de confirmar: …` en vez de redactar "
+                     "un Contexto que suene bien. Si el porqué SÍ lo sabés, va `dictado`",
+                     rid="origen-confirmado-sin-pregunta")
         if origen == "reconstruido" and status == "accepted":
             self.add("ERROR", path, 1,
                      "`origen: reconstruido` con `status: accepted`: una razón deducida del "

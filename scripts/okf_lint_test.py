@@ -235,6 +235,24 @@ def _(d):
          "status: accepted", "status: accepted\norigen: dictado")
 
 
+@case("una decisión confirmada que no declara el hueco del porqué",
+      "origen-confirmado-sin-pregunta")
+def _(d):
+    edit(d, "decisions/0001-relative-links-over-absolute.md",
+         "status: accepted", "status: accepted\norigen: confirmado")
+
+
+@case("una decisión confirmada que SÍ declara el hueco, normativa", None)
+def _(d):
+    # El caso legítimo: la decisión obliga (alguien confirma que se tomó) y el porqué queda
+    # como deuda visible, que además entra sola en `--questions`.
+    edit(d, "decisions/0001-relative-links-over-absolute.md",
+         "status: accepted", "status: accepted\norigen: confirmado")
+    edit(d, "decisions/0001-relative-links-over-absolute.md", "# Contexto",
+         "# Contexto\n\n> Pendiente de confirmar: por que se decidio esto. La decision esta\n"
+         "> confirmada; el razonamiento no quedo registrado.")
+
+
 @case("--questions saca a la superficie una pregunta abierta", None, questions_expect=1)
 def _(d):
     edit(d, "decisions/0001-relative-links-over-absolute.md", "# Contexto",

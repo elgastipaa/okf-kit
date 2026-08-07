@@ -30,6 +30,16 @@ timestamp: {{YYYY-MM-DDTHH:MM:SSZ}}
      `origen: reconstruido`  — lo dedujiste vos leyendo el código. **NO puede ser
                                `accepted`**: el linter lo rechaza. Va `proposed` hasta que
                                alguien que sabe la confirme.
+     `origen: confirmado`    — alguien confirma que la decisión **se tomó**, pero **el porqué
+                               no se recuperó**. Puede ser `accepted`: lo que falta es la
+                               razón, no la decisión. **Obliga a dejar la pregunta abierta**
+                               (`> Pendiente de confirmar: …`) y el linter lo exige — si no,
+                               este valor sería el atajo para redactar un Contexto convincente
+                               esquivando el ERROR de `reconstruido`.
+
+     El tercero existe porque el estado es real y frecuente: midiendo un repo vibecodeado, su
+     dueño **confirmó que había decidido** dos reglas y en la misma sesión **no supo decir por
+     qué**. Con dos valores había que mentir en algún sentido.
 
      **Y SI NADIE SABE POR QUÉ, NO ESCRIBAS UNA DECISIÓN.** Esa es la trampa: el código
      muestra QUÉ se hizo, y es facilísimo redactar un Contexto convincente sobre por qué
