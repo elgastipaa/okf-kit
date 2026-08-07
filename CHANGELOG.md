@@ -10,6 +10,54 @@ Revisiones de **este kit de templates** (`okf-kit`). Formato basado en
 > en su `log.md`, para que el repo sepa de qué revisión nació. La fuente de verdad
 > de la versión es el archivo `VERSION`.
 
+## 0.12.0 — Los repos viejos dejan de estar estrangulados
+
+Se midió si el kit es **re-aplicable** a un repo que ya lo tenía, corriendo `--upgrade` sobre
+uno real instalado con la v0.6.2. La respuesta era **no**, por dos motivos distintos.
+
+### `--adopt` — el material sin sello ya no es un callejón
+Cada archivo que el kit instala lleva su versión y un hash, y eso distingue *"es mi copia
+vieja"* de *"lo editaste vos"*. Un repo instalado **antes de que el sello existiera** no tiene
+ninguno, así que el upgrade se abstenía **siempre**: ese repo quedaba para siempre con el
+material con el que nació. Medido: su linter tenía **320 líneas contra 713**, sin
+`--questions`, `--budget`, `--pack` ni `--skip`.
+
+`--adopt` reemplaza también lo sin sello, **archivo por archivo y solo si git lo puede
+devolver**: si alguno tiene cambios sin commitear, ese se omite y se te nombra.
+
+### `okf_lint --modernize` — lo que un upgrade NO puede arreglar
+`--upgrade` mueve la **maquinaria**; la **forma del bundle** no la puede mover un script.
+Armar la puerta con las preguntas reales del repo o clasificar el `origen` de una decisión
+vieja es criterio. Resultado: un repo instalado hace seis versiones se queda con la forma
+vieja y **nadie se entera**, porque el `kit_version` dice que está al día — la maquinaria lo
+está.
+
+`--modernize` lista lo que un bundle nuevo tendría y este no, con la versión desde la que
+existe cada cosa. Vive en el linter y no en prosa **a propósito**: una lista de "lo que cambió
+de forma" escrita en un documento queda vieja a la próxima versión.
+
+Se estrenó cazando al kit: su propio bundle no tenía la puerta que la 0.9.0 instala en todos
+los demás, y 26 de 37 decisiones no declaraban `origen`.
+
+### `example/` — qué produce el kit, sin creerle a nadie
+Un acortador de links real (stdlib + SQLite, 10 archivos) sobre el que se corrió `okf-init` **a
+ciegas**. Documentando el código **encontró dos bugs que su autor no sabía** —uno tapado por un
+test que medía otra cosa y pasaba con la propiedad rota—, dejó 8 preguntas abiertas, y las tres
+decisiones que dedujo quedaron en `proposed` en vez de arrogarse autoridad.
+
+Vive **dentro del kit y no en un repo aparte** para poder gatearlo: el CI verifica su linter,
+sus referencias, sus tests y que su `kit_version` sea el actual. Un ejemplo que muestra un kit
+viejo es peor que no tener ejemplo.
+
+### Además
+- `okf_stale` avisa cuando **el chequeo de una decisión puede estar custodiando la regla
+  vieja** (el doc se editó después de fijar su `verify:`). Medido sobre 50 decisiones reales:
+  dispara en 2, y las dos eran legítimas.
+- `okf_refs --symbols` **declara que es ruidoso**: validado sobre cinco bundles, sus únicos
+  hallazgos fueron APIs externas. Sigue fuera del default y ahora lo dice.
+- Un parser del kit se comía la comilla de cierre de un valor que **contiene** comillas.
+  Aparecía en tres herramientas.
+
 ## 0.11.0 — Dos herramientas nuevas para lo que el kit no chequeaba: si el bundle dice la verdad
 
 El linter valida **estructura** y `okf_stale` **rankea** por antigüedad. Ninguna miraba si lo

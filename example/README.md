@@ -3,13 +3,17 @@
 Un acortador de links de verdad: Python stdlib + SQLite, 10 archivos, tests en verde, **y sus
 bugs**. Está acá para que puedas ver qué produce el kit sobre código real en vez de creerme.
 
-**Nada de este bundle lo escribí a mano.** Se corrió `okf-init` en un proceso limpio, sin
-contarle nada del proyecto, y esto es lo que hizo.
+**El bundle no lo escribió nadie a mano.** Se corrió `okf-init` en un proceso limpio, sin
+contarle nada del proyecto, y `knowledge/` es lo que hizo. El `AGENTS.md` sigue el flujo normal
+de una instalación: el instalador escribe su parte —las secciones 1, 2, 3 y Procedimientos— y
+deja marcado lo que requiere criterio; el stack y las **reglas duras** se completaron después,
+que es lo que hace el dueño del repo en cualquier instalación real.
 
 ## Qué mirar, si tenés dos minutos
 
 | | |
 |---|---|
+| [`AGENTS.md`](AGENTS.md) | **El contrato**, lo único que un agente carga en *cada* turno: **6981 chars ≈ 1745 tokens**, de los cuales 826 son de este proyecto y el resto es del kit. Corré `okf_lint --budget` para ver el desglose por dueño. |
 | [`knowledge/index.md`](knowledge/index.md) | **La puerta.** Rutea por necesidad: *"si necesitás X, leé estos 1-3 archivos, y la fuente de verdad es esta"*. No es un índice por tipo. |
 | [`knowledge/references/codigos-cortos-en-db-nueva.md`](knowledge/references/codigos-cortos-en-db-nueva.md) | **El mejor hallazgo.** Documentando el código encontró que un piso de seguridad **no se aplicaba** — y que había un test que lo tapaba porque medía otra cosa. |
 | [`knowledge/decisions/`](knowledge/decisions/) | Las tres quedaron **`proposed`**, no `accepted`, con `origen: reconstruido`. Dedujo los porqués del código y **se negó a darles autoridad** hasta que una persona los confirme. |
