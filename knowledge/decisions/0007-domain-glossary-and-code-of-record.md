@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+origen: dictado
 verify: none
 verify_note: "el dogfood del kit no tiene glosario — es un repo de tooling, no de dominio"
 title: Glosario de dominio + code-of-record para abaratar preguntas a nivel término

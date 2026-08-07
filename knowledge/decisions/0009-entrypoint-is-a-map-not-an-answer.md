@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+origen: dictado
 verify: grep -q "MAPA, no la respuesta" templates/AGENTS.md
 title: El entrypoint es un mapa, no una respuesta — guardrail contra falsos positivos
 description: El template AGENTS.md instruye explícitamente no responder preguntas de dominio citando el propio contrato, porque una capa de contexto puede fabricar respuestas rápidas y equivocadas.

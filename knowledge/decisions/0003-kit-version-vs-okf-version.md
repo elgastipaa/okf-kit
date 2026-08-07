@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+origen: dictado
 verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*estampa kit_version == VERSION"
 title: kit_version y okf_version son dos versiones distintas
 description: okf_version versiona el formato; kit_version versiona esta guía+templates+tooling.

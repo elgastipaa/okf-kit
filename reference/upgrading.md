@@ -59,6 +59,24 @@ que te estás perdiendo — y de lo que hay que re-copiar.
    puede devolver**: si alguno tiene cambios sin commitear, ese se omite y se te nombra
    ([0029](../knowledge/decisions/0029-nunca-se-destruye-lo-que-git-no-puede-devolver.md)).
    Commiteá antes y mirá el `git diff` después.
+3b. **Modernizá la FORMA del bundle** — esto **no** lo hace `--upgrade`, y es lo que separa
+   "tengo las herramientas nuevas" de "tengo el bundle nuevo":
+
+   ```
+   python3 scripts/okf_lint.py knowledge --modernize
+   ```
+
+   Lista lo que un bundle instalado hoy tendría y este no, con la versión desde la que existe:
+   la puerta que rutea, el `origen:` de las decisiones, la capa generada, `checks.md`,
+   `verify:`. **Nada de eso lo puede hacer un script** —armar la puerta con las preguntas
+   reales del repo o clasificar el `origen` de una decisión es criterio—, y por eso el
+   `--upgrade` lo deja intacto y nadie se entera: el `kit_version` dice que el repo está al
+   día porque **la maquinaria** lo está.
+
+   Aplicá lo que liste, y **lo que no puedas saber preguntáselo al dueño**: el `origen` de una
+   decisión vieja casi nunca se deduce. Lo que quede sin respuesta va como
+   `> Pendiente de confirmar:` y se entrega con `--questions`.
+
 4. **El `AGENTS.md` se actualiza por secciones** (esto lo hace `--upgrade`). Es el único
    archivo que mezcla contenido del proyecto con contenido del kit, así que **no se reemplaza
    entero**: el instalador cambia solo `## 1.`, `## 2.`, `## 3.` y `## Procedimientos`, y deja

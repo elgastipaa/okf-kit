@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+origen: dictado
 verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*upgrade conserva el contenido del usuario"
 title: El contrato se actualiza por secciones, y por eso lo del kit y lo del usuario no se mezclan en un párrafo
 description: El instalador reemplaza solo sus propias secciones del AGENTS.md y conserva las del usuario, así que el contrato deja de estar congelado en la versión que lo instaló.

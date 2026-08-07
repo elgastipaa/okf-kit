@@ -3,6 +3,7 @@ type: Decision
 title: "Material instalado y contenido del bundle envejecen distinto, y cada uno tiene su camino"
 description: El bundle es del proyecto y lo mantiene okf-update; el contrato, skills y scripts son del kit y se reemplazan siguiendo reference/upgrading.md.
 status: accepted
+origen: dictado
 verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*documenta cómo subir el material instalado"
 resource: reference/upgrading.md
 tags: [installation, lifecycle, kit-version]

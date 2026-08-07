@@ -3,6 +3,7 @@ type: Decision
 title: "Descriptivo vs normativo: la autoridad frente al código corre según el tipo de documento"
 description: "Los conceptos descriptivos pierden contra el código; los normativos (decisiones aceptadas, convenciones, rumbo, cambios activos) obligan al código, y una violación se reporta en vez de emparejarse."
 status: accepted
+origen: dictado
 verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*define la regla canónica de autoridad"
 tags: [source-of-truth, future-work, spec-driven]
 timestamp: 2026-07-26T00:00:00Z

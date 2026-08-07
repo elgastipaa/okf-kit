@@ -35,6 +35,14 @@ ningún comando puede falsear).
 El linter se consume **desde `templates/`**: copiarlo a la raíz crearía dos copias, que es la
 deriva que el kit existe para evitar.
 
+# Por qué el kit NO tiene capa generada
+
+`okf_lint --modernize` la va a seguir ofreciendo, y la respuesta es **no**, evaluada: los
+únicos números que cita este bundle son **registros históricos** (`v0.7.6 — 96 asserts`), que
+están congelados a propósito y no driftean. No hay hechos volátiles que se pregunten seguido.
+Es el caso que la [0031](decisions/0031-generar-compra-correctitud-no-velocidad.md) llama
+*"no generes por generar"*: un generador es código a mantener.
+
 # Lo que ninguno de estos cubre
 
 Que el kit **sirva**. Eso no lo dice un chequeo determinista: lo dice la medición

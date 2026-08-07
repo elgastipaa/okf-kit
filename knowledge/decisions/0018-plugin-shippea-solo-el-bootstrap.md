@@ -3,6 +3,7 @@ type: Decision
 title: El plugin shippea solo el par de bootstrap, y no copia skills
 description: "El plugin de Claude Code apunta a templates/skills/ con rutas custom y solo distribuye okf-init y okf-migrate; los procedimientos de mantenimiento se copian al repo destino."
 status: accepted
+origen: dictado
 verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*plugin.json no ship"
 tags: [distribucion, plugin, anti-drift]
 timestamp: 2026-07-29T00:00:00Z

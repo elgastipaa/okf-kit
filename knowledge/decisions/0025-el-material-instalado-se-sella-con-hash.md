@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+origen: dictado
 verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*upgrade no pisa material instalado que el usuario editó"
 title: El material instalado se sella con hash, no solo con versión
 description: "Cada archivo que el kit instala lleva su versión y el hash de lo que se escribió, que es lo único que distingue una copia vieja del kit de un archivo que editó el usuario."

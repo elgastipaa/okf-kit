@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+origen: dictado
 verify: none
 verify_note: es el resultado de una medición revertida; su evidencia está en MEASUREMENT.md
 supersedes: 0022-el-bundle-tambien-es-un-mapa

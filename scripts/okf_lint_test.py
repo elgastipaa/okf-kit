@@ -83,7 +83,12 @@ def _(d): edit(d, "decisions/0012-descriptive-vs-normative.md",
 
 
 @case("subcarpeta que el index del padre no lista (subárbol invisible)", "no está listada")
-def _(d): edit(d, "index.md", "* [decisions](decisions/index.md)", "* ~~decisions~~")
+def _(d):
+    # La PUERTA del index también linkea `decisions/index.md`, así que sacar la entrada del
+    # listado ya no alcanza: hay que sacar las dos para que el subárbol quede invisible.
+    p = d / "index.md"
+    t = p.read_text(encoding="utf-8")
+    p.write_text(t.replace("decisions/index.md", "decisions/index.md-x"), encoding="utf-8")
 
 
 @case("entrada del index que divergió de la `description` del concepto", "no coincide")
@@ -163,7 +168,11 @@ def _(d):
 def _(d):
     # El índice de la carpeta lo lista bien, pero el índice RAÍZ deja de listar la carpeta:
     # los chequeos locales siguen contentos y el subárbol entero queda inalcanzable.
-    edit(d, "index.md", "](decisions/index.md)", "](decisions/index.md-roto)")
+    # Se rompen TODAS las apariciones: desde la 0.9.0 la puerta del index también la linkea,
+    # y romper solo la primera dejaba el subárbol alcanzable por la otra.
+    p = d / "index.md"
+    t = p.read_text(encoding="utf-8")
+    p.write_text(t.replace("](decisions/index.md)", "](decisions/index.md-roto)"), encoding="utf-8")
 
 
 @case("un concepto linkeado desde otro concepto, no desde un índice", None)
@@ -222,27 +231,28 @@ def _(d):
     # El estado exacto que produjo la peor falla que midió este kit: un agente redactó un
     # Contexto convincente para algo que NADIE decidió, y quedó `accepted` = normativo.
     edit(d, "decisions/0001-relative-links-over-absolute.md",
-         "status: accepted", "status: accepted\norigen: reconstruido")
+         "origen: dictado", "origen: reconstruido")
 
 
 @case("una decisión reconstruida que NO se declara normativa", None)
 def _(d):
     # Redacción legítima: reconstruir está bien mientras no se disfrace de mandato.
     edit(d, "decisions/0001-relative-links-over-absolute.md",
-         "status: accepted", "status: proposed\norigen: reconstruido")
+         "origen: dictado", "origen: reconstruido")
+    edit(d, "decisions/0001-relative-links-over-absolute.md", "status: accepted", "status: proposed")
 
 
 @case("una decisión dictada por una persona, normativa", None)
 def _(d):
     edit(d, "decisions/0001-relative-links-over-absolute.md",
-         "status: accepted", "status: accepted\norigen: dictado")
+         "origen: dictado", 'origen: "dictado"')
 
 
 @case("una decisión confirmada que no declara el hueco del porqué",
       "origen-confirmado-sin-pregunta")
 def _(d):
     edit(d, "decisions/0001-relative-links-over-absolute.md",
-         "status: accepted", "status: accepted\norigen: confirmado")
+         "origen: dictado", "origen: confirmado")
 
 
 @case("una decisión confirmada que SÍ declara el hueco, normativa", None)
@@ -250,7 +260,7 @@ def _(d):
     # El caso legítimo: la decisión obliga (alguien confirma que se tomó) y el porqué queda
     # como deuda visible, que además entra sola en `--questions`.
     edit(d, "decisions/0001-relative-links-over-absolute.md",
-         "status: accepted", "status: accepted\norigen: confirmado")
+         "origen: dictado", "origen: confirmado")
     edit(d, "decisions/0001-relative-links-over-absolute.md", "# Contexto",
          "# Contexto\n\n> Pendiente de confirmar: por que se decidio esto. La decision esta\n"
          "> confirmada; el razonamiento no quedo registrado.")

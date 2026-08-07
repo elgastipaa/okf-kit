@@ -3,6 +3,19 @@ okf_version: "0.1"
 kit_version: "0.11.0"
 ---
 
+# Por dónde empezar
+
+| Si necesitás… | Leé | Fuente de verdad |
+|---|---|---|
+| Entender qué es este kit y para quién | [`../README.md`](../README.md) · [roadmap](roadmap.md) | el dueño |
+| Saber si el kit sirve, con números | [`../MEASUREMENT.md`](../MEASUREMENT.md) | las mediciones |
+| Cómo sé que el kit anda / qué comandos correr | [`checks.md`](checks.md) | el repo |
+| Ver qué produce sobre código real | [`../example/README.md`](../example/README.md) | el ejemplo, que el gate mantiene al día |
+| Por qué una regla del kit es así | [`decisions/index.md`](decisions/index.md) | las decisiones (`accepted` = normativas) |
+| Cambiar el formato OKF en sí | [`../OKF-SPEC.md`](../OKF-SPEC.md) | la spec |
+| Tocar el instalador o el gate | [`architecture/index.md`](architecture/index.md) · [`checks.md`](checks.md) | el código de `scripts/` |
+| Saber qué NO hay que hacer | [roadmap](roadmap.md) (§No-goals) | el dueño |
+
 # Roadmap
 
 * [Rumbo del kit OKF](roadmap.md) - Hacia dónde va el kit hoy: ingeniería de contexto completa (pasado, presente y futuro) aplicable a cualquier repo sin tooling.

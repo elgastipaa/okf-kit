@@ -710,6 +710,18 @@ check(near(read_required("templates/scripts/okf_decisions.py") or "",
       "okf_decisions.py advierte que ejecuta comandos y ofrece verlos antes",
       "sin la advertencia, el usuario lo pone en CI sin saber qué está habilitando")
 
+# `--upgrade` mueve la maquinaria; la FORMA del bundle no la puede mover un script. Sin un
+# reporte que la liste, un repo instalado hace seis versiones se queda con la forma vieja y
+# nadie se entera — el `kit_version` dice que está al día porque la maquinaria lo está. La
+# lista vive en el linter y no en prosa a propósito: en un documento queda vieja a la próxima
+# versión, que es el pecado original de este kit.
+check("--modernize" in (read_required("templates/scripts/okf_lint.py") or ""),
+      "el linter reporta qué le falta a un bundle viejo (--modernize)")
+check(near(read_required("reference/upgrading.md") or "",
+           "--modernize", "no** lo hace `--upgrade`", "preguntáselo al dueño", window=900),
+      "el procedimiento de upgrade manda a modernizar la forma del bundle",
+      "sin esto el upgrade deja el bundle viejo y el kit_version dice que está al día")
+
 # --adopt destraba los repos instalados ANTES del sellado, que si no se quedan para siempre
 # con el material con el que nacieron (medido: un repo v0.6.2 tenía el linter de 320 líneas
 # contra 713). Pero pisa material del usuario, así que hereda la prudencia de la 0029: solo

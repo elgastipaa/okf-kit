@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: "superseded by 0023"
+origen: dictado
 supersedes: 0009-entrypoint-is-a-map-not-an-answer
 title: El bundle también es un mapa — la obligación de verificar es previa, no reactiva
 description: El guardrail contra respuestas rápidas y equivocadas se extiende del contrato a las páginas del bundle, y pasa de resolver conflictos a exigir la fuente antes de contestar.

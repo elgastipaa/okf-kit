@@ -532,6 +532,72 @@ class Linter:
 QUESTION_RE = re.compile(r"^\s*>\s*Pendiente de confirmar:\s*(.+)$", re.M)
 
 
+def modernize(bundle: Path) -> int:
+    """Qué le falta a un bundle viejo para tener la forma que el kit instala HOY.
+
+    Un `--upgrade` reemplaza la MAQUINARIA (scripts, skills, CI, contrato). La forma del
+    BUNDLE no la puede mover un script: armar la puerta con las preguntas reales del repo o
+    decidir el `origen` de una decisión es criterio. Sin este reporte, un repo instalado hace
+    seis versiones se queda con la forma vieja y nadie se entera — el `kit_version` dice que
+    está al día porque la maquinaria lo está.
+
+    Vive acá y no en prosa **a propósito**: una lista de "lo que cambió de forma" escrita en un
+    documento queda vieja en la próxima versión. Acá se actualiza en el mismo lugar donde se
+    agrega la regla.
+
+    Es un REPORTE: no falla nunca. Lo que liste se arregla con criterio, y lo que no se pueda
+    saber se le pregunta al usuario.
+    """
+    root = bundle / "index.md"
+    if not bundle.is_dir():
+        print(f"okf_lint: no existe el directorio '{bundle}'", file=sys.stderr)
+        return 2
+    faltan: list[tuple[str, str]] = []
+
+    if root.is_file() and "# Por dónde empezar" not in root.read_text(encoding="utf-8"):
+        faltan.append(("0.9.0", "el `index.md` no tiene la PUERTA que rutea por necesidad "
+                                "(`# Por dónde empezar`): una fila por pregunta que el repo "
+                                "recibe de verdad, a 1-3 archivos. Un índice por `type` hace "
+                                "navegar, y navegar cuesta casi lo mismo que grepear"))
+
+    decs = sorted((bundle / "decisions").glob("*.md")) if (bundle / "decisions").is_dir() else []
+    decs = [d for d in decs if d.name != "index.md"]
+    sin_origen = [d for d in decs if not re.search(r"^origen:", d.read_text(encoding="utf-8"), re.M)]
+    if sin_origen:
+        faltan.append(("0.8.0", f"{len(sin_origen)} de {len(decs)} decisiones no declaran "
+                                "`origen:`, así que todas afirman por default que **una "
+                                "persona dictó** ese porqué. Las que se dedujeron del código "
+                                "van `reconstruido` + `proposed`; si se decidió pero nadie "
+                                "recuerda por qué, `confirmado` con su pregunta abierta"))
+
+    if not any(p.is_dir() and p.name == "_generated" for p in bundle.rglob("*")):
+        faltan.append(("0.9.0", "no hay capa generada (`_generated/`). Si el repo tiene hechos "
+                                "que se preguntan seguido Y cambian seguido (conteos, flags, "
+                                "enums, rutas), generalos del código con su `--check`. Si son "
+                                "pocos y estables, un puntero alcanza: no generes por generar"))
+
+    if not (bundle / "checks.md").is_file():
+        faltan.append(("0.7.6", "falta `checks.md`: el concepto que contesta *¿cómo sé que "
+                                "esto anda?*. Si el repo no tiene chequeos automáticos, "
+                                "escribí eso — es información, y hoy es invisible"))
+
+    if decs and not any(re.search(r"^verify:", d.read_text(encoding="utf-8"), re.M) for d in decs):
+        faltan.append(("0.11.0", "ninguna decisión declara `verify:` (opcional). Es el comando "
+                                 "que falla si alguien la rompe; se contesta al escribirla, "
+                                 "que es cuando alguien todavía se acuerda de qué la protege"))
+
+    if not faltan:
+        print("okf_lint --modernize: el bundle ya tiene la forma que el kit instala hoy.")
+        return 0
+
+    print(f"okf_lint --modernize: {len(faltan)} cosa(s) que un bundle nuevo tendría y este no.\n")
+    for desde, que in faltan:
+        print(f"  [desde v{desde}] {que}\n")
+    print("Nada de esto lo puede hacer un script: es criterio. Aplicalo, y las preguntas que\n"
+          "no puedas contestar dejalas como `> Pendiente de confirmar:` y entregáselas al dueño.")
+    return 0
+
+
 def questions(bundle: Path) -> int:
     """Lista las preguntas abiertas del bundle.
 
@@ -698,9 +764,14 @@ def main(argv: list[str]) -> int:
     do_questions = "--questions" in args
     if do_questions:
         args.remove("--questions")
+    do_modern = "--modernize" in args
+    if do_modern:
+        args.remove("--modernize")
     bundle = Path(args[0]) if args else Path("knowledge")
     if do_pack:
         return pack(bundle)
+    if do_modern:
+        return modernize(bundle)
     if do_questions:
         return questions(bundle)
     if do_budget:

@@ -3,6 +3,7 @@ type: Decision
 title: "El material instalado es autosuficiente y se recorta con marcadores, no con prosa"
 description: "Lo que el kit copia a un repo destino no puede citar rutas del kit ni depender de instrucciones de borrado en prosa; ambas cosas las verifica el selfcheck."
 status: accepted
+origen: dictado
 verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*no cita rutas que solo existen en el kit"
 tags: [installation, source-of-truth, enforcement]
 timestamp: 2026-07-26T00:00:00Z

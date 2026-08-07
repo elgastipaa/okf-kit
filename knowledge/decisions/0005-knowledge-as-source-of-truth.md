@@ -1,6 +1,7 @@
 ---
 type: Decision
 status: accepted
+origen: dictado
 verify: none
 verify_note: es la premisa del kit entero, no una regla que un comando pueda falsear
 title: El bundle en git es la fuente de verdad, no la memoria de la herramienta

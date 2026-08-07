@@ -3,6 +3,7 @@ type: Decision
 title: La auditoría del bundle la corre un revisor que no vio el trabajo
 description: "Los Niveles 2 y 4 de verificación se delegan a contexto fresco con un revisor que no puede editar, porque quien escribió un concepto o el código no puede auditarlo sin sesgo."
 status: accepted
+origen: dictado
 verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*revisor con contexto fresco"
 tags: [verificacion, roles, drift, cumplimiento]
 timestamp: 2026-07-30T00:00:00Z

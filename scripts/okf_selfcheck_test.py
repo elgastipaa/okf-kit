@@ -283,6 +283,15 @@ def _(d): edit(d, "templates/scripts/okf_decisions.py",
                 "Este script corre los chequeos declarados.")
 
 
+@case("el upgrade deja de mandar a modernizar la forma del bundle", True)
+def _(d):
+    p = d / "reference/upgrading.md"
+    t = p.read_text(encoding="utf-8")
+    a = t.index("3b. **Modernizá la FORMA del bundle**")
+    b = t.index("4. **El `AGENTS.md` se actualiza por secciones**")
+    p.write_text(t[:a] + t[b:], encoding="utf-8")
+
+
 @case("--adopt pierde el guard de trabajo sin commitear", True)
 def _(d): edit(d, "scripts/okf_install.py",
                 'if _uncommitted(target, [rel]):',

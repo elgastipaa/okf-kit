@@ -3,6 +3,7 @@ type: Decision
 title: La capa de futuro — roadmap como concepto + _changes/ efímera con harvest
 description: "El kit cubre el trabajo futuro con dos piezas: el rumbo vigente es un concepto (roadmap.md) y cada cambio no trivial es un doc efímero en _changes/ que muere en un harvest."
 status: accepted
+origen: dictado
 verify: python3 scripts/okf_selfcheck.py 2>&1 | grep -q "PASS.*nombra las tres piezas de la capa de futuro"
 tags: [future-work, spec-driven, roadmap]
 timestamp: 2026-07-26T00:00:00Z
